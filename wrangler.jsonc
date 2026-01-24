@@ -2,9 +2,6 @@
   "name": "bite-marks-2",
   "compatibility_date": "2026-01-24",
  	"main": ".svelte-kit/cloudflare/_worker.js",
-	"build": {
-		"command": "npm run build"
-	},
 	"assets": {
 		"binding": "ASSETS",
 		"directory": ".svelte-kit/cloudflare",

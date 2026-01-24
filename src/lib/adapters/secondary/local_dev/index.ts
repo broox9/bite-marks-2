@@ -1,7 +1,11 @@
 import type { PersistenceRepository } from "$lib/ports/persistence.repository";
-import { randomUUID } from "crypto";
+// import { randomUUID } from "crypto";
 import { readFile, writeFile } from "fs/promises";
-import { join } from "path";
+// import { join } from "path";
+//
+
+function join() { }
+function randomUUID() { }
 
 interface LocalData {
   masterPlaces: Record<string, any>;
@@ -82,4 +86,3 @@ export class InMemoryAdapter implements PersistenceRepository {
 const inMemoryAdapter = new InMemoryAdapter();
 
 export default inMemoryAdapter;
-
