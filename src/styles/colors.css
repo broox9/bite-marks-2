@@ -1,0 +1,54 @@
+:root {
+  /* primary color */
+  /*--primary: oklch(0.8 0.16 61);*/
+
+  /* CTA Color */
+  /* --cta-color: oklch(0.72 0.18 227); */
+  --cta-color: oklch(0.7152 0.1812 133.55); /* kelly green */
+  /* hover + active pushing */
+  --cta-light: oklch(0.8 0.18 227);
+  --cta-light-super: oklch(0.85 0.18 227);
+  --cta-dark: oklch(0.64 0.18 227);
+  --cta-dark-super: oklch(0.59 0.18 227);
+  /* hover + active pushing */
+
+  --cta-box-shadow: 4px 4px 8px 0 #bbb;
+
+  /* secondary color */
+  --accent: oklch(0.8 0.16 61);
+
+  /* backgrounds & neutrals */
+  --bg-color: #f5f5f5;
+  --bg-low-contrast: #e5e5e5;
+  /* medium ahd low swap in dark mode */
+  --bg-high-contrast: #444;
+  --bg-medium-contrast: #737373;
+
+
+
+  /* denotive colors */
+  --error: oklch(0.72 0.25 25);
+  --success: oklch(0.72 0.18 169);
+  /* if primary is green, can make it the same */
+  --disabled: #dedede;
+  /* straight up different */
+  --disabled-text: #aaa;
+
+
+}
+
+.dark {
+  --bg-color: #444;
+  /* was high contrast bg color */
+  --bg-low-contrast-neutral: #737373;
+  /* was medium contrast bg */
+  --bg-high-contrast: #f5f5f5;
+  /* was bg color */
+  --bg-medium-contrast: #e5e5e5;
+  /* was low contrast neutral bg color */
+  --disabled: #565656;
+  --disabled-text: #888;
+  --cta-box-shadow: 3px 5px 10px 0 #222;
+
+  background-color: var(--bg-color);
+}

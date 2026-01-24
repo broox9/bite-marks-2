@@ -1,0 +1,33 @@
+@import 'tailwindcss';
+
+/* src/app.css */
+@import './colors.css';
+@import './typography.css';
+@import './components.css';
+
+
+body {
+  padding: 0;
+  margin: 0;
+  font-family: system-ui, sans-serif;
+  /* background: light-dark(#f9f9f9, #222);
+  color: light-dark(#222, #fefefe); */
+  background: var(--bg-color);
+  color: var(--bg-high-contrast);
+
+  * {
+    box-sizing: border-box;
+  }
+}
+a {
+  color: var(--cta-color);
+  text-decoration: none;
+}
+
+a:hover {
+  color: var(--cta-dark);
+}
+
+a:active {
+  color: var(--cta-dark-super);
+}

@@ -1,0 +1,29 @@
+:root {
+  color-scheme: light dark;
+  --bg: oklch(0.96 0.01 105);
+  --bg-dark: oklch(from var(--bg) calc(l - 0.04) c h);
+  --bg-light: oklch(from var(--bg) calc(l + 0.04) c h);
+
+  --text: oklch(0.15 0.02 105);
+  --text-muted: oklch(0.7 0.02 105);
+  --highlight: oklch(1 0.02 105);
+
+  --border: oklch(0.6 0.02 105);
+  --border-muted: oklch(0.6 0.02 105);
+
+  --primary: oklch(0.4189 0.0858 187.63);
+  --primary-highlight: oklch(from var(--primary) 0.55 c h);
+  /* --primary-highlight: oklch(from var(--primary) calc(l - 0.1) l c h); */
+  --primary-light: oklch(from var(--primary) calc(l + 0.3) l c h);
+  --primary-desaturated: oklch(from var(--primary) l calc(c * 0.5) h);
+
+  --secondary: oklch(0.5488 0.1 105.28);
+  --secondary-highlight: oklch(from var(--secondary) calc(l - 0.1) c h);
+  --secondary-light: oklch(from var(--secondary) calc(l + 0.2) c h);
+  --secondary-desaturated: oklch(from var(--secondary) l calc(c * 0.6) h);
+
+  --danger: oklch(0.5 0.05 30);
+  --warning: oklch(0.5 0.05 100);
+  --success: oklch(0.5 0.05 160);
+  --info: oklch(0.5 0.05 260);
+}
