@@ -8,6 +8,8 @@
 		"build": "vite build",
 		"build:local": "export CF_P=1 && npm run build",
 		"preview": "vite preview",
+		"preview:worker": "wrangler dev .svelte-kit/cloudflare/_worker.js",
+		"deploy": "wrangler deploy",
 		"prepare": "svelte-kit sync || echo ''",
 		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
 		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch"
@@ -32,6 +34,7 @@
 	},
 	"dependencies": {
 		"@lucide/svelte": "^0.562.0",
+		"@sentry/sveltekit": "^10.38.0",
 		"@sveltejs/adapter-cloudflare": "^7.2.6",
 		"appwrite": "^21.5.0",
 		"node-appwrite": "^21.1.0",

@@ -43,13 +43,12 @@ function selectResult(selectedPlace: ResultPlaceRecord) {
 
 function resultSaveAction(result: any, selectedResult: ResultPlaceRecord) {
   console.log('[bs] resultSaveAction', [...arguments], selectedResult)
-    // selectResultController(selectedResult, () => void 0)
+    // selectResultController(selectedResult, () => undefined)
     // saveSpot({ spot: selectedResult }) // this happens in the ResultCard component
 }
 
 function resultClearAction() {
     selectedResult = null
-    // return void 0
 }
 
 // function listClearAction() {

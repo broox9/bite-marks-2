@@ -4,7 +4,7 @@
   import { getPlacePhotoUrl } from '$lib/adapters/secondary/google/google.svelte';
   import Card from "./util/Card.svelte";
 
-  let { place, saveAction, clearAction } : { place: ResultPlaceRecord, saveAction: (place: ResultPlaceRecord, result: any) => void, clearAction: () => void } = $props()
+  let { place, saveAction, clearAction } : { place: ResultPlaceRecord, saveAction: (place: ResultPlaceRecord, result: any) => undefined, clearAction: () => undefined } = $props()
   
   let photoUrl = $state<string | null>(null);
   let photoLoading = $state(true);

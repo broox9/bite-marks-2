@@ -1,3 +1,11 @@
+import { sequence } from "@sveltejs/kit/hooks";
+import {
+  initCloudflareSentryHandle,
+  sentryHandle,
+  handleErrorWithSentry,
+  // consoleLoggingIntegration,
+} from "@sentry/sveltekit";
+// import * as Sentry from "@sentry/sveltekit";
 import type { Handle } from "@sveltejs/kit";
 import {
   getSessionCookieName,
@@ -5,7 +13,19 @@ import {
   createSessionTablesDB,
 } from "$lib/adapters/secondary/appwrite/server-client.server";
 
-export const handle: Handle = async ({ event, resolve }) => {
+const sentryOptions = {
+  dsn: "https://7ab0ec7634448d8b30f20c5bcffb7121@o4510803666927616.ingest.us.sentry.io/4510803670663168",
+  tracesSampleRate: 1.0,
+  enableLogs: true,
+  // integrations: [
+  //   consoleLoggingIntegration({ levels: ["log", "warn", "error"] }),
+  // ],
+};
+
+export const handle: Handle = sequence(
+  initCloudflareSentryHandle(sentryOptions),
+  sentryHandle(),
+  async ({ event, resolve }) => {
   const sessionSecret = event.cookies.get(getSessionCookieName()) ?? "";
 
   event.locals.appwrite = {
@@ -22,4 +42,6 @@ export const handle: Handle = async ({ event, resolve }) => {
   }
 
   return resolve(event);
-};
+  }
+);
+export const handleError = handleErrorWithSentry();

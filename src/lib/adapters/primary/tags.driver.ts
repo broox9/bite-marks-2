@@ -39,7 +39,7 @@ export async function createTagController(params: {
   }
 }
 
-export async function listTagsController(params: { userId: string; callback: (tags: TagResult[]) => void }) {
+export async function listTagsController(params: { userId: string; callback: (tags: TagResult[]) => undefined }) {
   const { userId, callback } = params;
   try {
     const response: any = await database.listDocuments(DATABASE_ID, COLLECTIONS.tags, [
