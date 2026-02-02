@@ -41,8 +41,9 @@
 
 <div id="page-container">
   {#if showSearch}
-    <section id="search-container">
+    <section id="search-container" shouldModalBeOpen={showSearch}>
       <PlaceSearchTool selectResultAction={selectResultFn} />
+      <!-- this is the results dialog, not the search one -->
       <Dialog shouldModalBeOpen={!!selectedResultObj} onClose={resultClearAction}>
           {#if selectedResultObj}
               <ResultCard place={selectedResultObj} saveAction={resultSaveAction} clearAction={resultClearAction} />
@@ -52,7 +53,7 @@
   {/if}
 
   <section id="map-container">
-    OpenStreet Map here
+    Maps coming soon
   </section>
 
   <section id="spots-list">
@@ -91,15 +92,17 @@
 
 <style>
 #page-container {
-  display: grid;
+  display: flex;
+  flex-direction: column;
+  /*display: grid;
   grid-template-areas:
     "map"
     "spots"
     "search";
-  grid-template-rows: auto 1fr auto;
+  grid-template-rows: auto 1fr auto;*/
   /*grid-template-rows: auto 1fr;
   grid-template-columns: minmax(300px, 500px) 1fr;*/
-  height: 100%;
+  /*height: 100%;
   min-height: 0; /* Allow grid item to shrink below content size */
   /* max-height: 100svh; */
 }
@@ -108,31 +111,43 @@
   /* grid-area: bottom-sheet; /* grid stacking */
   grid-area: unset;
   /* background-color: hsla(200, 50%, 50%, 0.25); */
-  background-color: white;
+  background-color: hsl(from var(--bg-light) h s l / 0.85);
+  backdrop-filter: blur(3px);
   height: auto;
+  min-height: 20rem;
   padding: 0.75rem;
-  border-radius: 1rem 1rem 0 0;
+  border-radius: var(--border-radius);
+  box-shadow: 0 0 1rem rgba(0, 0, 0, 0.2);
   transition: all 0.3s ease;
-  /* transform: translateY(100%);
-  &.open {
-    transform: translateY(0);
-  }
-  &.closed {
-    transform: translateY(100%);
-  } */
+  position: fixed;
+  top: 3rem;
+  /*bottom: 50%;*/
+  left: 1rem;
+  right: 1rem;
+  z-index: 5;
 }
 
+
+
 #map-container {
+  --base-section-color: hsla(100 50% 50% / 0.25);
   grid-area: map;
-  background-color: hsla(100, 50%, 50%, 0.25);
+  background-color: var(--base-section-color);
+  color: hsla(from(var(--base-section-color) h s 75% / 1));
+  padding: var(--padding-2);
+  padding-bottom: var(--padding-3);
+  border-radius: var(--border-radius) var(--border-radius) 0 0;
 }
 
 #spots-list {
+  margin-top: calc(var(--padding-1) * -1);
+  background-color: var(--bg-light);
   grid-area: spots;
   overflow-y: auto;
   /* background-color: hsla(300 50% 50% / 0.1); */
   min-height: 0; /* Allow grid item to shrink below content size */
   padding-bottom: 3rem;
+  border-radius: var(--border-radius)  var(--border-radius) 0 0;
 }
 
 #floating-search-button {
@@ -142,7 +157,7 @@
     display: block;
     border-radius: 100svh;
     /* background-color: lightblue; */
-    padding: 0.75rem;
+    /*padding: 0.75rem;*/
     z-index: 5;
   }
 

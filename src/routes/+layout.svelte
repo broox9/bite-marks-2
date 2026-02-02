@@ -61,27 +61,31 @@
     <a href="/login">Login</a>
     <a href="/">Home</a>
     <button onclick={logout} type="button">Logout</button>
-    <button type='button' disabled={true}>disabled</button>
+    <!-- <button type='button' disabled={true}>disabled</button> -->
   </footer>
 </div>
 
 <style>
   #body-container {
-      width: 100%;
-      /*min-height: 100svh;*/
-      box-sizing: border-box;
-      display: grid;
-      grid-template:
-      "header"
-      "content";
-      grid-template-rows: auto 1fr;
-      height: 100vh;
-      overflow: hidden;
+    /*font-size: 16px;*/
+    width: 100%;
+    box-sizing: border-box;
+    padding-inline: 0.5rem;
+    display: grid;
+    grid-template:
+    "header"
+    "content";
+    grid-template-rows: auto 1fr;
+    height: 100vh;
+    /*overflow: hidden;*/
+    background: var(--bg-light);
   }
 
 
   #page-header {
     grid-area: header;
+    background: var(--bg-light);
+    padding: 0.25rem;
   }
 
   #page-header .sub-header {
@@ -90,7 +94,7 @@
 
   #page-content {
     grid-area: content;
-    overflow: hidden; /* Prevent page-level scrolling, allow children to scroll */
+    /*overflow: hidden; /* Prevent page-level scrolling, allow children to scroll */*/
     min-height: 0; /* Allow grid item to shrink below content size */
   }
 

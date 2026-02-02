@@ -11,6 +11,7 @@ https://typescale.net - typescale
   --padding-4: 2rem;
   --padding-5: 2.5rem;
   --padding-6: 3rem;
+  --border-radius: 0.75rem;
 }
 
 body {

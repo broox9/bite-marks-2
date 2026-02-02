@@ -5,7 +5,6 @@ import {
   handleErrorWithSentry,
   // consoleLoggingIntegration,
 } from "@sentry/sveltekit";
-// import * as Sentry from "@sentry/sveltekit";
 import type { Handle } from "@sveltejs/kit";
 import {
   getSessionCookieName,

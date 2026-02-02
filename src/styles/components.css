@@ -1,111 +1,17 @@
 @layer components {
 
-  form {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
-  label {
-    align-items: center;
-    margin-bottom: 0.5rem;
-  }
-
-  label>span {
-    margin-right: 0.5rem;
-    /* background-color: #fff; */
-    padding: 0.25rem;
-    position: relative;
-    z-index: 1;
-  }
-
-  label>input,
-  label>select {
-    padding: 0.5rem;
-    border: 1px solid #ccc;
-    border-radius: 0.25rem;
-    width: 100%;
-    background-color: var(--bg-light);
-  }
-
-  label>input:focus,
-  label>select:focus {
-    outline: none;
-    border-color: #007bff;
-    box-shadow: 0 0 0 2px #007bff;
-  }
-
-
-  /** INPUTS */
-  /* input[type="text"],
-  input[type="search"],
-  input[type="email"],
-  input[type="password"],
-  input[type="number"],
-  input[type="date"],
-  input[type="time"],
-  input[type="datetime"],
-  input[type="datetime-local"],
-  input[type="month"],
-  input[type="week"],
-  input[type="tel"], */
-  input:not([type="range"]),
-  select {
-    padding: 0.5rem;
-    border: 1px solid #ccc;
-    border-radius: 0.25rem;
-    width: 100%;
-    background-color: var(--bg-light);
-  }
-
-  label:has(button, input:not([type="range"])) {
-    /* border: none;
-    padding: none; */
-    display: flex;
-    border: 1px solid #ccc;
-    border-radius: 1rem;
-    width: 100%;
-    background-color: var(--bg-light);
-    padding: var(--padding-1);
-
-    &:focus-within {
-      outline: 1px solid var(--cta-color);
-    }
-    /* span {
-      display: block flex;
-      position: absolute;
-      position-anchor: top left;
-    } */
-    
-    > input, input:focus {
-      border: none;
-      padding: 0;
-      outline: none;
-      box-shadow: none;
-    }
-  }
-
-
   /** BUTTONS */
   button {
     --button-color: var(--cta-color);
     cursor: pointer;
     transition: all 0.3s ease;
-  }
-  
-  button:not(.icon-button) {
-    padding: var(--padding-1) var(--padding-2);
-    border-radius: 0.25rem;
-    cursor: pointer;
-    text-wrap: nowrap;
+    border-radius: var(--border-radius);
     border: 1px solid;
-    box-shadow: 4px 4px 8px -4px oklch(from var(--cta-color) l c h / 0.5);
-    transition: all 0.3s ease;
-
-    &:hover {
-      box-shadow: 12px 10px 12px -6px oklch(from var(--button-color) 0.9 c h / 0.75);
-    }
+    line-height: 1.5;
+    padding: var(--padding-2);
+    font-weight: 500;
   }
+
 
   button[type="button"] {
     background: oklch(from var(--button-color) 1 0 h);
@@ -127,21 +33,29 @@
     }
   }
 
-  /* button.clear {
-    padding: 0;
-    background: unset;
-    color: unset;
-    border: none;
-    border-radius: 0;
-  } */
+  button:not(.icon-button) {
+    padding: var(--padding-1) var(--padding-2);
+    cursor: pointer;
+    text-wrap: nowrap;
+    /*border: 1px solid;*/
+    box-shadow: 4px 4px 8px -4px oklch(from var(--cta-color) l c h / 0.5);
+    transition: all 0.3s ease;
 
-  /* button[type="submit"]:hover {
-    background-color: var(--cta-light);
+    &:hover {
+      box-shadow: 12px 10px 12px -6px oklch(from var(--button-color) 0.9 c h / 0.75);
+    }
   }
 
-  button[type="submit"]:active {
-    background-color: var(--cta-light-super);
-  } */
+  button.icon-button {
+    padding: var(--padding-1);
+    cursor: pointer;
+    text-wrap: nowrap;
+    line-height: 1;
+    border: none;
+    box-shadow: 4px 4px 8px -4px oklch(from var(--cta-color) l c h / 0.5);
+  }
+
+
 
   button[type="button"]:disabled,
   button[type="submit"]:disabled {
@@ -152,5 +66,92 @@
   }
 
 
-}
+  form {
+    /*background-color: rgb(255 0 0 / 0.25);*/
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+  }
 
+  /** INPUTS */
+  /* input[type="text"],
+  input[type="search"],
+  input[type="email"],
+  input[type="password"],
+  input[type="number"],
+  input[type="date"],
+  input[type="time"],
+  input[type="datetime"],
+  input[type="datetime-local"],
+  input[type="month"],
+  input[type="week"],
+  input[type="tel"], */
+  input:not([type="range"]),
+  select {
+    padding: var(--padding-2);
+    border: 1px solid var(--bg-low-contrast);
+    border-radius: var(--border-radius);
+    width: 100%;
+    background-color: var(--bg-light);
+  }
+
+
+  /* ** LABEL INPUT COMBOS */
+  label {
+    align-items: center;
+    margin-bottom: 0.5rem;
+  }
+
+  label>span {
+    margin-right: 0.5rem;
+    /* background-color: #fff; */
+    padding: 0.25rem;
+    position: relative;
+    z-index: 1;
+  }
+
+  label>input,
+  label>select {
+    padding: 0.5rem;
+    width: 100%;
+    background-color: var(--bg-light);
+  }
+
+  label>input:focus,
+  label>select:focus {
+    /*outline: none;*/
+    border-color: var(--accent-color);
+    box-shadow: 0 0 0 2px var(--accent-color);
+  }
+
+  label:has(button, input:not([type="range"])) {
+    /* border: none;
+    padding: none; */
+    display: flex;
+    border: 1px solid var(--bg-medium-contrast);
+    border-radius: 1rem;
+    width: 100%;
+    background-color: var(--bg-light-contrast);
+    padding: var(--padding-1);
+
+    &:focus-within {
+      outline: 1px solid var(--accent-color);
+    }
+    /* span {
+      display: block flex;
+      position: absolute;
+      position-anchor: top left;
+    } */
+
+    > input, input:focus {
+      padding: 0.25rem !important;
+      background-color: transparent;
+      border: none;
+      padding: 0;
+      outline: none;
+      box-shadow: none;
+    }
+  }
+
+
+}

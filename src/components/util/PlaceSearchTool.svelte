@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { X } from '@lucide/svelte';
   import type { ResultPlaceRecord } from "$lib/core/domain/Place/Place";
   import { resultsListController } from "$lib/adapters/primary/place-search.driver";
   import ResultList from '../ResultList.svelte';
@@ -12,14 +13,14 @@
 
   const resultHandler = (results  : ResultPlaceRecord[]) => {
       resultList = results
-  }  
+  }
 
   async function searchHandler(e: Event) {
       const value = (e.currentTarget as HTMLInputElement | null)?.value;
-      if (!value || value.length < 3) { 
+      if (!value || value.length < 3) {
           resultList = [];
           return
-      } 
+      }
       await resultsListController({value, type: 'places', callback: resultHandler})
   }
 
@@ -57,19 +58,19 @@
 
     <label for="search">
         <!-- <span>Search</span> -->
-        <input 
-            type="search" 
-            id="search" 
+        <input
+            type="search"
+            id="search"
             bind:value={currentSearchValue}
-            oninput={searchHandler} 
-            autocomplete="off" 
-            role="combobox" 
-            aria-autocomplete="list" 
-            aria-controls="results-list" 
+            oninput={searchHandler}
+            autocomplete="off"
+            role="combobox"
+            aria-autocomplete="list"
+            aria-controls="results-list"
             aria-expanded={!!resultList.length}
             placeholder="Search for a spot"
         />
-        <button type="button" class="clear" onclick={listClearAction}>Clear</button>
+        <button type="button" class="icon-button" onclick={listClearAction}><X size={20} /></button>
     </label>
 
     <section class='mt-4'>
