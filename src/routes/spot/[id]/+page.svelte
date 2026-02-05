@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { Star } from '@lucide/svelte';
   import { page } from '$app/state';
   import { getSpotById, updateSpot } from '$lib/adapters/primary/remote-handlers/spots.remote';
   import { invalidateAll } from '$app/navigation';
@@ -79,7 +80,7 @@
   }
 </script>
 
-<div class="container mx-auto p-4 max-w-2xl">
+<div class="container">
   {#if spotQuery.loading}
     <p>Loading spot...</p>
   {:else if spotQuery.error}
@@ -97,9 +98,9 @@
         </div>
       {:else if photoUrl}
         <div class="w-full rounded-lg overflow-hidden">
-          <img 
-            src={photoUrl} 
-            alt={spot.name} 
+          <img
+            src={photoUrl}
+            alt={spot.name}
             class="w-full h-48 object-cover"
           />
         </div>
@@ -113,37 +114,49 @@
           <p class="text-sm text-gray-500">Rating: {spot.rating}</p>
         {/if}
         {#if spot.websiteURI}
-          <a href={spot.websiteURI} target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:underline text-sm">
+          <a href={spot.websiteURI} target="_blank" rel="noopener noreferrer">
             Visit Website
           </a>
         {/if}
       </section>
 
       <!-- Editable Fields -->
-      <section class="space-y-4">
-        <h2 class="text-xl font-semibold">Your Notes</h2>
-
+      <section>
         <!-- Personal Rating -->
-        <div>
-          <label for="personal-rating" class="block text-sm font-medium mb-1">
-            Personal Rating
+        <section id="rating-section"class="flex flex-row">
+          <label for="personal-rating">
+            <span>My Rating</span>
+            <input
+              id="personal-rating"
+              type="number"
+              min="0"
+              max="5"
+              step="0.25"
+              bind:value={personalRating}
+              placeholder="Rate 0-5"
+            />
           </label>
-          <input
-            id="personal-rating"
-            type="number"
-            min="0"
-            max="5"
-            step="0.1"
-            bind:value={personalRating}
-            class="w-full px-3 py-2 border border-gray-300 rounded-md"
-            placeholder="Rate 0-5"
-          />
-        </div>
+
+          <div class="flex flex-row mb-0.5 py-4 gap-1">
+            {spot.rating}
+            <Star size={20} />
+          </div>
+
+          <!-- Is Visited -->
+          <label for="is-visited">
+            <input
+              id="is-visited"
+              type="checkbox"
+              bind:checked={isVisited}
+            />
+            Visited
+          </label>
+        </section>
 
         <!-- Personal Notes -->
         <div>
           <label for="personal-notes" class="block text-sm font-medium mb-1">
-            Personal Notes
+            My Notes
           </label>
           <textarea
             id="personal-notes"
@@ -154,18 +167,6 @@
           ></textarea>
         </div>
 
-        <!-- Is Visited -->
-        <div class="flex items-center">
-          <input
-            id="is-visited"
-            type="checkbox"
-            bind:checked={isVisited}
-            class="mr-2"
-          />
-          <label for="is-visited" class="text-sm font-medium">
-            I've visited this place
-          </label>
-        </div>
 
         <!-- Social Links -->
         <div>
@@ -206,8 +207,8 @@
 
         <!-- Save Button -->
         <div class="pt-4">
-          <button 
-            type="submit" 
+          <button
+            type="submit"
             onclick={handleSave}
             disabled={isSaving || !rowId}
             class="w-full px-4 py-2"
@@ -224,6 +225,85 @@
 
 <style>
   .container {
-    min-height: 100vh;
+    /*min-height: 100vh;*/
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: flex-start;
+    gap: 1rem;
+    margin-bottom: 1rem;
+  }
+
+
+  #rating-section {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: flex-end;
+    gap: 1rem;
+    margin-bottom: 1rem;
+  }
+
+  #personal-rating {
+    padding: var(--padding-1);
+    /*width: 6rem;*/
+  }
+
+  label:has(#personal-rating) {
+    flex-basis: 6.25rem;
+    width: 6.25rem;
+    flex-grow: 0;
+    flex-shrink: 0;
+  }
+
+  #is-visited {
+    appearance: none;
+    cursor: pointer;
+    border: none;
+    /*padding: var(--padding-1);*/
+    padding: 0;
+    display: inline-block;
+    position: relative;
+    width: 2rem;
+    height: 2rem;
+  }
+
+  #is-visited::before {
+    content: " ";
+    /*padding: var(--padding-1);*/
+    line-height: 2rem;
+    cursor: pointer;
+    display: inline-block;
+    position: absolute;
+    inset: 0;
+    width: 2rem;
+    height: 2rem;
+    border: 1px solid var(--bg-low-contrast);
+    /*outline: none;*/
+    background-color: transparent;
+    border-radius: var(--border-radius);
+  }
+
+  #is-visited:checked::before {
+    content: '✓';
+    /*line-height: 2rem;*/
+    color: white;
+    text-align: center;
+    vertical-align: middle;
+    font-size: 1rem;
+    background-color: var(--cta-color);
+    border-color: var(--cta-color);
+  }
+
+  label:has(#is-visited) {
+    display: block flex;
+    gap: 1ex;
+    /*flex-basis: 2.5rem;*/
+    /*width: 2.5rem;*/
+    flex-grow: 1;
+    flex-shrink: 0;
+    justify-self: flex-end;
+    margin-bottom: 0.5rem;
+    padding: var(--padding-1);
   }
 </style>

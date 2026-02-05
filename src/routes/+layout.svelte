@@ -67,20 +67,32 @@
 
 <style>
   #body-container {
+    position: relative;
     /*font-size: 16px;*/
     width: 100%;
     box-sizing: border-box;
     padding-inline: 0.5rem;
-    display: grid;
+    /*display: grid;*/
     grid-template:
     "header"
     "content";
     grid-template-rows: auto 1fr;
-    height: 100vh;
+    min-height: 100vh;
     /*overflow: hidden;*/
-    background: var(--bg-light);
+    background-color: var(--bg-light);
   }
 
+
+  footer {
+    width: 100%;
+    margin-top: 3.5rem;
+    background-color: var(--bg-light);
+    padding: 0.25rem;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 0.5rem;
+  }
 
   #page-header {
     grid-area: header;

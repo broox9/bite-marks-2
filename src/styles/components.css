@@ -78,7 +78,7 @@
   input[type="search"],
   input[type="email"],
   input[type="password"],
-  input[type="number"],
+
   input[type="date"],
   input[type="time"],
   input[type="datetime"],
@@ -86,7 +86,9 @@
   input[type="month"],
   input[type="week"],
   input[type="tel"], */
+  input:not([type="number"]),
   input:not([type="range"]),
+  input:not([type="checkbox"]),
   select {
     padding: var(--padding-2);
     border: 1px solid var(--bg-low-contrast);
@@ -100,6 +102,7 @@
   label {
     align-items: center;
     margin-bottom: 0.5rem;
+    width: 100%;
   }
 
   label>span {
@@ -121,12 +124,13 @@
   label>select:focus {
     /*outline: none;*/
     border-color: var(--accent-color);
-    box-shadow: 0 0 0 2px var(--accent-color);
+    /*box-shadow: 0 0 0 2px var(--accent-color);*/
   }
 
-  label:has(button, input:not([type="range"])) {
-    /* border: none;
-    padding: none; */
+  label:has(button) {
+    box-sizing: border-box;
+    border: none;
+    padding: none;
     display: flex;
     border: 1px solid var(--bg-medium-contrast);
     border-radius: 1rem;
@@ -143,7 +147,7 @@
       position-anchor: top left;
     } */
 
-    > input, input:focus {
+    > input:is(input):not([type="checkbox"]):not([type="radio"]):not([type="range"]), input:focus {
       padding: 0.25rem !important;
       background-color: transparent;
       border: none;

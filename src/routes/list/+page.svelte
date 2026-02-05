@@ -68,7 +68,10 @@
           <div>
             <strong>
               <a name={spot.id} aria-ignored="true"></a>
-              <a href="spot/{spot.id}">{spot.name}</a>{ spot.is_visited ? '☆' : ''}
+              <a href="spot/{spot.id}">{spot.name}</a>
+              {#if spot.is_visited}
+                <small class='visited-check'>✓</small>
+              {/if}
             </strong>
             <br />
             <small>{spot.address}</small>
@@ -150,6 +153,15 @@
   border-radius: var(--border-radius)  var(--border-radius) 0 0;
 }
 
+.visited-check {
+  display: inline-block;
+  /*width: 1rem;
+  height: 1rem;*/
+  border-radius: 50%;
+  color: var(--bg-low-contrast);
+  margin-left: 0.5rem;
+}
+
 #floating-search-button {
     position: fixed;
     bottom: 1.5rem;
@@ -158,6 +170,8 @@
     border-radius: 100svh;
     /* background-color: lightblue; */
     /*padding: 0.75rem;*/
+    background-color: var(--cta-color);
+    color: var(--bg-light);
     z-index: 5;
   }
 

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { X } from '@lucide/svelte';
+  import { X, Trash } from '@lucide/svelte';
   import type { ResultPlaceRecord } from "$lib/core/domain/Place/Place";
   import { resultsListController } from "$lib/adapters/primary/place-search.driver";
   import ResultList from '../ResultList.svelte';
@@ -70,7 +70,7 @@
             aria-expanded={!!resultList.length}
             placeholder="Search for a spot"
         />
-        <button type="button" class="icon-button" onclick={listClearAction}><X size={20} /></button>
+        <button type="button" class="icon-button" onclick={listClearAction}><Trash size={16} /></button>
     </label>
 
     <section class='mt-4'>
