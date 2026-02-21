@@ -127,7 +127,7 @@
   }
 
   #page-header .sub-header {
-    background-color: var(--bg-low-contrast);
+    background-color: hsl(57  100% 91% / 0.35);
     padding: 0.25rem;
     text-align: center;
   }

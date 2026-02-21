@@ -2,7 +2,8 @@
   import { X, Trash } from '@lucide/svelte';
   import type { ResultPlaceRecord } from "$lib/core/domain/Place/Place";
   import { resultsListController } from "$lib/adapters/primary/place-search.driver";
-  import ResultList from '../ResultList.svelte';
+  import ResultList from './ResultList.svelte';
+  import InputWithButton from './ui/InputWithButton.svelte';
 
   let currentSearchValue = $state('')
   let resultList = $state<ResultPlaceRecord[] | []>([])
@@ -53,28 +54,30 @@
     listClearAction()
 }
 
+  const anchorName = '--place-search-anchor'
 </script>
 
-
-    <label for="search">
-        <!-- <span>Search</span> -->
-        <input
-            type="search"
-            id="search"
-            bind:value={currentSearchValue}
-            oninput={searchHandler}
-            autocomplete="off"
-            role="combobox"
-            aria-autocomplete="list"
-            aria-controls="results-list"
-            aria-expanded={!!resultList.length}
-            placeholder="Search for a spot"
-        />
-        <button type="button" class="icon-button" onclick={listClearAction}><Trash size={16} /></button>
-    </label>
-
-    <section class='mt-4'>
+    <form>
+        <label for="search" class="ui-input-with-button" style="anchor-name: {anchorName};">
+            
+            <!-- <span>Search</span> -->
+            <input
+                type="search"
+                id="search"
+                bind:value={currentSearchValue}
+                oninput={searchHandler}
+                autocomplete="off"
+                role="combobox"
+                aria-autocomplete="list"
+                aria-controls="results-list"
+                aria-expanded={!!resultList.length}
+                placeholder="Search for a spot"
+            />
+            <button type="button" class="warning" onclick={listClearAction}><X size={18} /></button>
+        </label>
+    </form>
+    <section>
         {#if resultList.length > 0}
-            <ResultList items={resultList} onSelect={selectResult}/>
+            <ResultList items={resultList} onSelect={selectResult} anchorName={anchorName}/>
         {/if}
     </section>

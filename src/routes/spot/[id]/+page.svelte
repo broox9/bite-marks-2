@@ -126,7 +126,7 @@
       <!-- Editable Fields -->
       <section>
         <!-- Personal Rating -->
-        <section id="rating-section"class="flex flex-row">
+        <section id="rating-section"class="ui-input-with-button">
           <label for="personal-rating">
             <span>My Rating</span>
             <input

@@ -5,10 +5,10 @@
     getSpots,
     deleteUserSpot,
   } from "$lib/adapters/primary/remote-handlers/spots.remote";
-  import PlaceSearchTool from "../../components/util/PlaceSearchTool.svelte";
+  import PlaceSearchTool from "../../components/PlaceSearchTool.svelte";
   import Dialog from "../../components/util/Dialog.svelte";
   import ResultCard from "../../components/ResultCard.svelte";
-  import ResultListItem from "../../components/util/ResultListItem.svelte";
+  import ResultListItem from "../../components/ResultListItem.svelte";
   import type { ResultPlaceRecord } from "$lib/core/domain/Place/Place";
 
   // let spotsList :any[] = $state([])
@@ -92,7 +92,7 @@
     id="floating-search-button"
     type="button"
     class="icon-button"
-    onclick={() => (showSearch = true)}><Search size={20} /></button
+    onclick={() => (showSearch = true)}><Search size={20} strokeWidth={2}/></button
   >
 {:else}
   <button
@@ -174,11 +174,17 @@
     position: fixed;
     bottom: 1.5rem;
     right: 1rem;
-    display: block;
-    border-radius: 100svh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 42px;
+    width: 42px;
+    border-radius: 100%;
+    border: none;
+    box-shadow: var(--cta-box-shadow);
     /* background-color: lightblue; */
-    /*padding: 0.75rem;*/
-    background-color: var(--cta-color);
+    line-height: 1;
+    background-color: var(--accent-color);
     color: var(--bg-light);
     z-index: 5;
   }

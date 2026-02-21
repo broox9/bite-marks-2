@@ -35,6 +35,8 @@
   --bg-medium-contrast: oklch(0.467 0.0134 267.1);
 
 
+  --text-color: oklch(0.15 0.02 105);
+  --text-muted: oklch(0.7 0.02 105);
 
   /* denotive colors */
   --error: oklch(0.72 0.25 25);

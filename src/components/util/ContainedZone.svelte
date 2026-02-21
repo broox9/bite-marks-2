@@ -11,6 +11,7 @@
 <style>
   .contained-zone {
     max-width: 1024px;
+    margin: 0 auto;
     /* display: flex;
     justify-content: center;
     align-items: center; */
