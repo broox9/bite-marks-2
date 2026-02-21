@@ -7,6 +7,11 @@
   /*--cta-color: oklch(0.7152 0.1812 133.55); /* kelly green */
   /*--cta-color: oklch(0.7 0.1 149); /* sage green */
   --cta-color: oklch(0.7943 0.1796 70.67); /* bite orange */
+  --cta-color: oklch(0.78 0.14 85); /* warm mustard */
+  --cta-color: oklch(0.72 0.13 82); /* premium mustard */
+  --cta-color: oklch(0.82 0.16 90); /* Friendly Gold */
+  --cta-color: oklch(0.75 0.17 50); /* warm orange */
+  --cta-color: oklch(0.68 0.16 45); /* burnt orange */
 
   /* hover + active pushing */
   --cta-light: oklch(0.8 0.18 227);

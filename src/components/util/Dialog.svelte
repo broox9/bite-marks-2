@@ -52,10 +52,7 @@
 
   ::backdrop {
     position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
+    inset: 0;
     background-color: var(--bg-medium-contrast);
     backdrop-filter: blur(12px) sepia(70%) opacity(30%);
     opacity: 0.7;

@@ -1,51 +1,55 @@
 <script lang="ts">
-	import '../styles/app.css';
-  import type { LayoutProps, LayoutData, PageData} from './$types';
-  import { goto } from '$app/navigation';
-  import { page } from '$app/state';
+  import { Hamburger } from "@lucide/svelte";
+  import "../styles/app.css";
+  import type { LayoutProps, LayoutData, PageData } from "./$types";
+  import { goto } from "$app/navigation";
+  import { page } from "$app/state";
 
   // do these CLEAN, don't use them directily
-  import { storeDeleteUser } from '$lib/adapters/primary/stores/user.store.svelte';
-  import { locationStore } from '$lib/adapters/primary/stores/location.store.svelte';
+  import { storeDeleteUser } from "$lib/adapters/primary/stores/user.store.svelte";
+  import { locationStore } from "$lib/adapters/primary/stores/location.store.svelte";
 
-  import ContainedZone from '../components/util/ContainedZone.svelte';
+  import ContainedZone from "../components/util/ContainedZone.svelte";
 
-	let { data, children }: LayoutProps = $props();
+  let { data, children }: LayoutProps = $props();
   // const HOME_ROUTE = '/'
   // const LOGIN_ROUTE = '/login'
   // const isLoginPage = $derived(page.route === LOGIN_ROUTE) // makes changes reactive
-  let currentPlace = $derived(locationStore)
-
-  console.log('[bs] LAYOUT::layout effect', page.route, data )
+  let currentPlace = $derived(locationStore);
 
   const logout = async () => {
-    await storeDeleteUser()
-    goto('/login')
-  }
+    await storeDeleteUser();
+    goto("/login");
+  };
 </script>
 
-
 <div id="body-container">
-	<header id="page-header">
-    <ContainedZone cssClasses="flex justify-between center-align">
-      <div>
-        <!-- <img src="/new-bite-marks-logo.png" alt="Bite Marks" width="32" height="48" /> -->
-        <a href="/">Bite Marks</a>
-      </div>
+  <header id="page-header">
+    <ContainedZone>
+      <div class="main-header">
+        <strong>
+          <!-- <img src="/new-bite-marks-logo.png" alt="Bite Marks" width="32" height="48" /> -->
+          <a href="/">
+            <Hamburger size={24} />
+            Bite Marks
+          </a>
+        </strong>
 
-      <nav>
-        <ul class='flex flex-row gap-2'>
-          <li><a href="/list">Spots</a></li>
-          <li><a href="/">Search</a></li>
-          <li><a href="/tags">Tags</a></li>
-        </ul>
-      </nav>
+        <nav>
+          <ul>
+            <li><a href="/list">Spots</a></li>
+            <li><a href="/">Search</a></li>
+            <li><a href="/tags">Tags</a></li>
+          </ul>
+        </nav>
+      </div>
       <!-- <button onclick={logout}>Logout</button> -->
-    </ContainedZone>
-    <ContainedZone cssClasses="sub-header flex justify-center center-align">
-      <em>
-        { currentPlace.name || "???" } ({currentPlace.radiusMiles} miles)
-      </em>
+
+      <div class="sub-header">
+        <small
+          >{currentPlace.name || "???"} ({currentPlace.radiusMiles} miles)</small
+        >
+      </div>
     </ContainedZone>
   </header>
 
@@ -53,9 +57,7 @@
     {@render children()}
   </section>
 
-  <section id="bottom-sheet">
-    Bottom Sheet here
-  </section>
+  <section id="bottom-sheet">Bottom Sheet here</section>
 
   <footer>
     <a href="/login">Login</a>
@@ -71,15 +73,39 @@
     /*font-size: 16px;*/
     width: 100%;
     box-sizing: border-box;
-    padding-inline: 0.5rem;
+    /* padding-inline: 0.5rem; */
     /*display: grid;*/
-    grid-template:
+    /* grid-template:
     "header"
     "content";
-    grid-template-rows: auto 1fr;
+    grid-template-rows: auto 1fr; */
     min-height: 100vh;
     /*overflow: hidden;*/
     background-color: var(--bg-light);
+  }
+
+  .main-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.25rem;
+  }
+
+  .main-header strong {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 1.25rem;
+  }
+
+  nav ul {
+    display: flex;
+    list-style: none;
+    gap: 1rem;
+  }
+
+  nav ul li a {
+    color: var(--accent-color)
   }
 
 
@@ -95,17 +121,19 @@
   }
 
   #page-header {
-    grid-area: header;
+    /* grid-area: header; */
     background: var(--bg-light);
     padding: 0.25rem;
   }
 
   #page-header .sub-header {
     background-color: var(--bg-low-contrast);
+    padding: 0.25rem;
+    text-align: center;
   }
 
   #page-content {
-    grid-area: content;
+    /* grid-area: content; */
     /*overflow: hidden; /* Prevent page-level scrolling, allow children to scroll */*/
     min-height: 0; /* Allow grid item to shrink below content size */
   }

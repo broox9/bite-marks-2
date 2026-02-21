@@ -1,11 +1,14 @@
 <script lang="ts">
-  import { Star } from '@lucide/svelte';
+  import { Star, SquareChevronLeftIcon } from '@lucide/svelte';
   import { page } from '$app/state';
   import { getSpotById, updateSpot } from '$lib/adapters/primary/remote-handlers/spots.remote';
   import { invalidateAll } from '$app/navigation';
   import { getPlacePhotoUrl } from '$lib/adapters/secondary/google/google.svelte';
+  import { Input, Button, Checkbox, Textarea } from '$components/ui';
 
   const spotQuery = getSpotById({ id: page.params.id ?? '' });
+  const maxPhotoWidth = 800;
+  const maxPhotoHeight = 1200;
 
   let personalRating = $state<number | null>(null);
   let personalNotes = $state<string | null>(null);
@@ -32,7 +35,7 @@
   $effect(() => {
     if (spotQuery.current?.place_id && !photoUrl && !photoLoading) {
       photoLoading = true;
-      getPlacePhotoUrl(spotQuery.current.place_id, 400, 600)
+      getPlacePhotoUrl(spotQuery.current.place_id, maxPhotoWidth, maxPhotoHeight)
         .then((url) => {
           photoUrl = url;
         })
@@ -80,7 +83,7 @@
   }
 </script>
 
-<div class="container">
+<div class="content-container">
   {#if spotQuery.loading}
     <p>Loading spot...</p>
   {:else if spotQuery.error}
@@ -89,19 +92,19 @@
     </div>
   {:else if spotQuery.current}
     {@const spot = spotQuery.current}
-    <div class="space-y-6">
-      <a href={`/list#${spot.id}`}> &lt; Back to list</a>
+    <div class="">
+      <a href={`/list#${spot.id}`} class="flex flex-row gap-1 items-center"><SquareChevronLeftIcon size={20} /> Back to list</a>
       <!-- Place Photo -->
       {#if photoLoading}
-        <div class="w-full h-48 bg-gray-200 rounded-lg animate-pulse flex items-center justify-center">
+        <div id="photo-container" class="animate-pulse flex items-center justify-center">
           <span class="text-gray-400">Loading photo...</span>
         </div>
       {:else if photoUrl}
-        <div class="w-full rounded-lg overflow-hidden">
+        <div id="photo-container">
           <img
             src={photoUrl}
             alt={spot.name}
-            class="w-full h-48 object-cover"
+            class=""
           />
         </div>
       {/if}
@@ -144,12 +147,13 @@
 
           <!-- Is Visited -->
           <label for="is-visited">
-            <input
+            <!-- <input
               id="is-visited"
               type="checkbox"
               bind:checked={isVisited}
-            />
-            Visited
+            /> -->
+            <span>Visited</span>
+            <Checkbox id="is-visited" value={isVisited} />
           </label>
         </section>
 
@@ -224,24 +228,43 @@
 </div>
 
 <style>
-  .container {
+  .content-container {
     /*min-height: 100vh;*/
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-start;
+    /* display: flex;
+    flex-direction: column; */
+    /* justify-content: flex-start;
     align-items: flex-start;
-    gap: 1rem;
+    gap: 1rem; */
     margin-bottom: 1rem;
+    width: 100%;
   }
 
+  #photo-container {
+    width: 100%;
+    max-height: 25rem;
+    object-fit: cover;
+    aspect-ratio: 16/9;
+    /* overflow: hidden; */
+    /* border-radius: var(--border-radius); */
+    background-color: var(--bg-low-contrast);
+
+    > img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      aspect-ratio: 16/9;
+      transition: transform 0.3s ease-in-out;
+    }
+  }
 
   #rating-section {
     display: flex;
     flex-direction: row;
-    justify-content: flex-start;
+    justify-content: space-between;
     align-items: flex-end;
     gap: 1rem;
     margin-bottom: 1rem;
+    flex-grow: 1;
   }
 
   #personal-rating {
@@ -249,7 +272,7 @@
     /*width: 6rem;*/
   }
 
-  label:has(#personal-rating) {
+  label:has(#personal-rating), label:has(#is-visited) {
     flex-basis: 6.25rem;
     width: 6.25rem;
     flex-grow: 0;

@@ -1,11 +1,18 @@
 <script lang="ts">
-	let { cssClasses = '', children } = $props();
+  let { cssClasses = "", children } = $props();
 
-  const classList = `${cssClasses} w-full max-w-5xl`
+  const classList = `${cssClasses}`;
 </script>
 
-<div class="flex justify-center">
-  <div class={classList}>
-    {@render children()}
-  </div>
+<div class="contained-zone">
+  {@render children()}
 </div>
+
+<style>
+  .contained-zone {
+    max-width: 1024px;
+    /* display: flex;
+    justify-content: center;
+    align-items: center; */
+  }
+</style>

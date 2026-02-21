@@ -1,7 +1,7 @@
 @layer components {
 
   /** BUTTONS */
-  button {
+  /* button {
     --button-color: var(--cta-color);
     cursor: pointer;
     transition: all 0.3s ease;
@@ -21,9 +21,9 @@
     &:hover {
       color: oklch(from var(--button-color) 0.7 0.5 h);
     }
-  }
+  } */
 
-  button[type="submit"] {
+  /* button[type="submit"] {
     background-color: var(--button-color);
     color: oklch(from var(--button-color) 1 0 h);
     border-color: var(--button-color);
@@ -37,7 +37,6 @@
     padding: var(--padding-1) var(--padding-2);
     cursor: pointer;
     text-wrap: nowrap;
-    /*border: 1px solid;*/
     box-shadow: 4px 4px 8px -4px oklch(from var(--cta-color) l c h / 0.5);
     transition: all 0.3s ease;
 
@@ -63,7 +62,7 @@
     color: var(--bg-medium-contrast);
     border-color: var(--bg-low-contrast);
     cursor: not-allowed;
-  }
+  } */
 
 
   form {
@@ -86,7 +85,7 @@
   input[type="month"],
   input[type="week"],
   input[type="tel"], */
-  input:not([type="number"]),
+  /* input:not([type="number"]),
   input:not([type="range"]),
   input:not([type="checkbox"]),
   select {
@@ -95,11 +94,11 @@
     border-radius: var(--border-radius);
     width: 100%;
     background-color: var(--bg-light);
-  }
+  } */
 
 
   /* ** LABEL INPUT COMBOS */
-  label {
+  /* label {
     align-items: center;
     margin-bottom: 0.5rem;
     width: 100%;
@@ -107,13 +106,12 @@
 
   label>span {
     margin-right: 0.5rem;
-    /* background-color: #fff; */
     padding: 0.25rem;
     position: relative;
     z-index: 1;
-  }
+  } */
 
-  label>input,
+  /* label>input, */
   label>select {
     padding: 0.5rem;
     width: 100%;
