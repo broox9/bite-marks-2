@@ -63,6 +63,36 @@ npm run check
 
 # Development Conventions
 
-*   **Code Style:** The project uses Prettier for code formatting (inferred from `.prettierrc`) and ESLint for linting (inferred from `.eslintrc.cjs`).
+*   **Code Style:** No ESLint or Prettier configs are currently present in the repo.
 *   **Testing:** There are no testing frameworks configured in the `package.json`.
 *   **Commits:** There is no commit message convention specified.
+
+## Cursor Cloud specific instructions
+
+### Package manager
+
+The project uses **Bun** (`bun.lock`). Use `bun install` and `bun run <script>` for all dependency and script operations.
+
+### Environment variables
+
+The app requires three Appwrite secrets injected as env vars. For the SvelteKit dev server to pick them up, they must be written to a `.env` file in the project root:
+- `PUBLIC_APPWRITE_ENDPOINT`
+- `APPWRITE_PROJECT_ID`
+- `APPWRITE_API_KEY`
+
+The update script handles creating `.env` from env vars automatically.
+
+### Running services
+
+| Service | Command | Notes |
+|---|---|---|
+| Dev server | `bun run dev` | Vite dev server on port 5173. `--host` flag is already in the script. |
+| Type check | `bun run check` | Runs `svelte-kit sync && svelte-check`. Pre-existing type errors exist in the codebase. |
+
+### Gotchas
+
+- **No ESLint/Prettier configs exist** despite AGENTS.md previously claiming they did. The only code-quality check available is `bun run check` (Svelte + TypeScript checker).
+- **Pre-existing type errors**: `bun run check` currently reports ~17 errors. These are in existing code (e.g. `local_dev/index.ts`, `appwrite/index.ts`, various `.svelte` files) and are not blocking the dev server.
+- **Appwrite is remote-only**: There is no local/Docker Appwrite setup. All auth and data go to Appwrite Cloud. Without valid credentials the app still starts but authenticated routes won't work.
+- **`svelte.config.js` uses `adapter-cloudflare`**: This is fine for dev (`vite dev` uses its own adapter), but `vite build` produces a Cloudflare Workers bundle, not a Node.js bundle.
+- **Login requires an Appwrite account**: To test authenticated flows (spots list, search, tags), you need a valid user account in the connected Appwrite project. Provide `TEST_LOGIN_USERNAME` and `TEST_LOGIN_PASSWORD` secrets for full E2E testing.
