@@ -40,6 +40,7 @@
 		"@sveltejs/adapter-cloudflare": "^7.2.6",
 		"ai": "^6.0.86",
 		"appwrite": "^21.5.0",
+		"mapbox-gl": "^3.19.0",
 		"node-appwrite": "^21.1.0",
 		"zod": "^4.3.6"
 	}

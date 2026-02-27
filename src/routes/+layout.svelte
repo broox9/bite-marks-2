@@ -23,6 +23,14 @@
   };
 </script>
 
+<svelte:head>
+  <title>Bite Marks</title>
+  <link
+    href="https://api.mapbox.com/mapbox-gl-js/v3.19.0/mapbox-gl.css"
+    rel="stylesheet"
+  />
+</svelte:head>
+
 <div id="body-container">
   <header id="page-header">
     <ContainedZone>
@@ -70,25 +78,39 @@
 <style>
   #body-container {
     position: relative;
-    /*font-size: 16px;*/
-    width: 100%;
+    /* width: 100%; */
     box-sizing: border-box;
     /* padding-inline: 0.5rem; */
-    /*display: grid;*/
-    /* grid-template:
-    "header"
-    "content";
-    grid-template-rows: auto 1fr; */
+    display: grid;
+    grid-template:
+      "header"
+      "content"
+      "footer";
+    grid-template-rows: auto 1fr auto;
     min-height: 100vh;
     /*overflow: hidden;*/
+    background-color: var(--bg-color);
+  }
+
+  #page-header {
+    grid-area: header;
+    /* background: var(--bg-light); */
+    padding: 0.25rem;
+  }
+
+  #page-header .sub-header {
     background-color: var(--bg-light);
+    padding: 0.25rem;
+    text-align: center;
+    border-radius: var(--border-radius) var(--border-radius) 0 0;
+    margin-bottom: -0.5rem;
   }
 
   .main-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 0.25rem;
+    padding: 0 0.25rem;
   }
 
   .main-header strong {
@@ -105,11 +127,11 @@
   }
 
   nav ul li a {
-    color: var(--accent-color)
+    color: var(--accent-color);
   }
 
-
   footer {
+    grid-area: footer;
     width: 100%;
     margin-top: 3.5rem;
     background-color: var(--bg-light);
@@ -120,21 +142,9 @@
     gap: 0.5rem;
   }
 
-  #page-header {
-    /* grid-area: header; */
-    background: var(--bg-light);
-    padding: 0.25rem;
-  }
-
-  #page-header .sub-header {
-    background-color: hsl(57  100% 91% / 0.35);
-    padding: 0.25rem;
-    text-align: center;
-  }
-
   #page-content {
-    /* grid-area: content; */
-    /*overflow: hidden; /* Prevent page-level scrolling, allow children to scroll */*/
+    grid-area: content;
+    /*overflow: hidden; /* Prevent page-level scrolling, allow children to scroll */
     min-height: 0; /* Allow grid item to shrink below content size */
   }
 
@@ -143,7 +153,6 @@
     display: none;
     bottom: -100px;
     width: 100%;
-    background-color: hsla(0, 0%, 0%, 0.5);
     z-index: -4;
     height: minmax(200px, 50svh);
     place-self: end;
@@ -154,7 +163,6 @@
       z-index: 10;
     }
   }
-
 
   @media (min-width: 768px) {
     #bottom-sheet {

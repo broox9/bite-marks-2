@@ -83,7 +83,7 @@
     padding: 1rem;
     z-index: 2;
     transition: all 0.25s ease;
-    background-color: var(--bg-light);
+    background-color: var(--bg-color);
     isolation: isolate;
   }
 

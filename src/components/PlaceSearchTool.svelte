@@ -66,7 +66,7 @@
                 id="search"
                 bind:value={currentSearchValue}
                 oninput={searchHandler}
-                autocomplete="off"
+                autocomplete="off" 
                 role="combobox"
                 aria-autocomplete="list"
                 aria-controls="results-list"

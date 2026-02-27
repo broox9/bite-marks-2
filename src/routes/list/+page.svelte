@@ -10,12 +10,61 @@
   import ResultCard from "../../components/ResultCard.svelte";
   import ResultListItem from "../../components/ResultListItem.svelte";
   import type { ResultPlaceRecord } from "$lib/core/domain/Place/Place";
-
+  import mapboxgl from "mapbox-gl";
+  import "mapbox-gl/dist/mapbox-gl.css";
+  import { MAPBOX_PUBLIC_KEY } from "$lib/constants";
   // let spotsList :any[] = $state([])
   let showSearch = $state(false);
   const spotsQuery = getSpots({});
   let selectedResultObj = $state<ResultPlaceRecord | null>(null);
 
+  let mapContainer: HTMLElement;
+  let map: mapboxgl.Map;
+  let markers: mapboxgl.Marker[] = [];
+
+  $effect(() => {
+    if (!mapContainer || map) return;
+
+    mapboxgl.accessToken = MAPBOX_PUBLIC_KEY;
+    map = new mapboxgl.Map({
+      container: mapContainer,
+      // style: "mapbox://styles/mapbox/dark-v11",
+      // style: "mapbox://styles/mapbox/streets-v12",
+      center: [-98.5795, 39.8283],
+      zoom: 4,
+    });
+  });
+
+  $effect(() => {
+    if (!map) return;
+    const spotRows = spotsQuery.current?.rows ?? [];
+
+    // Clear old markers
+    markers.forEach((m) => m.remove());
+    markers = [];
+
+    if (spotRows.length === 0) return;
+
+    const bounds = new mapboxgl.LngLatBounds();
+
+    spotRows.forEach((spot: any) => {
+      const el = document.createElement("div");
+      el.className = "custom-marker";
+      el.innerHTML =
+        '<div style="background-color: var(--accent-color, #ff0000); width: 1rem; height: 1rem; border-radius: 50%; border: 2px solid white; box-shadow: 0 0 5px rgba(0,0,0,0.5);"></div>';
+
+      const marker = new mapboxgl.Marker({ element: el })
+        .setLngLat([spot.lng, spot.lat])
+        .addTo(map);
+
+      markers.push(marker);
+      bounds.extend([spot.lng, spot.lat]);
+    });
+
+    if (markers.length > 0) {
+      map.fitBounds(bounds, { padding: 50, maxZoom: 15 });
+    }
+  });
   function selectResultFn(selectedResult: ResultPlaceRecord) {
     console.log("[bs] selectResultFn", [...arguments], selectedResult);
     selectedResultObj = selectedResult;
@@ -44,8 +93,15 @@
     resultClearAction();
   }
 
-  function mapSpotAction() {
-    console.log("[bs] mapSpotAction::page::fired", [...arguments]);
+  function mapSpotAction(rowId: string) {
+    console.log("[bs] mapSpotAction::page::fired", rowId);
+    const spot = spotsQuery.current?.rows?.find((r: any) => r.id === rowId);
+    if (spot && map) {
+      map.flyTo({ center: [spot.lng, spot.lat], zoom: 16 });
+
+      // on mobile, we might want to scroll up to the map so it's visible
+      mapContainer?.scrollIntoView({ behavior: "smooth" });
+    }
   }
 </script>
 
@@ -69,7 +125,7 @@
     </section>
   {/if}
 
-  <section id="map-container">Maps coming soon</section>
+  <section id="map-container" bind:this={mapContainer}></section>
 
   <section id="spots-list">
     {#if spotsQuery.error}
@@ -92,7 +148,8 @@
     id="floating-search-button"
     type="button"
     class="icon-button"
-    onclick={() => (showSearch = true)}><Search size={20} strokeWidth={2}/></button
+    onclick={() => (showSearch = true)}
+    ><Search size={20} strokeWidth={2} /></button
   >
 {:else}
   <button
@@ -141,21 +198,22 @@
   }
 
   #map-container {
-    --base-section-color: hsla(100 50% 50% / 0.25);
-    grid-area: map;
+    /* --base-section-color: hsla(100 50% 50% / 0.25); */
+    /* grid-area: map; */
+    height: 350px;
     background-color: var(--base-section-color);
-    color: hsla(from(var(--base-section-color) h s 75% / 1));
-    padding: var(--padding-2);
+    /* color: hsla(from(var(--base-section-color) h s 75% / 1)); */
+    /* padding: var(--padding-2); */
     padding-bottom: var(--padding-3);
     border-radius: var(--border-radius) var(--border-radius) 0 0;
+    position: relative;
+    overflow: hidden;
   }
 
   #spots-list {
     margin-top: calc(var(--padding-1) * -1);
-    background-color: var(--bg-light);
     grid-area: spots;
     overflow-y: auto;
-    /* background-color: hsla(300 50% 50% / 0.1); */
     min-height: 0; /* Allow grid item to shrink below content size */
     padding-bottom: 3rem;
     border-radius: var(--border-radius) var(--border-radius) 0 0;

@@ -26,13 +26,13 @@
   --accent-color: oklch(0.6892 0.1425 166.1212); /* mint green */
 
   /* backgrounds & neutrals */
-  --bg-color: oklch(0.9362 0.0134 267.1);
-  --bg-light: oklch(1 0.0134 267.1);
-  --bg-low-contrast: oklch(0.8397 0.0134 267.1);
+  --bg-color: oklch(1 0.0134 267.1);
+  --bg-light: oklch(0.9762 0.0134 267.1);
+  --bg-low-contrast: oklch(0.9262 0.0134 267.1);
 
   /* medium ahd low swap in dark mode */
+    --bg-medium-contrast: oklch(0.667 0.0134 267.1);
   --bg-high-contrast: oklch(0.297 0.0134 267.1);
-  --bg-medium-contrast: oklch(0.467 0.0134 267.1);
 
 
   --text-color: oklch(0.15 0.02 105);
