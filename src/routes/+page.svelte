@@ -8,7 +8,7 @@ import ResultCard from '../components/ResultCard.svelte';
 import ResultList from '../components/ResultList.svelte';
 import Dialog from '../components/util/Dialog.svelte'
 import LocationTools from '../components/LocationTools.svelte';
-import PlaceSearchTool from '../components/util/PlaceSearchTool.svelte';
+import PlaceSearchTool from '../components/PlaceSearchTool.svelte';
 
 // let currentSearchValue = $state('')
 // let resultList = $state<ResultPlaceRecord[] | []>([])
@@ -59,9 +59,11 @@ function resultClearAction() {
 </script>
 
 
-<ContainedZone cssClasses='p-8'>
-     <LocationTools />
-     <PlaceSearchTool selectResultAction={selectResult} />
+<ContainedZone>
+    <section id="location-tools-container">
+        <LocationTools />
+        <PlaceSearchTool selectResultAction={selectResult} />
+     </section>
     <!-- <label>
         <span class="flex flex-row justify-between items-center">
             Search
@@ -94,3 +96,16 @@ function resultClearAction() {
         {/if}
     </Dialog>
 </ContainedZone>
+
+
+<style>
+    #location-tools-container {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+        padding: 0.25rem;
+        /* min-width: 350px; */
+        max-width: 800px;
+        margin: 0 auto;
+    }
+</style>
