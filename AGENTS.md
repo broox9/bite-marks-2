@@ -7,7 +7,7 @@ This is a Svelte-based web application that uses Appwrite for its backend servic
 *   **Frontend:** Svelte, SvelteKit
 *   **Backend:** Appwrite
 *   **Build Tool:** Vite
-*   **Styling:** Tailwind CSS
+*   **Styling:** Tailwind CSS is installed, but do not use it. Use CSS variables and custom properties instead.
 *   **Language:** TypeScript
 
 ## Architecture

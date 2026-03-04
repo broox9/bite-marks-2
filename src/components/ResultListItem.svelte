@@ -6,9 +6,10 @@
     item: ResultPlaceRecord;
     deleteSpotAction: (rowId: string) => void;
     mapSpotAction: (rowId: string) => void;
+    isMapActive?: boolean;
   };
 
-  const { item, deleteSpotAction, mapSpotAction }: ListItemProps = $props();
+  const { item, deleteSpotAction, mapSpotAction, isMapActive = false }: ListItemProps = $props();
   let contentElement = null;
 
   let isToolsOpen = $state(false);
@@ -55,6 +56,7 @@
     <button
       type="button"
       class="map-button"
+      data-active={isMapActive}
       onclick={() => mapSpotAction(item.id)}><MapPin size={16} /></button
     >
   </div>
@@ -131,5 +133,9 @@
 
   .map-button {
     background-color: var(--success);
+  }
+
+  .map-button[data-active="true"] {
+    background-color: var(--accent-color);
   }
 </style>
