@@ -66,3 +66,8 @@ npm run check
 *   **Code Style:** The project uses Prettier for code formatting (inferred from `.prettierrc`) and ESLint for linting (inferred from `.eslintrc.cjs`).
 *   **Testing:** There are no testing frameworks configured in the `package.json`.
 *   **Commits:** There is no commit message convention specified.
+
+## Skills
+
+### Available skills
+- `frontend-design`: Create distinctive, production-grade frontend interfaces with high design quality for component/page/application build requests. (file: `/Users/brooxm2/projects/bite-marks-2/skills/frontend-design/SKILL.md`)

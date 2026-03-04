@@ -2,6 +2,10 @@
 
   /** BUTTONS */
   button {
+    cursor: pointer;
+    transition: all 0.3s ease-out;
+  }
+  /* button {
     --button-color: var(--cta-color);
     cursor: pointer;
     transition: all 0.3s ease;
@@ -21,9 +25,9 @@
     &:hover {
       color: oklch(from var(--button-color) 0.7 0.5 h);
     }
-  }
+  } */
 
-  button[type="submit"] {
+  /* button[type="submit"] {
     background-color: var(--button-color);
     color: oklch(from var(--button-color) 1 0 h);
     border-color: var(--button-color);
@@ -37,7 +41,6 @@
     padding: var(--padding-1) var(--padding-2);
     cursor: pointer;
     text-wrap: nowrap;
-    /*border: 1px solid;*/
     box-shadow: 4px 4px 8px -4px oklch(from var(--cta-color) l c h / 0.5);
     transition: all 0.3s ease;
 
@@ -63,7 +66,7 @@
     color: var(--bg-medium-contrast);
     border-color: var(--bg-low-contrast);
     cursor: not-allowed;
-  }
+  } */
 
 
   form {
@@ -86,7 +89,7 @@
   input[type="month"],
   input[type="week"],
   input[type="tel"], */
-  input:not([type="number"]),
+  /* input:not([type="number"]),
   input:not([type="range"]),
   input:not([type="checkbox"]),
   select {
@@ -95,11 +98,11 @@
     border-radius: var(--border-radius);
     width: 100%;
     background-color: var(--bg-light);
-  }
+  } */
 
 
   /* ** LABEL INPUT COMBOS */
-  label {
+  /* label {
     align-items: center;
     margin-bottom: 0.5rem;
     width: 100%;
@@ -107,13 +110,25 @@
 
   label>span {
     margin-right: 0.5rem;
-    /* background-color: #fff; */
     padding: 0.25rem;
     position: relative;
     z-index: 1;
-  }
+  } */
 
-  label>input,
+
+    input[type="range"] {
+      width: 100%;
+      color: var(--cta-color);
+      accent-color: var(--bg-high-contrast);
+      /* background-color: var(--bg-low-contrast); */
+    }
+    input[type="range"]::-webkit-slider-runnable-track, 
+    input[type="range"]::-moz-range-track {
+      background-color: var(--cta-color);
+    }
+
+
+  /* label>input, */
   label>select {
     padding: 0.5rem;
     width: 100%;
@@ -127,19 +142,22 @@
     /*box-shadow: 0 0 0 2px var(--accent-color);*/
   }
 
-  label:has(button) {
+  /* label:has(button), */
+  label.ui-input-with-button {
+    position: relative;
+    isolation: isolate;
+    z-index: 1;
     box-sizing: border-box;
-    border: none;
-    padding: none;
     display: flex;
-    border: 1px solid var(--bg-medium-contrast);
+    border: 1px solid var(--bg-low-contrast);
     border-radius: 1rem;
     width: 100%;
-    background-color: var(--bg-light-contrast);
+    /* background-color: var(--bg-light-contrast); */
     padding: var(--padding-1);
+    gap: var(--padding-1);
 
     &:focus-within {
-      outline: 1px solid var(--accent-color);
+      outline: 1px solid var(--bg-medium-contrast);
     }
     /* span {
       display: block flex;
@@ -147,15 +165,39 @@
       position-anchor: top left;
     } */
 
-    > input:is(input):not([type="checkbox"]):not([type="radio"]):not([type="range"]), input:focus {
-      padding: 0.25rem !important;
+    > input:is(input):not([type="checkbox"]):not([type="radio"]):not([type="range"]) {
+    /* > input:focus { */
+      flex-grow: 1;
+      padding: 0.25rem;
       background-color: transparent;
+      border-radius: var(--border-radius);
       border: none;
       padding: 0;
       outline: none;
       box-shadow: none;
     }
+
+    > button {
+      aspect-ratio: 1 / 1;
+      line-height: 1;
+      text-align: center;
+      vertical-align: middle;
+      padding: 0 0.5rem;
+      border-radius: 0;
+      background-color: transparent;
+      border: none;
+      border-left: 1px solid var(--bg-low-contrast);
+      outline: none;
+      box-shadow: none;
+      color: var(--cta-color);
+    }
+
+    > button.warning {
+      color: var(--error);
+    }
   }
+
+
 
 
 }

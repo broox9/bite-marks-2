@@ -1,4 +1,5 @@
 <script lang='ts'>
+  import { Pin } from '@lucide/svelte';
   import ContainedZone from "./util/ContainedZone.svelte"
 
    // do these proper, don't use them directily
@@ -39,29 +40,41 @@
     console.log('[bs] locationStore', locationStore)
   }
 
+  const anchorName = '--location-search-anchor'
 </script>
 
-
-<ContainedZone>
   <h3>Current Location</h3>
-  <p>{locationStore.name}</p>
-
-  <br />
-
-  <strong>Radius:</strong> <em>{locationRadius} miles</em><br />
-  <input type="range" step="5" min="5" max="30" bind:value={locationRadius}/>
+  <strong>{locationStore.name}</strong>
+  
+  <label for="radius">
+    <div>Radius: <em>{locationRadius} miles</em></div>
+    <input name="radius" id="radius" type="range" step="5" min="5" max="30" bind:value={locationRadius} aria-label="Search Radius" title="SearchRadius"/>
+  </label>
 
     <form onsubmit={searchHandler}>
-    <label class="flex flex-row gap" for="location-search">
+    <label for="location-search" class="ui-input-with-button" style="anchor-name: {anchorName};">
       <input type="search" name="location-search" id="location-search" placeholder="Search for a location" bind:value={locationInput}/>
-      <button type="submit">Set</button>
+      <button type="submit" aria-label="Set location" title="Set location"><Pin size={18} /></button>
     </label>
   </form>
-  {#if locationList.length}
-    <ResultList items={locationList} onSelect={selectAreaResult}/>
+  {#if locationList.length && locationInput.length}
+    <ResultList items={locationList} onSelect={selectAreaResult} anchorName={anchorName}/>
   {/if}
 
   <!-- <pre>
     {JSON.stringify(locationList, null, 2)}
   </pre> -->
-</ContainedZone>
+
+  <style>
+    label[for="radius"] {
+      margin: 0 auto;
+      width: clamp(300px, 600px,50%);
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 0.5rem;
+      cursor: pointer;
+    }
+  </style>
