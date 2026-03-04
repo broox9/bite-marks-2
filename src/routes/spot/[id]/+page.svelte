@@ -110,11 +110,11 @@
       {/if}
 
       <!-- Place Information (Read-only) -->
-      <section class="bg-gray-50 p-4 rounded-lg">
+      <section>
         <h1 class="text-2xl font-bold mb-2">{spot.name}</h1>
-        <p class="text-gray-600 mb-1">{spot.address}</p>
+        <div class="text-gray-600 mb-1">{spot.address}</div>
         {#if spot.rating}
-          <p class="text-sm text-gray-500">Rating: {spot.rating}</p>
+          <div class="text-sm text-gray-500">Rating: {spot.rating}</div>
         {/if}
         {#if spot.websiteURI}
           <a href={spot.websiteURI} target="_blank" rel="noopener noreferrer">
@@ -124,7 +124,7 @@
       </section>
 
       <!-- Editable Fields -->
-      <section>
+      <section id="editable-fields-section">
         <!-- Personal Rating -->
         <section id="rating-section"class="ui-input-with-button">
           <label for="personal-rating">
@@ -140,25 +140,20 @@
             />
           </label>
 
-          <div class="flex flex-row mb-0.5 py-4 gap-1">
+          <div id="spot-rating">
             {spot.rating}
             <Star size={20} />
           </div>
 
           <!-- Is Visited -->
-          <label for="is-visited">
-            <!-- <input
-              id="is-visited"
-              type="checkbox"
-              bind:checked={isVisited}
-            /> -->
-            <span>Visited</span>
-            <Checkbox id="is-visited" value={isVisited} />
+          <label for="is-visited" id="is-visited-label">
+            <Checkbox id="is-visited" name="is-visited" value={isVisited} />
+            <span>Is visited?</span>
           </label>
         </section>
 
         <!-- Personal Notes -->
-        <div>
+        <div id="personal-notes-section">
           <label for="personal-notes" class="block text-sm font-medium mb-1">
             My Notes
           </label>
@@ -228,6 +223,9 @@
 </div>
 
 <style>
+ section {
+  padding: var(--padding-1);
+ }
   .content-container {
     /*min-height: 100vh;*/
     /* display: flex;
@@ -258,13 +256,10 @@
   }
 
   #rating-section {
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    align-items: flex-end;
-    gap: 1rem;
-    margin-bottom: 1rem;
-    flex-grow: 1;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    align-items: end;
+    gap: 0.5rem;
   }
 
   #personal-rating {
@@ -272,18 +267,26 @@
     /*width: 6rem;*/
   }
 
-  label:has(#personal-rating), label:has(#is-visited) {
+  #spot-rating {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 1ex;
+    padding-bottom: var(--padding-1);
+  }
+
+  /* label:has(#personal-rating), label:has(#is-visited) {
     flex-basis: 6.25rem;
     width: 6.25rem;
     flex-grow: 0;
     flex-shrink: 0;
-  }
+  } */
 
   #is-visited {
     appearance: none;
     cursor: pointer;
     border: none;
-    /*padding: var(--padding-1);*/
     padding: 0;
     display: inline-block;
     position: relative;
@@ -318,15 +321,21 @@
     border-color: var(--cta-color);
   }
 
-  label:has(#is-visited) {
-    display: block flex;
+  #is-visited-label {
+    display: flex;
     gap: 1ex;
     /*flex-basis: 2.5rem;*/
     /*width: 2.5rem;*/
     flex-grow: 1;
     flex-shrink: 0;
     justify-self: flex-end;
-    margin-bottom: 0.5rem;
-    padding: var(--padding-1);
+    padding-bottom: var(--padding-1);
+  }
+
+
+  #personal-notes-section {
+    margin-top: 1rem;
+    display: flex;
+    flex-direction: column;
   }
 </style>
