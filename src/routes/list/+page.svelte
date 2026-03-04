@@ -20,7 +20,8 @@
 
   let mapContainer: HTMLElement;
   let map: mapboxgl.Map;
-  let markers: mapboxgl.Marker[] = [];
+  let activeMarker: mapboxgl.Marker | null = null;
+  let activeMapSpotId = $state<string | null>(null);
 
   $effect(() => {
     if (!mapContainer || map) return;
@@ -30,40 +31,9 @@
       container: mapContainer,
       // style: "mapbox://styles/mapbox/dark-v11",
       // style: "mapbox://styles/mapbox/streets-v12",
-      center: [-98.5795, 39.8283],
-      zoom: 4,
+      center: [-73.9654, 40.7829],
+      zoom: 10,
     });
-  });
-
-  $effect(() => {
-    if (!map) return;
-    const spotRows = spotsQuery.current?.rows ?? [];
-
-    // Clear old markers
-    markers.forEach((m) => m.remove());
-    markers = [];
-
-    if (spotRows.length === 0) return;
-
-    const bounds = new mapboxgl.LngLatBounds();
-
-    spotRows.forEach((spot: any) => {
-      const el = document.createElement("div");
-      el.className = "custom-marker";
-      el.innerHTML =
-        '<div style="background-color: var(--accent-color, #ff0000); width: 1rem; height: 1rem; border-radius: 50%; border: 2px solid white; box-shadow: 0 0 5px rgba(0,0,0,0.5);"></div>';
-
-      const marker = new mapboxgl.Marker({ element: el })
-        .setLngLat([spot.lng, spot.lat])
-        .addTo(map);
-
-      markers.push(marker);
-      bounds.extend([spot.lng, spot.lat]);
-    });
-
-    if (markers.length > 0) {
-      map.fitBounds(bounds, { padding: 50, maxZoom: 15 });
-    }
   });
   function selectResultFn(selectedResult: ResultPlaceRecord) {
     console.log("[bs] selectResultFn", [...arguments], selectedResult);
@@ -95,8 +65,38 @@
 
   function mapSpotAction(rowId: string) {
     console.log("[bs] mapSpotAction::page::fired", rowId);
+
+    // Clear existing marker (popup is removed with it)
+    if (activeMarker) {
+      activeMarker.remove();
+      activeMarker = null;
+    }
+
+    // Toggle off if same row pressed again
+    if (activeMapSpotId === rowId) {
+      activeMapSpotId = null;
+      return;
+    }
+
     const spot = spotsQuery.current?.rows?.find((r: any) => r.id === rowId);
     if (spot && map) {
+      const el = document.createElement("div");
+      el.className = "bite-marker-pin";
+
+      const popup = new mapboxgl.Popup({
+        offset: 12,
+        closeButton: false,
+        className: "bite-marker-popup",
+      }).setText(spot.name);
+
+      activeMarker = new mapboxgl.Marker({ element: el })
+        .setLngLat([spot.lng, spot.lat])
+        .setPopup(popup)
+        .addTo(map);
+
+      activeMarker.togglePopup();
+
+      activeMapSpotId = rowId;
       map.flyTo({ center: [spot.lng, spot.lat], zoom: 16 });
 
       // on mobile, we might want to scroll up to the map so it's visible
@@ -135,7 +135,7 @@
     {:else}
       {@const spotRows = spotsQuery.current?.rows ?? []}
       {#each spotRows as spot}
-        <ResultListItem item={spot} {deleteSpotAction} {mapSpotAction} />
+        <ResultListItem item={spot} {deleteSpotAction} {mapSpotAction} isMapActive={activeMapSpotId === spot.id} />
       {/each}
     {/if}
 
@@ -208,6 +208,30 @@
     border-radius: var(--border-radius) var(--border-radius) 0 0;
     position: relative;
     overflow: hidden;
+  }
+
+  :global(.bite-marker-pin) {
+    width: 1.25rem;
+    height: 1.25rem;
+    background-color: var(--accent-color);
+    border-radius: 50%;
+    border: 2px solid white;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  }
+
+  :global(.bite-marker-popup) {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--text-color);
+    padding: 0.25rem 0.5rem;
+  }
+
+  .map-marker-icon {
+    width: 1rem;
+    height: 1rem;
+    border-radius: 50%;
+    background-color: var(--accent-color);
+    opacity: 0.5;
   }
 
   #spots-list {
