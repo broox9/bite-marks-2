@@ -23,6 +23,11 @@
   let activeMarker: mapboxgl.Marker | null = null;
   let activeMapSpotId = $state<string | null>(null);
 
+  let isMapMinimized = $state(false);
+  function toggleMapMinimization() {
+    isMapMinimized = !isMapMinimized;
+  }
+
   $effect(() => {
     if (!mapContainer || map) return;
 
@@ -39,7 +44,6 @@
     console.log("[bs] selectResultFn", [...arguments], selectedResult);
     selectedResultObj = selectedResult;
   }
-  console.log("[bs] list::page::SPOTS QUERY", getSpots);
 
   function resultClearAction() {
     selectedResultObj = null;
@@ -125,9 +129,13 @@
     </section>
   {/if}
 
-  <section id="map-container" bind:this={mapContainer}></section>
+  <section id="map-container" class:minimized={isMapMinimized} bind:this={mapContainer}></section>
 
   <section id="spots-list">
+    <div id="spots-list-header">
+      <button id="shrink-map-button" type="button" onclick={toggleMapMinimization} title="Toggle shrink map"></button>
+    </div>
+    
     {#if spotsQuery.error}
       <p>Error: {spotsQuery.error}</p>
     {:else if spotsQuery.loading}
@@ -208,6 +216,11 @@
     border-radius: var(--border-radius) var(--border-radius) 0 0;
     position: relative;
     overflow: hidden;
+    transition: height 0.2s ease-out;
+
+    &.minimized {
+      height: 25px;
+    }
   }
 
   :global(.bite-marker-pin) {
@@ -237,10 +250,36 @@
   #spots-list {
     margin-top: calc(var(--padding-1) * -1);
     grid-area: spots;
+    position: relative;
     overflow-y: auto;
     min-height: 0; /* Allow grid item to shrink below content size */
     padding-bottom: 3rem;
     border-radius: var(--border-radius) var(--border-radius) 0 0;
+  }
+
+  #spots-list-header {
+    border-radius: var(--border-radius) var(--border-radius) 0 0;
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    display: flex;
+    /* display: none; */
+    /* grid-area: spots; */
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    padding: 0.25rem;
+    padding-top: calc(var(--padding-1) * 1.5);
+  }
+
+  #shrink-map-button {
+    height: 0.25rem;
+    width: 3rem;
+    background-color: var(--bg-light);
+    border: 1px solid var(--bg-low-contrast);
+    border-radius: var(--border-radius);
+    box-shadow: none;
+    cursor: pointer;
   }
 
   .visited-check {
