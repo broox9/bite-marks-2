@@ -2,7 +2,7 @@
   interface Props extends Omit<Record<string, unknown>, 'class'> {
     type?: string
     class?: string
-    value?: string
+    value?: string | number | readonly string[]
     'data-size'?: 'sm' | 'md' | 'lg'
     'data-variant'?: string
   }
