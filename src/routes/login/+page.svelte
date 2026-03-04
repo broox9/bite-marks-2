@@ -51,6 +51,7 @@ form {
     flex-direction: column;
     gap: 1rem;
     padding: 1rem;
+    --field-width: min(100%, 20rem);
     /*border: 1px solid #ccc;
     border-radius: 0.5rem;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);*/
@@ -58,7 +59,10 @@ form {
 
 
   label {
-    display: block;
+    display: flex;
+    flex-direction: column;
+    width: var(--field-width);
+    margin-inline: auto;
 
     span {
       display: none;
@@ -66,8 +70,15 @@ form {
     }
   }
 
+  input,
+  button {
+    box-sizing: border-box;
+    width: var(--field-width);
+    margin-inline: auto;
+    display: block;
+  }
 
    button {
-    width: 100%;
+    text-align: center;
   }
 </style>
