@@ -2,6 +2,7 @@
   // import { account, ID } from '$lib/infrastructure/database/appwrite.client';
   import  { storeGetCurrentUser, storeSetCurrentUser } from '$lib/adapters/primary/stores/user.store.svelte';
   import { loginAction } from '$lib/adapters/primary/remote-handlers/login.remote'
+  import { Input } from '$components/ui'
 
   let loggedInUser = $state<any | null>(null)
 </script>
@@ -16,12 +17,12 @@
 <form {...loginAction}>
   <label for="email">
     <span>Email</span>
-     <input {...loginAction.fields.email.as('text')} placeholder="email" />
+    <Input {...loginAction.fields.email.as('text')} placeholder="email" />
   </label>
 
   <label for="password">
     <span>Password</span>
-    <input {...loginAction.fields.password.as('password')} placeholder="password" />
+    <Input {...loginAction.fields.password.as('password')} placeholder="password" />
   </label>
 
   <button type="submit" data-type="login">Login</button>
