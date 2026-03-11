@@ -71,3 +71,21 @@ npm run check
 
 ### Available skills
 - `frontend-design`: Create distinctive, production-grade frontend interfaces with high design quality for component/page/application build requests. (file: `/Users/brooxm2/projects/bite-marks-2/skills/frontend-design/SKILL.md`)
+
+## Cursor Cloud specific instructions
+
+### Package manager
+- The project uses **Bun** (`bun.lock`). Bun is installed at `~/.bun/bin/bun` and is on `PATH` via `~/.bashrc`. Use `bun install` for dependency installation. `npm run <script>` still works for running package scripts.
+
+### Environment variables
+- Required secrets (`PUBLIC_APPWRITE_ENDPOINT`, `APPWRITE_PROJECT_ID`, `APPWRITE_API_KEY`) are injected as environment variables. `OPENAI_API_KEY` and `SENTRY_AUTH_TOKEN` are also available.
+- No `.env` file is needed; SvelteKit picks up the injected env vars directly.
+
+### Running services
+- **Dev server:** `npm run dev` starts Vite on `http://localhost:5173/` (binds to `--host` by default).
+- **Type/Svelte check:** `npm run check` — expect ~25 pre-existing TS errors; these are in the existing codebase, not regressions.
+- **Tests:** `npm run test` runs Vitest (7 test files, 95 tests). Despite `package.json` not mentioning Vitest in its description, it is configured and works.
+
+### Authentication
+- The app requires Appwrite email/password login. Without a test account, unauthenticated users are redirected to `/login`. The `/all-spots` route is publicly accessible and proves Appwrite database connectivity.
+- To test authenticated flows, a test login account is needed (see `AUTH-README.md` for details).
