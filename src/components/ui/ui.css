@@ -1,30 +1,228 @@
-/**
- * UI form components – theme hooks only (no visual styles).
- * Target these classes in your app to add layout and theming.
- *
- * Primitives:
- *   .ui-input, .ui-button, .ui-checkbox, .ui-label
- *
- * Composition:
- *   .ui-input-group, .ui-input-group__leading, .ui-input-group__input, .ui-input-group__trailing
- *   .ui-button-group
- *   .ui-input-with-button, .ui-input-with-button__input, .ui-input-with-button__action
- *
- * Optional attributes for theming/layout:
- *   [data-size="sm"|"md"|"lg"]
- *   [data-variant="..."]
- *   .ui-button-group[data-orientation="horizontal"|"vertical"]
- *   .ui-input-with-button[data-order="input-action"|"action-input"]
- */
+@layer components {
+  :where(.ui-input, .ui-button, .ui-textarea, .ui-input-group, .ui-input-with-button, .ui-button-group) {
+    --ui-control-padding-block: var(--padding-1);
+    --ui-control-padding-inline: var(--padding-2);
+    --ui-control-radius: var(--border-radius);
+    --ui-control-border-color: var(--bg-low-contrast);
+    --ui-control-bg: var(--bg-light);
+    --ui-control-text: var(--bg-high-contrast);
+    --ui-control-focus-ring: oklch(from var(--accent-color) l c h / 0.2);
+  }
 
-/* No default styles – add your own, e.g:
+  :where(.ui-input, .ui-button, .ui-textarea, .ui-input-group, .ui-input-with-button, .ui-button-group)[data-size='sm'] {
+    --ui-control-padding-block: calc(var(--padding-1) * 0.75);
+    --ui-control-padding-inline: var(--padding-1);
+  }
 
-.ui-input { ... }
-.ui-button { ... }
-.ui-input-group { display: flex; align-items: stretch; }
-.ui-input-group .ui-input { flex: 1; }
-.ui-button-group { display: inline-flex; }
-.ui-button-group .ui-button { ... }
-.ui-input-with-button { display: flex; }
-.ui-input-with-button__input { flex: 1; }
-*/
+  :where(.ui-input, .ui-button, .ui-textarea, .ui-input-group, .ui-input-with-button, .ui-button-group)[data-size='lg'] {
+    --ui-control-padding-block: var(--padding-2);
+    --ui-control-padding-inline: var(--padding-3);
+  }
+
+  .ui-input,
+  .ui-button,
+  .ui-textarea {
+    border: 1px solid var(--ui-control-border-color);
+    border-radius: var(--ui-control-radius);
+    background-color: var(--ui-control-bg);
+    color: var(--ui-control-text);
+    padding: var(--ui-control-padding-block) var(--ui-control-padding-inline);
+    line-height: 1.25;
+    font: inherit;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+  }
+
+  .ui-input,
+  .ui-textarea {
+    width: 100%;
+  }
+
+  .ui-textarea {
+    min-height: 6rem;
+    resize: vertical;
+  }
+
+  .ui-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    width: fit-content;
+    cursor: pointer;
+    text-wrap: nowrap;
+  }
+
+  .ui-button[type='submit'],
+  .ui-button[data-variant='primary'] {
+    background-color: var(--cta-color);
+    border-color: var(--cta-color);
+    color: var(--bg-light);
+  }
+
+  .ui-button:disabled,
+  .ui-input:disabled,
+  .ui-textarea:disabled {
+    cursor: not-allowed;
+    opacity: 0.7;
+  }
+
+  .ui-input:focus-visible,
+  .ui-button:focus-visible,
+  .ui-textarea:focus-visible,
+  .ui-checkbox:focus-visible {
+    outline: none;
+    border-color: var(--accent-color);
+    box-shadow: 0 0 0 3px var(--ui-control-focus-ring);
+  }
+
+  .ui-checkbox {
+    appearance: none;
+    inline-size: 1.25rem;
+    block-size: 1.25rem;
+    margin: 0;
+    border: 1px solid var(--ui-control-border-color);
+    border-radius: calc(var(--ui-control-radius) * 0.5);
+    background-color: var(--ui-control-bg);
+    display: inline-grid;
+    place-content: center;
+    cursor: pointer;
+  }
+
+  .ui-checkbox:checked {
+    background-color: var(--cta-color);
+    border-color: var(--cta-color);
+  }
+
+  .ui-checkbox:checked::before {
+    content: '✓';
+    color: var(--bg-light);
+    font-size: 0.75rem;
+    line-height: 1;
+  }
+
+  .ui-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 500;
+  }
+
+  .ui-input-group,
+  .ui-input-with-button,
+  label.ui-input-with-button {
+    width: 100%;
+    display: flex;
+    align-items: stretch;
+    border: 1px solid var(--ui-control-border-color);
+    border-radius: var(--ui-control-radius);
+    background-color: var(--ui-control-bg);
+    overflow: hidden;
+  }
+
+  .ui-input-group:focus-within,
+  .ui-input-with-button:focus-within,
+  label.ui-input-with-button:focus-within {
+    border-color: var(--accent-color);
+    box-shadow: 0 0 0 3px var(--ui-control-focus-ring);
+  }
+
+  .ui-input-group__input,
+  .ui-input-with-button__input {
+    min-width: 0;
+    flex: 1;
+    display: flex;
+  }
+
+  .ui-input-group__leading,
+  .ui-input-group__trailing,
+  .ui-input-with-button__action {
+    display: inline-flex;
+    align-items: center;
+    padding: var(--ui-control-padding-block) var(--ui-control-padding-inline);
+    background-color: var(--ui-control-bg);
+  }
+
+  .ui-input-group__leading {
+    border-right: 1px solid var(--ui-control-border-color);
+  }
+
+  .ui-input-group__trailing,
+  .ui-input-with-button__action {
+    border-left: 1px solid var(--ui-control-border-color);
+  }
+
+  .ui-input-group :is(.ui-input, .ui-textarea, .ui-button),
+  .ui-input-with-button :is(.ui-input, .ui-textarea, .ui-button),
+  .ui-input-with-button > :is(input, textarea, button),
+  label.ui-input-with-button > :is(input, textarea, button) {
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+    background: transparent;
+    margin: 0;
+  }
+
+  .ui-input-with-button > :is(input, textarea),
+  label.ui-input-with-button > :is(input, textarea) {
+    flex: 1;
+    min-width: 0;
+    padding: var(--ui-control-padding-block) var(--ui-control-padding-inline);
+    outline: none;
+  }
+
+  .ui-input-with-button > :is(button, .ui-button),
+  label.ui-input-with-button > :is(button, .ui-button) {
+    border-left: 1px solid var(--ui-control-border-color);
+  }
+
+  .ui-input-with-button > button.warning,
+  label.ui-input-with-button > button.warning {
+    color: var(--error);
+  }
+
+  .ui-button-group {
+    display: inline-flex;
+    width: fit-content;
+  }
+
+  .ui-button-group[data-orientation='vertical'] {
+    flex-direction: column;
+  }
+
+  .ui-button-group[data-orientation='horizontal'] > .ui-button:not(:first-child) {
+    margin-left: -1px;
+  }
+
+  .ui-button-group[data-orientation='vertical'] > .ui-button:not(:first-child) {
+    margin-top: -1px;
+  }
+
+  .ui-button-group[data-orientation='horizontal'] > .ui-button {
+    border-radius: 0;
+  }
+
+  .ui-button-group[data-orientation='horizontal'] > .ui-button:first-child {
+    border-top-left-radius: var(--ui-control-radius);
+    border-bottom-left-radius: var(--ui-control-radius);
+  }
+
+  .ui-button-group[data-orientation='horizontal'] > .ui-button:last-child {
+    border-top-right-radius: var(--ui-control-radius);
+    border-bottom-right-radius: var(--ui-control-radius);
+  }
+
+  .ui-button-group[data-orientation='vertical'] > .ui-button {
+    border-radius: 0;
+    width: 100%;
+  }
+
+  .ui-button-group[data-orientation='vertical'] > .ui-button:first-child {
+    border-top-left-radius: var(--ui-control-radius);
+    border-top-right-radius: var(--ui-control-radius);
+  }
+
+  .ui-button-group[data-orientation='vertical'] > .ui-button:last-child {
+    border-bottom-left-radius: var(--ui-control-radius);
+    border-bottom-right-radius: var(--ui-control-radius);
+  }
+}
