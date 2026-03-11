@@ -1,6 +1,6 @@
 # UI Form Components
 
-Unstyled, composable form primitives for consistent theming and layout. Customize via your own CSS by targeting the stable class names and optional `data-size` / `data-variant` attributes.
+Composable form primitives with a shared baseline style for spacing, border radius, and borders. Customize via your own CSS by targeting the stable class names and optional `data-size` / `data-variant` attributes.
 
 ## Primitives
 
@@ -27,7 +27,8 @@ Unstyled, composable form primitives for consistent theming and layout. Customiz
 - Each component has a stable class: `ui-input`, `ui-button`, `ui-checkbox`, `ui-label`, etc.
 - Optional attributes: `data-size` (`sm` \| `md` \| `lg`), `data-variant` (any string).
 - Composition classes: `.ui-input-group`, `.ui-input-group__leading`, `.ui-input-group__input`, `.ui-input-group__trailing`, `.ui-button-group`, `.ui-input-with-button`, `.ui-input-with-button__input`, `.ui-input-with-button__action`.
-- Add your styles in app CSS or a theme file; `ui.css` in this folder documents the hooks and adds no visual styles.
+- Base styles are defined in `ui.css` and imported globally from `src/styles/app.css`.
+- Override or extend these rules in app CSS or a theme file as needed.
 
 ## Usage
 

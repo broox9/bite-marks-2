@@ -4,7 +4,7 @@
   import { getSpotById, updateSpot } from '$lib/adapters/primary/remote-handlers/spots.remote';
   import { invalidateAll } from '$app/navigation';
   import { getPlacePhotoUrl } from '$lib/adapters/secondary/google/google.svelte';
-  import { Input, Button, Checkbox, Textarea } from '$components/ui';
+  import { Input, Button, Checkbox, Textarea, SubmitButton } from '$components/ui';
 
   const spotQuery = getSpotById({ id: page.params.id ?? '' });
   const maxPhotoWidth = 800;
@@ -185,35 +185,34 @@
                   class="flex-1 px-3 py-2 border border-gray-300 rounded-md"
                   placeholder="https://..."
                 />
-                <button
+                <Button
                   type="button"
                   onclick={() => removeSocialLink(index)}
                   class="px-3 py-2 bg-red-500 text-white rounded-md hover:bg-red-600"
                 >
                   Remove
-                </button>
+                </Button>
               </div>
             {/each}
-            <button
+            <Button
               type="button"
               onclick={addSocialLink}
               class="px-3 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300"
             >
               + Add Social Link
-            </button>
+            </Button>
           </div>
         </div>
 
         <!-- Save Button -->
         <div class="pt-4">
-          <button
-            type="submit"
+          <SubmitButton
             onclick={handleSave}
             disabled={isSaving || !rowId}
             class="w-full px-4 py-2"
           >
             {isSaving ? 'Saving...' : 'Save Changes'}
-          </button>
+          </SubmitButton>
         </div>
       </section>
     </div>

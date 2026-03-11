@@ -4,6 +4,7 @@
 @import './colors.css';
 @import './typography.css';
 @import './components.css';
+@import '../components/ui/ui.css';
 
 
 body {

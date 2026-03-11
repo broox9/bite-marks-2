@@ -1,6 +1,6 @@
 /**
- * Unstyled form UI components.
- * Use classes .ui-input, .ui-button, etc. in your CSS for theming.
+ * Form UI components with a shared baseline style.
+ * Use classes .ui-input, .ui-button, etc. in your CSS to theme or override.
  * Optional data-size (sm|md|lg) and data-variant for layout/theme targeting.
  */
 
