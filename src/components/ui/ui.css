@@ -1,7 +1,8 @@
 @layer components {
-  :where(.ui-input, .ui-button, .ui-textarea, .ui-input-group, .ui-input-with-button, .ui-button-group) {
-    --ui-control-padding-block: var(--padding-1);
-    --ui-control-padding-inline: var(--padding-2);
+  :where(.ui-input, .ui-button, .ui-textarea, .ui-checkbox, .ui-label, .ui-input-group, .ui-input-with-button, .ui-button-group) {
+    --ui-control-padding-block: 0.625rem;
+    --ui-control-padding-inline: 1.125rem;
+    --ui-control-min-block-size: 2.5rem;
     --ui-control-radius: var(--border-radius);
     --ui-control-border-color: var(--bg-low-contrast);
     --ui-control-bg: var(--bg-light);
@@ -9,14 +10,15 @@
     --ui-control-focus-ring: oklch(from var(--accent-color) l c h / 0.2);
   }
 
-  :where(.ui-input, .ui-button, .ui-textarea, .ui-input-group, .ui-input-with-button, .ui-button-group)[data-size='sm'] {
-    --ui-control-padding-block: calc(var(--padding-1) * 0.75);
-    --ui-control-padding-inline: var(--padding-1);
+  :where(.ui-input, .ui-button, .ui-textarea, .ui-checkbox, .ui-label, .ui-input-group, .ui-input-with-button, .ui-button-group)[data-size='sm'] {
+    --ui-control-padding-block: 0.5rem;
+    --ui-control-padding-inline: 1rem;
   }
 
-  :where(.ui-input, .ui-button, .ui-textarea, .ui-input-group, .ui-input-with-button, .ui-button-group)[data-size='lg'] {
-    --ui-control-padding-block: var(--padding-2);
-    --ui-control-padding-inline: var(--padding-3);
+  :where(.ui-input, .ui-button, .ui-textarea, .ui-checkbox, .ui-label, .ui-input-group, .ui-input-with-button, .ui-button-group)[data-size='lg'] {
+    --ui-control-padding-block: 0.75rem;
+    --ui-control-padding-inline: 1.25rem;
+    --ui-control-min-block-size: 2.75rem;
   }
 
   .ui-input,
@@ -27,6 +29,7 @@
     background-color: var(--ui-control-bg);
     color: var(--ui-control-text);
     padding: var(--ui-control-padding-block) var(--ui-control-padding-inline);
+    min-block-size: var(--ui-control-min-block-size);
     line-height: 1.25;
     font: inherit;
     transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
@@ -77,8 +80,8 @@
 
   .ui-checkbox {
     appearance: none;
-    inline-size: 1.25rem;
-    block-size: 1.25rem;
+    inline-size: var(--ui-control-min-block-size);
+    block-size: var(--ui-control-min-block-size);
     margin: 0;
     border: 1px solid var(--ui-control-border-color);
     border-radius: calc(var(--ui-control-radius) * 0.5);
@@ -96,7 +99,7 @@
   .ui-checkbox:checked::before {
     content: '✓';
     color: var(--bg-light);
-    font-size: 0.75rem;
+    font-size: 1rem;
     line-height: 1;
   }
 
@@ -139,6 +142,7 @@
     display: inline-flex;
     align-items: center;
     padding: var(--ui-control-padding-block) var(--ui-control-padding-inline);
+    min-block-size: var(--ui-control-min-block-size);
     background-color: var(--ui-control-bg);
   }
 
@@ -166,12 +170,15 @@
   label.ui-input-with-button > :is(input, textarea) {
     flex: 1;
     min-width: 0;
+    min-block-size: var(--ui-control-min-block-size);
     padding: var(--ui-control-padding-block) var(--ui-control-padding-inline);
     outline: none;
   }
 
   .ui-input-with-button > :is(button, .ui-button),
   label.ui-input-with-button > :is(button, .ui-button) {
+    min-block-size: var(--ui-control-min-block-size);
+    padding: var(--ui-control-padding-block) var(--ui-control-padding-inline);
     border-left: 1px solid var(--ui-control-border-color);
   }
 
