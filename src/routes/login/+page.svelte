@@ -2,7 +2,7 @@
   // import { account, ID } from '$lib/infrastructure/database/appwrite.client';
   import  { storeGetCurrentUser, storeSetCurrentUser } from '$lib/adapters/primary/stores/user.store.svelte';
   import { loginAction } from '$lib/adapters/primary/remote-handlers/login.remote'
-  import { Input } from '$components/ui'
+  import { Input, SubmitButton } from '$components/ui'
 
   let loggedInUser = $state<any | null>(null)
 </script>
@@ -25,8 +25,8 @@
     <Input {...loginAction.fields.password.as('password')} placeholder="password" />
   </label>
 
-  <button type="submit" data-type="login">Login</button>
-  <!-- <button type="submit" data-type="register">Register</button> -->
+  <SubmitButton data-type="login">Login</SubmitButton>
+  <!-- <SubmitButton data-type="register">Register</SubmitButton> -->
 </form>
 
 <div class="text-center">
@@ -71,15 +71,15 @@ form {
     }
   }
 
-  input,
-  button {
+  :global(.ui-input),
+  :global(.ui-button) {
     box-sizing: border-box;
     width: var(--field-width);
     margin-inline: auto;
     display: block;
   }
 
-   button {
+   :global(.ui-button) {
     text-align: center;
   }
 </style>
