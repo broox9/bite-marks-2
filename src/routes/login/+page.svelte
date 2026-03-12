@@ -25,7 +25,9 @@
     <Input {...loginAction.fields.password.as('password')} placeholder="password" />
   </label>
 
-  <SubmitButton data-type="login">Login</SubmitButton>
+  <div class="form-action">
+    <SubmitButton data-type="login" data-width="full">Login</SubmitButton>
+  </div>
   <!-- <SubmitButton data-type="register">Register</SubmitButton> -->
 </form>
 
@@ -71,15 +73,8 @@ form {
     }
   }
 
-  :global(.ui-input),
-  :global(.ui-button) {
-    box-sizing: border-box;
+  .form-action {
     width: var(--field-width);
     margin-inline: auto;
-    display: block;
-  }
-
-   :global(.ui-button) {
-    text-align: center;
   }
 </style>

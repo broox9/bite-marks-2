@@ -1,8 +1,9 @@
 @layer components {
   :where(.ui-input, .ui-button, .ui-textarea, .ui-checkbox, .ui-label, .ui-input-group, .ui-input-with-button, .ui-button-group) {
+    --ui-control-tap-area: 2.5rem;
     --ui-control-padding-block: 0.625rem;
     --ui-control-padding-inline: 1.125rem;
-    --ui-control-min-block-size: 2.5rem;
+    --ui-control-min-block-size: var(--ui-control-tap-area);
     --ui-control-radius: var(--border-radius);
     --ui-control-border-color: var(--bg-low-contrast);
     --ui-control-bg: var(--bg-light);
@@ -29,7 +30,8 @@
     background-color: var(--ui-control-bg);
     color: var(--ui-control-text);
     padding: var(--ui-control-padding-block) var(--ui-control-padding-inline);
-    min-block-size: var(--ui-control-min-block-size);
+    min-block-size: max(var(--ui-control-tap-area), var(--ui-control-min-block-size));
+    min-height: max(var(--ui-control-tap-area), var(--ui-control-min-block-size));
     line-height: 1.25;
     font: inherit;
     transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
@@ -53,6 +55,16 @@
     width: fit-content;
     cursor: pointer;
     text-wrap: nowrap;
+  }
+
+  .ui-button[data-width='full'] {
+    width: 100%;
+  }
+
+  .ui-button[data-variant='danger'] {
+    background-color: var(--error);
+    border-color: var(--error);
+    color: var(--bg-light);
   }
 
   .ui-button[type='submit'],

@@ -7,8 +7,8 @@ Composable form primitives with a shared baseline style for spacing, border radi
 | Component | Description |
 |-----------|-------------|
 | **Input** | Base text input. Supports `class`, `data-size`, `data-variant`, and all native input attributes. |
-| **Button** | Button with optional content (text/icons). Default `type="button"`. |
-| **SubmitButton** | Same as Button but always `type="submit"`. |
+| **Button** | Button with optional content (text/icons). Default `type="button"`. Supports `data-width="full"` for full-width layout. |
+| **SubmitButton** | Same as Button but always `type="submit"`. Supports `data-width="full"` for full-width layout. |
 | **Checkbox** | Checkbox input with same layout/theming props. |
 | **Search** | Input with `type="search"` (wraps Input). |
 | **Password** | Input with `type="password"` (wraps Input). |
@@ -25,7 +25,7 @@ Composable form primitives with a shared baseline style for spacing, border radi
 ## Theming & layout
 
 - Each component has a stable class: `ui-input`, `ui-button`, `ui-checkbox`, `ui-label`, etc.
-- Optional attributes: `data-size` (`sm` \| `md` \| `lg`), `data-variant` (any string).
+- Optional attributes: `data-size` (`sm` \| `md` \| `lg`), `data-variant` (any string), `data-width` (`fit` \| `full` for buttons).
 - Composition classes: `.ui-input-group`, `.ui-input-group__leading`, `.ui-input-group__input`, `.ui-input-group__trailing`, `.ui-button-group`, `.ui-input-with-button`, `.ui-input-with-button__input`, `.ui-input-with-button__action`.
 - Base styles are defined in `ui.css` and imported globally from `src/styles/app.css`.
 - Override or extend these rules in app CSS or a theme file as needed.
