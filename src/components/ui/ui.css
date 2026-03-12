@@ -55,6 +55,14 @@
     text-wrap: nowrap;
   }
 
+  .ui-button.ui-button {
+    /* Keep button controls aligned with input spacing and tap target size. */
+    padding-block: var(--ui-control-padding-block);
+    padding-inline: var(--ui-control-padding-inline);
+    min-block-size: max(2.5rem, var(--ui-control-min-block-size));
+    min-height: max(2.5rem, var(--ui-control-min-block-size));
+  }
+
   .ui-button[type='submit'],
   .ui-button[data-variant='primary'] {
     background-color: var(--cta-color);
