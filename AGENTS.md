@@ -71,3 +71,30 @@ npm run check
 
 ### Available skills
 - `frontend-design`: Create distinctive, production-grade frontend interfaces with high design quality for component/page/application build requests. (file: `/Users/brooxm2/projects/bite-marks-2/skills/frontend-design/SKILL.md`)
+
+## Cursor Cloud specific instructions
+
+### Package manager
+The project uses **Bun** (lockfile: `bun.lock`). Use `bun install`, `bun run dev`, `bun run test`, etc. The `package.json` scripts reference `npm run` but all work via `bun run` as well.
+
+### Required environment variables
+The following secrets must be configured for the app to connect to Appwrite:
+- `PUBLIC_APPWRITE_ENDPOINT`
+- `APPWRITE_PROJECT_ID`
+- `APPWRITE_API_KEY`
+
+Optional: `OPENAI_API_KEY` (only needed for the `/agent` chat route).
+
+### Running services
+- **Dev server:** `bun run dev` — starts Vite on `http://localhost:5173`
+- The app requires no local databases or Docker containers; all persistence is via remote Appwrite.
+- Google Maps API key and Mapbox token are hardcoded in `src/app.html` and `src/lib/constants.ts`.
+
+### Checks, tests, build
+- `bun run check` — runs `svelte-kit sync && svelte-check`. There are ~25 pre-existing TS/Svelte errors in the codebase; these are not regressions.
+- `bun run test` — runs `vitest run` (95 tests across 7 files).
+- `bun run build` — production build (uses Cloudflare adapter). Note: this will fail without the Cloudflare-specific build environment; use the dev server for local testing.
+- No ESLint config file exists in the repo despite `AGENTS.md` mentioning it; there is no separate lint command.
+
+### Auth flow
+Unauthenticated requests to any route (except `/login` and `/all-spots`) redirect to `/login`. The `/all-spots` page is public and fetches data from Appwrite without auth — useful for quick smoke-testing.
