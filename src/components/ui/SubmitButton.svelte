@@ -6,6 +6,7 @@
     disabled?: boolean
     'data-size'?: 'sm' | 'md' | 'lg'
     'data-variant'?: string
+    'data-width'?: 'fit' | 'full'
   }
 
   let { ...rest }: Props = $props()

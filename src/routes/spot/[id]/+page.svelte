@@ -187,8 +187,8 @@
                 />
                 <Button
                   type="button"
+                  data-variant="danger"
                   onclick={() => removeSocialLink(index)}
-                  class="px-3 py-2 bg-red-500 text-white rounded-md hover:bg-red-600"
                 >
                   Remove
                 </Button>
@@ -197,7 +197,6 @@
             <Button
               type="button"
               onclick={addSocialLink}
-              class="px-3 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300"
             >
               + Add Social Link
             </Button>
@@ -209,7 +208,7 @@
           <SubmitButton
             onclick={handleSave}
             disabled={isSaving || !rowId}
-            class="w-full px-4 py-2"
+            data-width="full"
           >
             {isSaving ? 'Saving...' : 'Save Changes'}
           </SubmitButton>

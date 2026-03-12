@@ -8,6 +8,7 @@
     children?: Snippet
     'data-size'?: 'sm' | 'md' | 'lg'
     'data-variant'?: string
+    'data-width'?: 'fit' | 'full'
   }
 
   let {
@@ -16,6 +17,7 @@
     children,
     'data-size': dataSize,
     'data-variant': dataVariant,
+    'data-width': dataWidth,
     ...rest
   }: Props = $props()
 </script>
@@ -25,5 +27,6 @@
   class="ui-button {className}"
   data-size={dataSize}
   data-variant={dataVariant}
+  data-width={dataWidth}
   {...rest}
 >{@render children?.()}</button>
