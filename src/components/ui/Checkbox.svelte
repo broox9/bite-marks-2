@@ -12,6 +12,7 @@
     class: className = '',
     'data-size': dataSize,
     'data-variant': dataVariant,
+    checked: checkedValue,
     value,
     ...rest
   }: Props = $props()
@@ -23,5 +24,5 @@
   data-size={dataSize}
   data-variant={dataVariant}
   {...rest}
-  checked={value ?? false}
+  checked={checkedValue ?? value ?? false}
 />
