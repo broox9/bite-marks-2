@@ -147,7 +147,15 @@
 
           <!-- Is Visited -->
           <label for="is-visited" id="is-visited-label">
-            <Checkbox id="is-visited" name="is-visited" value={isVisited} />
+            <Checkbox
+              id="is-visited"
+              name="is-visited"
+              checked={isVisited}
+              onchange={(event: Event) => {
+                const target = event.currentTarget as HTMLInputElement;
+                isVisited = target.checked;
+              }}
+            />
             <span>Is visited?</span>
           </label>
         </section>
