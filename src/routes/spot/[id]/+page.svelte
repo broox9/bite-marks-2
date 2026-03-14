@@ -151,7 +151,7 @@
               id="is-visited"
               name="is-visited"
               checked={isVisited}
-              onchange={(event) => {
+              onchange={(event: Event) => {
                 const target = event.currentTarget as HTMLInputElement;
                 isVisited = target.checked;
               }}
