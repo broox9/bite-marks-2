@@ -18,7 +18,7 @@
   };
 </script>
 
-<div class="list-item-container" id={item.id}>
+<div class="list-item-container" id={item.id} data-open={isToolsOpen}>
   <div
     class="list-item-wrapper"
     data-open={isToolsOpen}
@@ -28,7 +28,7 @@
       <div class="spot-title-row">
         <a href={`/spot/${item.id}`} aria-label={`Open ${item.name}`}>{item.name}</a>
         {#if item.is_visited}
-          <span class="visited-check">Visited</span>
+          <span class="visited-check">v</span>
         {/if}
       </div>
       <p>{item.address}</p>
@@ -85,14 +85,13 @@
     padding: var(--padding-2);
     z-index: 2;
     transition:
-      transform 0.22s cubic-bezier(0.25, 1, 0.5, 1),
       background-color 0.18s ease-out;
     background-color: var(--bg-color);
     isolation: isolate;
   }
 
   .list-item-wrapper[data-open="true"] {
-    transform: translateX(-6rem);
+    background-color: var(--bg-light);
   }
 
   .list-item-wrapper[data-map-active="true"] {
@@ -111,6 +110,18 @@
     background-color: transparent;
     cursor: pointer;
     color: var(--bg-medium-contrast);
+    transition:
+      transform 0.22s cubic-bezier(0.25, 1, 0.5, 1),
+      border-color 0.18s ease-out,
+      background-color 0.18s ease-out,
+      color 0.18s ease-out;
+  }
+
+  .list-item-wrapper[data-open="true"] .tools-toggle {
+    transform: translateX(-6rem);
+    border-color: var(--accent-color);
+    background-color: var(--bg-light);
+    color: var(--bg-high-contrast);
   }
 
   .list-item-content {
@@ -143,14 +154,14 @@
 
   .visited-check {
     flex: 0 0 auto;
-    border: 1px solid var(--success);
-    border-radius: 999px;
-    background-color: var(--success-tint);
-    color: oklch(from var(--success) 0.35 calc(c * 0.8) h);
+    border: 1px solid var(--accent-color);
+    border-radius: 1rem;
+    /* background-color: var(--bg-low-contrast); */
+    color: var(--text-muted);
     padding: 0.125rem 0.5rem;
     font-size: 0.75rem;
-    font-weight: 700;
-    line-height: 1.2;
+    font-weight: 500;
+    line-height: 1;
   }
 
   .tool-buttons {
@@ -162,6 +173,15 @@
     right: 0;
     bottom: 0;
     z-index: 1;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.18s ease-out;
+  }
+
+  .list-item-container[data-open="true"] .tool-buttons {
+    z-index: 3;
+    opacity: 1;
+    pointer-events: auto;
   }
 
   .tool-buttons button {
@@ -204,7 +224,8 @@
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .list-item-wrapper {
+    .list-item-wrapper button,
+    .tool-buttons {
       transition: none;
     }
   }

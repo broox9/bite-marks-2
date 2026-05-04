@@ -9,14 +9,26 @@
   import Dialog from "../../components/util/Dialog.svelte";
   import ResultCard from "../../components/ResultCard.svelte";
   import ResultListItem from "../../components/ResultListItem.svelte";
+  import SegmentedControl from "../../components/ui/SegmentedControl.svelte";
   import type { ResultPlaceRecord } from "$lib/core/domain/Place/Place";
+  import type { UserSpotRecord } from "$lib/core/domain/Spot/Spot";
   import mapboxgl from "mapbox-gl";
   import "mapbox-gl/dist/mapbox-gl.css";
   import { MAPBOX_PUBLIC_KEY } from "$lib/constants";
-  // let spotsList :any[] = $state([])
+
   let showSearch = $state(false);
+  let filterValue = $state("all");
   const spotsQuery = getSpots({});
-  const spotRows = $derived(spotsQuery.current?.rows ?? []);
+  const spotRows = $derived(
+    (spotsQuery.current?.rows ?? []) as UserSpotRecord[],
+  );
+  const filteredSpotRows = $derived(
+    spotRows.filter((spot) => {
+      if (filterValue === "visited") return spot.is_visited;
+      if (filterValue === "unvisited") return !spot.is_visited;
+      return true;
+    }),
+  );
   let selectedResultObj = $state<ResultPlaceRecord | null>(null);
 
   let mapContainer: HTMLElement;
@@ -35,8 +47,7 @@
     mapboxgl.accessToken = MAPBOX_PUBLIC_KEY;
     map = new mapboxgl.Map({
       container: mapContainer,
-      // style: "mapbox://styles/mapbox/dark-v11",
-      // style: "mapbox://styles/mapbox/streets-v12",
+      style: "mapbox://styles/mapbox/streets-v12",
       center: [-73.9654, 40.7829],
       zoom: 10,
     });
@@ -50,7 +61,10 @@
     return undefined;
   }
 
-  function resultSaveAction(_result: unknown, _selectedResult: ResultPlaceRecord): undefined {
+  function resultSaveAction(
+    _result: unknown,
+    _selectedResult: ResultPlaceRecord,
+  ): undefined {
     void invalidateAll();
     resultClearAction();
     return undefined;
@@ -74,7 +88,7 @@
       return;
     }
 
-    const spot = spotsQuery.current?.rows?.find((r: any) => r.id === rowId);
+    const spot = spotRows.find((row) => row.id === rowId);
     if (spot && map) {
       const el = document.createElement("div");
       el.className = "bite-marker-pin";
@@ -121,19 +135,16 @@
       </button>
     </div>
 
-      <PlaceSearchTool selectResultAction={selectResultFn} />
-      <Dialog
-        shouldModalBeOpen={!!selectedResultObj}
-        onClose={resultClearAction}
-      >
-        {#if selectedResultObj}
-          <ResultCard
-            place={selectedResultObj}
-            saveAction={resultSaveAction}
-            clearAction={resultClearAction}
-          />
-        {/if}
-      </Dialog>
+    <PlaceSearchTool selectResultAction={selectResultFn} />
+    <Dialog shouldModalBeOpen={!!selectedResultObj} onClose={resultClearAction}>
+      {#if selectedResultObj}
+        <ResultCard
+          place={selectedResultObj}
+          saveAction={resultSaveAction}
+          clearAction={resultClearAction}
+        />
+      {/if}
+    </Dialog>
   </section>
 
   <section
@@ -146,26 +157,28 @@
   <section id="spots-list">
     <div id="spots-list-header">
       <div class="spots-summary">
-        <div>
-          <span class="eyebrow">Saved spots</span>
-          <h1>Your list</h1>
-        </div>
-        <span class="spot-count"
-          >{spotRows.length} {spotRows.length === 1 ? "spot" : "spots"}</span
-        >
-      </div>
+        <span class="spot-count">{filteredSpotRows.length}</span>
+        <SegmentedControl
+          options={[
+            { value: "all", label: "All" },
+            { value: "visited", label: "Visited" },
+            { value: "unvisited", label: "Unvisited" },
+          ]}
+          bind:selected={filterValue}
+        />
 
-      <button
-        id="shrink-map-button"
-        type="button"
-        onclick={toggleMapMinimization}
-        aria-label={isMapMinimized ? "Expand map" : "Collapse map"}
-        aria-pressed={isMapMinimized}
-      >
-        <span class="drag-handle"></span>
-      </button>
+        <button
+          id="shrink-map-button"
+          type="button"
+          onclick={toggleMapMinimization}
+          aria-label={isMapMinimized ? "Expand map" : "Collapse map"}
+          aria-pressed={isMapMinimized}
+        >
+          <span class="drag-handle"></span>
+        </button>
+      </div>
     </div>
-    
+
     {#if spotsQuery.error}
       <p class="state-message state-message-error" role="alert">
         Could not load saved spots. {spotsQuery.error}
@@ -179,31 +192,39 @@
           </div>
         {/each}
       </div>
-    {:else}
-      {#if spotRows.length === 0}
-        <div class="state-message empty-state">
+    {:else if filteredSpotRows.length === 0}
+      <div class="state-message empty-state">
+        {#if spotRows.length === 0}
           <h2>No saved spots yet</h2>
-          <p>Search for a place, save it, and it will stay here for the next time you are choosing where to eat.</p>
-          <button type="button" class="empty-state-action" onclick={() => (showSearch = true)}>
+          <p>
+            Search for a place, save it, and it will stay here for the next time
+            you are choosing where to eat.
+          </p>
+          <button
+            type="button"
+            class="empty-state-action"
+            onclick={() => (showSearch = true)}
+          >
             <Search size={18} />
             Search places
           </button>
-        </div>
-      {:else}
-        <div class="spots-stack" aria-label="Saved spots">
-          {#each spotRows as spot}
-            <ResultListItem
-              item={spot}
-              {deleteSpotAction}
-              {mapSpotAction}
-              isMapActive={activeMapSpotId === spot.id}
-            />
-          {/each}
-        </div>
-      {/if}
+        {:else}
+          <h2>No {filterValue} spots found</h2>
+          <p>Try changing your filter to see your other saved spots.</p>
+        {/if}
+      </div>
+    {:else}
+      <div class="spots-stack" aria-label="Saved spots">
+        {#each filteredSpotRows as spot}
+          <ResultListItem
+            item={spot}
+            {deleteSpotAction}
+            {mapSpotAction}
+            isMapActive={activeMapSpotId === spot.id}
+          />
+        {/each}
+      </div>
     {/if}
-
-    <!-- <pre>{JSON.stringify(spotsQuery.current, null, 2)}</pre> -->
   </section>
 </div>
 
