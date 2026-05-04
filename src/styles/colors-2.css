@@ -1,0 +1,75 @@
+/* colors-2.css
+ * Color system built on OKLCH.
+ * Relative colors (hover, active, disabled, tints) always derive
+ * from their base via the CSS relative color syntax so changing one
+ * base token updates the whole ramp automatically.
+ *
+ * Primary CTA  — warm orange
+ * Secondary CTA — cool indigo (warm ↔ cool contrast pair)
+ */
+
+:root {
+
+  /* ─── Primary CTA · Warm Orange ──────────────────────────────────────────
+   * Base: mid-lightness, high chroma, warm orange hue (~52°)
+   * ──────────────────────────────────────────────────────────────────────── */
+  --cta-primary:          oklch(0.63 0.21 52);
+  --cta-primary-hover:    oklch(from var(--cta-primary) calc(l + 0.06) calc(c + 0.02) h);
+  --cta-primary-active:   oklch(from var(--cta-primary) calc(l - 0.09) calc(c + 0.02) h);
+  --cta-primary-disabled: oklch(from var(--cta-primary) calc(l + 0.18) calc(c * 0.25) h);
+
+  /* Light tints — for backgrounds, badges, or muted text */
+  --cta-primary-tint-1:   oklch(from var(--cta-primary) 0.94 calc(c * 0.18) h); /* near-white wash  */
+  --cta-primary-tint-2:   oklch(from var(--cta-primary) 0.87 calc(c * 0.32) h); /* soft peach tint  */
+
+
+  /* ─── Secondary CTA · Cool Indigo ────────────────────────────────────────
+   * Chosen as the warm-cool contrast pair to the orange primary.
+   * Base: medium-dark, moderate chroma, indigo hue (~265°)
+   * ──────────────────────────────────────────────────────────────────────── */
+  --cta-secondary:          oklch(0.50 0.16 265);
+  --cta-secondary-hover:    oklch(from var(--cta-secondary) calc(l + 0.07) calc(c + 0.02) h);
+  --cta-secondary-active:   oklch(from var(--cta-secondary) calc(l - 0.09) calc(c + 0.02) h);
+  --cta-secondary-disabled: oklch(from var(--cta-secondary) calc(l + 0.20) calc(c * 0.25) h);
+
+  /* ─── Semantic Colors ────────────────────────────────────────────────────
+   * Chosen to sit naturally beside the orange/indigo CTA pair:
+   * notification leans blue-cyan, success is fresh green,
+   * error is a warm crimson, and warning is golden amber.
+   * ──────────────────────────────────────────────────────────────────────── */
+  --notification:       oklch(0.66 0.15 235);
+  --notification-tint:  oklch(from var(--notification) 0.94 calc(c * 0.18) h);
+
+  --success:            oklch(0.70 0.17 148);
+  --success-tint:       oklch(from var(--success) 0.94 calc(c * 0.18) h);
+
+  --error:              oklch(0.62 0.20 24);
+  --error-tint:         oklch(from var(--error) 0.94 calc(c * 0.18) h);
+
+  --warning:            oklch(0.76 0.17 78);
+  --warning-tint:       oklch(from var(--warning) 0.95 calc(c * 0.16) h);
+
+  /* ─── Product Surface Tokens ─────────────────────────────────────────────
+   * Keep the current component vocabulary working while the app moves from
+   * colors.css to this named OKLCH system.
+   * ──────────────────────────────────────────────────────────────────────── */
+  --accent-color: oklch(0.6892 0.1425 166.1212);
+  --accent-color-tint: oklch(from var(--accent-color) 0.94 calc(c * 0.18) h);
+
+  --bg-color: oklch(1 0.0134 267.1);
+  --bg-light: oklch(0.9762 0.0134 267.1);
+  --bg-low-contrast: oklch(0.9262 0.0134 267.1);
+  --bg-medium-contrast: oklch(0.667 0.0134 267.1);
+  --bg-high-contrast: oklch(0.297 0.0134 267.1);
+
+  --text-color: var(--bg-high-contrast);
+  --text-muted: var(--bg-medium-contrast);
+  --cta-color: var(--cta-primary);
+  --cta-dark: var(--cta-primary-hover);
+  --cta-dark-super: var(--cta-primary-active);
+  --cta-box-shadow: 0 0.5rem 1rem oklch(from var(--accent-color) 0.34 calc(c * 0.45) h / 0.24);
+
+  --disabled: oklch(from var(--bg-low-contrast) calc(l - 0.02) c h);
+  --disabled-text: var(--bg-medium-contrast);
+
+}

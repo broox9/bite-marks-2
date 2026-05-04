@@ -7,37 +7,42 @@
   let loggedInUser = $state<any | null>(null)
 </script>
 
-<div class="text-center mt-4">
-  <strong>
-      {loggedInUser ? `Logged in as ${loggedInUser.name}` : 'Login'}
-  </strong>
-</div>
 
+<section class="container">
+  <form {...loginAction}>
+      <strong>
+          {loggedInUser ? `Logged in as ${loggedInUser.name}` : 'Login'}
+      </strong>
+    <label for="email">
+      <span>Email</span>
+      <Input {...loginAction.fields.email.as('text')} placeholder="email" />
+    </label>
 
-<form {...loginAction}>
-  <label for="email">
-    <span>Email</span>
-    <Input {...loginAction.fields.email.as('text')} placeholder="email" />
-  </label>
+    <label for="password">
+      <span>Password</span>
+      <Input {...loginAction.fields.password.as('password')} placeholder="password" />
+    </label>
 
-  <label for="password">
-    <span>Password</span>
-    <Input {...loginAction.fields.password.as('password')} placeholder="password" />
-  </label>
+    <div class="form-action">
+      <SubmitButton data-type="login" data-width="full">Login</SubmitButton>
+    </div>
+    <!-- <SubmitButton data-type="register">Register</SubmitButton> -->
+  </form>
 
-  <div class="form-action">
-    <SubmitButton data-type="login" data-width="full">Login</SubmitButton>
+  <div class="text-center">
+    <em>just looking for <a href="/all-spots">all the spots?</a></em>
   </div>
-  <!-- <SubmitButton data-type="register">Register</SubmitButton> -->
-</form>
-
-<div class="text-center">
-  <em>just looking for <a href="/all-spots">all the spots?</a></em>
-</div>
+</section>
 
 
 
 <style>
+
+  .container {
+    max-width: 30rem;
+    margin-inline: auto;
+    text-align: center;
+  }
 
 header {
   display: flex;
