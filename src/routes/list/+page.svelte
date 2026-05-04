@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Trash2, Search, X } from "@lucide/svelte";
+  import { Search, X } from "@lucide/svelte";
   import { invalidateAll } from "$app/navigation";
   import {
     getSpots,
@@ -16,6 +16,7 @@
   // let spotsList :any[] = $state([])
   let showSearch = $state(false);
   const spotsQuery = getSpots({});
+  const spotRows = $derived(spotsQuery.current?.rows ?? []);
   let selectedResultObj = $state<ResultPlaceRecord | null>(null);
 
   let mapContainer: HTMLElement;
@@ -41,42 +42,33 @@
     });
   });
   function selectResultFn(selectedResult: ResultPlaceRecord) {
-    console.log("[bs] selectResultFn", [...arguments], selectedResult);
     selectedResultObj = selectedResult;
   }
 
-  function resultClearAction() {
+  function resultClearAction(): undefined {
     selectedResultObj = null;
+    return undefined;
   }
 
-  function resultSaveAction(result: any, selectedResult: ResultPlaceRecord) {
-    console.log(
-      "[bs] resultSaveAction::page::fired",
-      [...arguments],
-      selectedResult,
-    );
-    invalidateAll();
+  function resultSaveAction(_result: unknown, _selectedResult: ResultPlaceRecord): undefined {
+    void invalidateAll();
     resultClearAction();
+    return undefined;
   }
 
-  function deleteSpotAction(rowId: string) {
-    if (!confirm("Are you sure you want to delete this spot?")) return;
-    console.log("[bs] deleteSpotAction::page::fired", [...arguments], rowId);
-    deleteUserSpot(rowId);
-    invalidateAll();
+  async function deleteSpotAction(rowId: string) {
+    if (!confirm("Delete this saved spot?")) return;
+    await deleteUserSpot(rowId);
+    await invalidateAll();
     resultClearAction();
   }
 
   function mapSpotAction(rowId: string) {
-    console.log("[bs] mapSpotAction::page::fired", rowId);
-
-    // Clear existing marker (popup is removed with it)
     if (activeMarker) {
       activeMarker.remove();
       activeMarker = null;
     }
 
-    // Toggle off if same row pressed again
     if (activeMapSpotId === rowId) {
       activeMapSpotId = null;
       return;
@@ -103,17 +95,33 @@
       activeMapSpotId = rowId;
       map.flyTo({ center: [spot.lng, spot.lat], zoom: 16 });
 
-      // on mobile, we might want to scroll up to the map so it's visible
       mapContainer?.scrollIntoView({ behavior: "smooth" });
     }
   }
 </script>
 
-<div id="page-container">
-  {#if showSearch}
-    <section id="search-container" shouldModalBeOpen={showSearch}>
+<div id="page-container" data-search-open={showSearch}>
+  <section
+    id="search-container"
+    class:open={showSearch}
+    aria-label="Find and save a spot"
+  >
+    <div class="search-panel-header">
+      <div>
+        <span class="eyebrow">Add a spot</span>
+        <h2>Search nearby places</h2>
+      </div>
+      <button
+        class="search-panel-close icon-button"
+        type="button"
+        aria-label="Close spot search"
+        onclick={() => (showSearch = false)}
+      >
+        <X size={18} />
+      </button>
+    </div>
+
       <PlaceSearchTool selectResultAction={selectResultFn} />
-      <!-- this is the results dialog, not the search one -->
       <Dialog
         shouldModalBeOpen={!!selectedResultObj}
         onClose={resultClearAction}
@@ -126,100 +134,182 @@
           />
         {/if}
       </Dialog>
-    </section>
-  {/if}
+  </section>
 
-  <section id="map-container" class:minimized={isMapMinimized} bind:this={mapContainer}></section>
+  <section
+    id="map-container"
+    class:minimized={isMapMinimized}
+    bind:this={mapContainer}
+    aria-label="Saved spots map"
+  ></section>
 
   <section id="spots-list">
     <div id="spots-list-header">
-      <button id="shrink-map-button" type="button" onclick={toggleMapMinimization} title="Toggle shrink map"></button>
+      <div class="spots-summary">
+        <div>
+          <span class="eyebrow">Saved spots</span>
+          <h1>Your list</h1>
+        </div>
+        <span class="spot-count"
+          >{spotRows.length} {spotRows.length === 1 ? "spot" : "spots"}</span
+        >
+      </div>
+
+      <button
+        id="shrink-map-button"
+        type="button"
+        onclick={toggleMapMinimization}
+        aria-label={isMapMinimized ? "Expand map" : "Collapse map"}
+        aria-pressed={isMapMinimized}
+      >
+        <span class="drag-handle"></span>
+      </button>
     </div>
     
     {#if spotsQuery.error}
-      <p>Error: {spotsQuery.error}</p>
+      <p class="state-message state-message-error" role="alert">
+        Could not load saved spots. {spotsQuery.error}
+      </p>
     {:else if spotsQuery.loading}
-      <p>Loading...</p>
+      <div class="spots-skeleton" aria-label="Loading saved spots">
+        {#each Array(4) as _}
+          <div class="skeleton-row" aria-hidden="true">
+            <span></span>
+            <small></small>
+          </div>
+        {/each}
+      </div>
     {:else}
-      {@const spotRows = spotsQuery.current?.rows ?? []}
-      {#each spotRows as spot}
-        <ResultListItem item={spot} {deleteSpotAction} {mapSpotAction} isMapActive={activeMapSpotId === spot.id} />
-      {/each}
+      {#if spotRows.length === 0}
+        <div class="state-message empty-state">
+          <h2>No saved spots yet</h2>
+          <p>Search for a place, save it, and it will stay here for the next time you are choosing where to eat.</p>
+          <button type="button" class="empty-state-action" onclick={() => (showSearch = true)}>
+            <Search size={18} />
+            Search places
+          </button>
+        </div>
+      {:else}
+        <div class="spots-stack" aria-label="Saved spots">
+          {#each spotRows as spot}
+            <ResultListItem
+              item={spot}
+              {deleteSpotAction}
+              {mapSpotAction}
+              isMapActive={activeMapSpotId === spot.id}
+            />
+          {/each}
+        </div>
+      {/if}
     {/if}
 
     <!-- <pre>{JSON.stringify(spotsQuery.current, null, 2)}</pre> -->
   </section>
 </div>
 
-{#if !showSearch}
-  <button
-    id="floating-search-button"
-    type="button"
-    class="icon-button"
-    onclick={() => (showSearch = true)}
-    ><Search size={20} strokeWidth={2} /></button
-  >
-{:else}
-  <button
-    id="floating-search-button"
-    type="button"
-    class="icon-button"
-    onclick={() => (showSearch = false)}><X size={20} /></button
-  >
-{/if}
+<button
+  id="floating-search-button"
+  type="button"
+  class="icon-button"
+  aria-label={showSearch ? "Close spot search" : "Search for a spot"}
+  aria-expanded={showSearch}
+  aria-controls="search-container"
+  onclick={() => (showSearch = !showSearch)}
+>
+  {#if showSearch}
+    <X size={20} />
+  {:else}
+    <Search size={20} strokeWidth={2} />
+  {/if}
+</button>
 
 <style>
   #page-container {
     display: flex;
     flex-direction: column;
-    /*display: grid;
-  grid-template-areas:
-    "map"
-    "spots"
-    "search";
-  grid-template-rows: auto 1fr auto;*/
-    /*grid-template-rows: auto 1fr;
-  grid-template-columns: minmax(300px, 500px) 1fr;*/
-    /*height: 100%;
-  min-height: 0; /* Allow grid item to shrink below content size */
-    /* max-height: 100svh; */
+    gap: 0;
+    min-height: calc(100svh - 7rem);
+    color: var(--bg-high-contrast);
   }
 
   #search-container {
-    /* grid-area: bottom-sheet; /* grid stacking */
-    grid-area: unset;
-    /* background-color: hsla(200, 50%, 50%, 0.25); */
-    background-color: hsl(from var(--bg-light) h s l / 0.85);
-    backdrop-filter: blur(3px);
-    height: auto;
-    min-height: 20rem;
-    padding: 0.75rem;
+    display: none;
+    background-color: var(--bg-light);
+    border: 1px solid var(--bg-low-contrast);
     border-radius: var(--border-radius);
-    box-shadow: 0 0 1rem rgba(0, 0, 0, 0.2);
-    transition: all 0.3s ease;
+    box-shadow: 0 1rem 2rem oklch(0.35 0.02 267 / 0.18);
+    padding: var(--padding-2);
     position: fixed;
-    top: 3rem;
-    /*bottom: 50%;*/
+    top: 4.75rem;
     left: 1rem;
     right: 1rem;
     z-index: 5;
   }
 
+  #search-container.open {
+    display: block;
+  }
+
+  .search-panel-header,
+  .spots-summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--padding-2);
+  }
+
+  .search-panel-header {
+    margin-bottom: var(--padding-2);
+  }
+
+  .search-panel-header h2,
+  .spots-summary h1 {
+    margin: 0;
+    font-size: 1.25rem;
+    line-height: 1.2;
+    letter-spacing: 0;
+  }
+
+  .eyebrow {
+    display: block;
+    margin-bottom: 0.125rem;
+    color: var(--bg-medium-contrast);
+    font-size: 0.8125rem;
+    font-weight: 650;
+    line-height: 1.2;
+  }
+
+  .search-panel-close,
+  .empty-state-action {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    min-height: 2.75rem;
+    border: 1px solid var(--bg-low-contrast);
+    border-radius: var(--border-radius);
+    background-color: var(--bg-light);
+    color: var(--bg-high-contrast);
+  }
+
+  .search-panel-close {
+    width: 2.75rem;
+    padding: 0;
+  }
+
   #map-container {
-    /* --base-section-color: hsla(100 50% 50% / 0.25); */
-    /* grid-area: map; */
-    height: 350px;
-    background-color: var(--base-section-color);
-    /* color: hsla(from(var(--base-section-color) h s 75% / 1)); */
-    /* padding: var(--padding-2); */
-    padding-bottom: var(--padding-3);
+    height: min(38svh, 24rem);
+    min-height: 18rem;
+    background-color: var(--accent-color-tint);
+    border: 1px solid var(--bg-low-contrast);
+    border-bottom: 0;
     border-radius: var(--border-radius) var(--border-radius) 0 0;
     position: relative;
     overflow: hidden;
-    transition: height 0.2s ease-out;
 
     &.minimized {
-      height: 25px;
+      height: 3rem;
+      min-height: 3rem;
     }
   }
 
@@ -228,8 +318,8 @@
     height: 1.25rem;
     background-color: var(--accent-color);
     border-radius: 50%;
-    border: 2px solid white;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    border: 2px solid var(--bg-light);
+    box-shadow: 0 0.125rem 0.5rem oklch(0.24 0.02 267 / 0.3);
   }
 
   :global(.bite-marker-popup) {
@@ -239,21 +329,14 @@
     padding: 0.25rem 0.5rem;
   }
 
-  .map-marker-icon {
-    width: 1rem;
-    height: 1rem;
-    border-radius: 50%;
-    background-color: var(--accent-color);
-    opacity: 0.5;
-  }
-
   #spots-list {
-    margin-top: calc(var(--padding-1) * -1);
     grid-area: spots;
     position: relative;
     overflow-y: auto;
-    min-height: 0; /* Allow grid item to shrink below content size */
-    padding-bottom: 3rem;
+    min-height: 0;
+    padding-bottom: 5rem;
+    background-color: var(--bg-color);
+    border: 1px solid var(--bg-low-contrast);
     border-radius: var(--border-radius) var(--border-radius) 0 0;
   }
 
@@ -261,34 +344,129 @@
     border-radius: var(--border-radius) var(--border-radius) 0 0;
     position: sticky;
     top: 0;
-    z-index: 1;
+    z-index: 3;
     display: flex;
-    /* display: none; */
-    /* grid-area: spots; */
-    flex-direction: row;
-    justify-content: center;
-    align-items: center;
-    padding: 0.25rem;
-    padding-top: calc(var(--padding-1) * 1.5);
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--padding-1);
+    padding: var(--padding-2) var(--padding-2) var(--padding-1);
+    background-color: oklch(from var(--bg-color) l c h / 0.96);
+    border-bottom: 1px solid var(--bg-low-contrast);
+  }
+
+  .spot-count {
+    border: 1px solid var(--bg-low-contrast);
+    border-radius: 999px;
+    background-color: var(--bg-light);
+    color: var(--bg-medium-contrast);
+    padding: 0.25rem 0.625rem;
+    font-size: 0.8125rem;
+    font-weight: 650;
   }
 
   #shrink-map-button {
-    height: 0.25rem;
-    width: 3rem;
-    background-color: var(--bg-light);
+    align-self: center;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 1.5rem;
+    width: 5rem;
+    padding: 0;
+    background-color: transparent;
     border: 1px solid var(--bg-low-contrast);
-    border-radius: var(--border-radius);
+    border-radius: 999px;
     box-shadow: none;
     cursor: pointer;
   }
 
-  .visited-check {
-    display: inline-block;
-    /*width: 1rem;
-  height: 1rem;*/
-    border-radius: 50%;
-    color: var(--bg-low-contrast);
-    margin-left: 0.5rem;
+  .drag-handle {
+    display: block;
+    width: 2.75rem;
+    height: 0.25rem;
+    border-radius: 999px;
+    background-color: var(--bg-medium-contrast);
+  }
+
+  .spots-stack {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .state-message {
+    margin: var(--padding-2);
+    border: 1px solid var(--bg-low-contrast);
+    border-radius: var(--border-radius);
+    background-color: var(--bg-light);
+    padding: var(--padding-3);
+    color: var(--bg-medium-contrast);
+  }
+
+  .state-message h2 {
+    margin: 0 0 0.5rem;
+    color: var(--bg-high-contrast);
+    font-size: 1.25rem;
+    letter-spacing: 0;
+  }
+
+  .state-message p {
+    max-width: 38rem;
+    margin: 0;
+  }
+
+  .state-message-error {
+    border-color: var(--error);
+    background-color: var(--error-tint);
+    color: oklch(from var(--error) 0.38 calc(c * 0.85) h);
+  }
+
+  .empty-state {
+    display: grid;
+    justify-items: start;
+    gap: var(--padding-2);
+  }
+
+  .empty-state-action {
+    background-color: var(--cta-color);
+    border-color: var(--cta-color);
+    color: var(--bg-light);
+    padding: 0 var(--padding-2);
+    font-weight: 650;
+  }
+
+  .spots-skeleton {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .skeleton-row {
+    display: grid;
+    gap: 0.625rem;
+    padding: var(--padding-2);
+    border-bottom: 1px solid var(--bg-low-contrast);
+  }
+
+  .skeleton-row span,
+  .skeleton-row small {
+    display: block;
+    border-radius: 999px;
+    background: linear-gradient(
+      90deg,
+      var(--bg-light),
+      var(--bg-low-contrast),
+      var(--bg-light)
+    );
+    background-size: 200% 100%;
+    animation: skeleton-shimmer 1.3s ease-out infinite;
+  }
+
+  .skeleton-row span {
+    width: min(16rem, 72%);
+    height: 1rem;
+  }
+
+  .skeleton-row small {
+    width: min(24rem, 88%);
+    height: 0.75rem;
   }
 
   #floating-search-button {
@@ -298,30 +476,81 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 42px;
-    width: 42px;
+    height: 3rem;
+    width: 3rem;
     border-radius: 100%;
     border: none;
     box-shadow: var(--cta-box-shadow);
-    /* background-color: lightblue; */
     line-height: 1;
     background-color: var(--accent-color);
     color: var(--bg-light);
     z-index: 5;
   }
 
+  button:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 3px oklch(from var(--accent-color) l c h / 0.26);
+  }
+
+  @keyframes skeleton-shimmer {
+    from {
+      background-position: 100% 0;
+    }
+
+    to {
+      background-position: -100% 0;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .skeleton-row span,
+    .skeleton-row small {
+      animation: none;
+    }
+  }
+
   @media (min-width: 768px) {
     #page-container {
+      display: grid;
       grid-template-areas:
         "spots search"
         "spots map";
       grid-template-rows: auto 1fr;
       grid-template-columns: 1fr minmax(300px, 500px);
+      gap: var(--padding-2);
+      padding: var(--padding-2);
     }
 
     #search-container {
+      display: block;
       grid-area: search;
-      /* place-self: end; */
+      position: relative;
+      top: auto;
+      left: auto;
+      right: auto;
+      z-index: 1;
+      box-shadow: none;
+    }
+
+    .search-panel-close {
+      display: none;
+    }
+
+    #map-container {
+      grid-area: map;
+      height: auto;
+      min-height: 24rem;
+      border: 1px solid var(--bg-low-contrast);
+      border-radius: var(--border-radius);
+    }
+
+    #map-container.minimized {
+      min-height: 6rem;
+    }
+
+    #spots-list {
+      max-height: calc(100svh - 8rem);
+      border-radius: var(--border-radius);
     }
 
     #floating-search-button {

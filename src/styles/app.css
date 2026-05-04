@@ -1,7 +1,8 @@
 /* @import 'tailwindcss'; */
 
 /* src/app.css */
-@import './colors.css';
+/*@import './colors.css';*/
+@import './colors-2.css';
 @import './typography.css';
 @import './components.css';
 @import '../components/ui/ui.css';

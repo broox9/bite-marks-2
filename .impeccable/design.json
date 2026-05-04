@@ -1,0 +1,266 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-05-04T00:00:00-04:00",
+  "title": "Design System: Bite Marks",
+  "extensions": {
+    "colorMeta": {
+      "burnt-orange": {
+        "role": "primary",
+        "displayName": "Burnt Orange",
+        "canonical": "oklch(0.63 0.21 52)",
+        "tonalRamp": [
+          "oklch(0.15 0.10 52)",
+          "oklch(0.25 0.14 52)",
+          "oklch(0.35 0.18 52)",
+          "oklch(0.48 0.21 52)",
+          "oklch(0.63 0.21 52)",
+          "oklch(0.74 0.17 52)",
+          "oklch(0.86 0.10 52)",
+          "oklch(0.95 0.04 52)"
+        ]
+      },
+      "map-mint": {
+        "role": "secondary",
+        "displayName": "Map Mint",
+        "canonical": "oklch(0.6892 0.1425 166.1212)",
+        "tonalRamp": [
+          "oklch(0.16 0.07 166.1212)",
+          "oklch(0.26 0.10 166.1212)",
+          "oklch(0.38 0.13 166.1212)",
+          "oklch(0.52 0.1425 166.1212)",
+          "oklch(0.6892 0.1425 166.1212)",
+          "oklch(0.78 0.10 166.1212)",
+          "oklch(0.88 0.06 166.1212)",
+          "oklch(0.95 0.025 166.1212)"
+        ]
+      },
+      "cool-indigo": {
+        "role": "secondary",
+        "displayName": "Cool Indigo",
+        "canonical": "oklch(0.50 0.16 265)",
+        "tonalRamp": [
+          "oklch(0.15 0.08 265)",
+          "oklch(0.24 0.11 265)",
+          "oklch(0.34 0.14 265)",
+          "oklch(0.50 0.16 265)",
+          "oklch(0.62 0.14 265)",
+          "oklch(0.74 0.10 265)",
+          "oklch(0.86 0.06 265)",
+          "oklch(0.95 0.025 265)"
+        ]
+      },
+      "city-paper": {
+        "role": "neutral",
+        "displayName": "City Paper",
+        "canonical": "oklch(1 0.0134 267.1)",
+        "tonalRamp": [
+          "oklch(0.15 0.0134 267.1)",
+          "oklch(0.25 0.0134 267.1)",
+          "oklch(0.35 0.0134 267.1)",
+          "oklch(0.50 0.0134 267.1)",
+          "oklch(0.67 0.0134 267.1)",
+          "oklch(0.84 0.0134 267.1)",
+          "oklch(0.93 0.0134 267.1)",
+          "oklch(0.98 0.0134 267.1)"
+        ]
+      },
+      "asphalt-ink": {
+        "role": "neutral",
+        "displayName": "Asphalt Ink",
+        "canonical": "oklch(0.297 0.0134 267.1)",
+        "tonalRamp": [
+          "oklch(0.15 0.0134 267.1)",
+          "oklch(0.22 0.0134 267.1)",
+          "oklch(0.297 0.0134 267.1)",
+          "oklch(0.42 0.0134 267.1)",
+          "oklch(0.58 0.0134 267.1)",
+          "oklch(0.74 0.0134 267.1)",
+          "oklch(0.88 0.0134 267.1)",
+          "oklch(0.96 0.0134 267.1)"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display",
+        "purpose": "Rare page-level orientation only. Not for app panels."
+      },
+      "headline": {
+        "displayName": "Headline",
+        "purpose": "Major workflow sections and empty states."
+      },
+      "title": {
+        "displayName": "Title",
+        "purpose": "Brand link, list item names, dialog titles, compact headings."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Default interface copy, addresses, metadata, and descriptions."
+      },
+      "label": {
+        "displayName": "Label",
+        "purpose": "Button labels, field labels, tags, and compact metadata."
+      }
+    },
+    "shadows": [
+      {
+        "name": "popover-lift",
+        "value": "0.25rem 0.5rem 1rem rgba(0, 0, 0, 0.1)",
+        "purpose": "Search result popovers and temporary lists."
+      },
+      {
+        "name": "overlay-lift",
+        "value": "0 0 1rem rgba(0, 0, 0, 0.2)",
+        "purpose": "Search overlay and modal-like surfaces."
+      },
+      {
+        "name": "marker-lift",
+        "value": "0 2px 8px rgba(0, 0, 0, 0.3)",
+        "purpose": "Map markers and tiny objects sitting on complex map imagery."
+      },
+      {
+        "name": "legacy-glow",
+        "value": "1px 1px 4px #bbb, 0 0 10px 10px #ddd",
+        "purpose": "Existing card glow. Do not expand this pattern."
+      }
+    ],
+    "motion": [
+      {
+        "name": "control-state",
+        "value": "border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease",
+        "purpose": "Default control focus and hover transitions."
+      },
+      {
+        "name": "surface-state",
+        "value": "all 0.3s ease",
+        "purpose": "Existing broad transition vocabulary. Replace with property-specific transitions as components mature."
+      },
+      {
+        "name": "map-height",
+        "value": "height 0.2s ease-out",
+        "purpose": "Map minimization control."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "tablet",
+        "value": "768px"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Use for save, submit, and commit actions.",
+      "html": "<button class=\"ds-btn-primary\" type=\"button\">Save spot</button>",
+      "css": ".ds-btn-primary { min-height: 40px; padding: 10px 18px; border: 1px solid var(--cta-primary, oklch(0.63 0.21 52)); border-radius: var(--border-radius, 12px); background: var(--cta-primary, oklch(0.63 0.21 52)); color: var(--bg-light, oklch(0.9762 0.0134 267.1)); font: inherit; font-weight: 650; line-height: 1.25; cursor: pointer; transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease; } .ds-btn-primary:hover { background: var(--cta-primary-hover, oklch(0.69 0.23 52)); } .ds-btn-primary:focus-visible { outline: none; border-color: var(--accent-color, oklch(0.6892 0.1425 166.1212)); box-shadow: 0 0 0 3px oklch(from var(--accent-color, oklch(0.6892 0.1425 166.1212)) l c h / 0.2); }"
+    },
+    {
+      "name": "Quiet Button",
+      "kind": "button",
+      "refersTo": "button-quiet",
+      "description": "Use for clear, cancel, and secondary actions.",
+      "html": "<button class=\"ds-btn-quiet\" type=\"button\">Clear</button>",
+      "css": ".ds-btn-quiet { min-height: 40px; padding: 10px 18px; border: 1px solid var(--bg-low-contrast, oklch(0.9262 0.0134 267.1)); border-radius: var(--border-radius, 12px); background: var(--bg-light, oklch(0.9762 0.0134 267.1)); color: var(--bg-high-contrast, oklch(0.297 0.0134 267.1)); font: inherit; font-weight: 600; line-height: 1.25; cursor: pointer; transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease; } .ds-btn-quiet:hover { background: var(--bg-color, oklch(1 0.0134 267.1)); } .ds-btn-quiet:focus-visible { outline: none; border-color: var(--accent-color, oklch(0.6892 0.1425 166.1212)); box-shadow: 0 0 0 3px oklch(from var(--accent-color, oklch(0.6892 0.1425 166.1212)) l c h / 0.2); }"
+    },
+    {
+      "name": "Search Input",
+      "kind": "input",
+      "refersTo": "input-search",
+      "description": "Primary search field for places and locations.",
+      "html": "<label class=\"ds-search\"><input type=\"search\" placeholder=\"Search for a spot\" /><button type=\"button\" aria-label=\"Clear search\">×</button></label>",
+      "css": ".ds-search { width: 100%; min-height: 40px; display: flex; align-items: stretch; overflow: hidden; border: 1px solid var(--bg-low-contrast, oklch(0.9262 0.0134 267.1)); border-radius: var(--border-radius, 12px); background: var(--bg-light, oklch(0.9762 0.0134 267.1)); } .ds-search:focus-within { border-color: var(--accent-color, oklch(0.6892 0.1425 166.1212)); box-shadow: 0 0 0 3px oklch(from var(--accent-color, oklch(0.6892 0.1425 166.1212)) l c h / 0.2); } .ds-search input { flex: 1; min-width: 0; border: 0; background: transparent; color: var(--bg-high-contrast, oklch(0.297 0.0134 267.1)); padding: 10px 18px; font: inherit; outline: none; } .ds-search button { min-width: 40px; border: 0; border-left: 1px solid var(--bg-low-contrast, oklch(0.9262 0.0134 267.1)); background: transparent; color: var(--error, oklch(0.62 0.20 24)); font: inherit; font-size: 18px; cursor: pointer; }"
+    },
+    {
+      "name": "Floating Search Action",
+      "kind": "button",
+      "refersTo": "floating-action",
+      "description": "Circular discovery entry point used over map and saved-list surfaces.",
+      "html": "<button class=\"ds-floating-search\" type=\"button\" aria-label=\"Search\"><svg viewBox=\"0 0 24 24\" aria-hidden=\"true\"><path d=\"M10.5 18a7.5 7.5 0 1 1 5.3-12.8 7.5 7.5 0 0 1-5.3 12.8Zm5.8-1.7 4.2 4.2\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" /></svg></button>",
+      "css": ".ds-floating-search { width: 42px; height: 42px; display: inline-grid; place-items: center; border: 0; border-radius: 50%; background: var(--accent-color, oklch(0.6892 0.1425 166.1212)); color: var(--bg-light, oklch(0.9762 0.0134 267.1)); box-shadow: var(--cta-box-shadow, 4px 4px 8px 0 #bbb); cursor: pointer; transition: box-shadow 0.2s ease, background-color 0.2s ease; } .ds-floating-search svg { width: 20px; height: 20px; } .ds-floating-search:hover { background: oklch(from var(--accent-color, oklch(0.6892 0.1425 166.1212)) calc(l - 0.05) c h); } .ds-floating-search:focus-visible { outline: none; box-shadow: 0 0 0 3px oklch(from var(--accent-color, oklch(0.6892 0.1425 166.1212)) l c h / 0.25), var(--cta-box-shadow, 4px 4px 8px 0 #bbb); }"
+    },
+    {
+      "name": "Saved Spot Row",
+      "kind": "custom",
+      "refersTo": "saved-spot-row",
+      "description": "Compact edge-to-edge row for saved places with address metadata.",
+      "html": "<article class=\"ds-spot-row\"><div><strong><a href=\"#\">Superiority Burger</a></strong><small>119 Avenue A, New York</small></div><button type=\"button\" aria-label=\"Spot tools\">⋯</button></article>",
+      "css": ".ds-spot-row { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 16px; background: var(--bg-color, oklch(1 0.0134 267.1)); color: var(--bg-high-contrast, oklch(0.297 0.0134 267.1)); border-bottom: 1px solid var(--bg-low-contrast, oklch(0.9262 0.0134 267.1)); } .ds-spot-row a { color: var(--cta-color, oklch(0.68 0.16 45)); text-decoration: none; } .ds-spot-row small { display: block; margin-top: 2px; color: var(--text-muted, oklch(0.7 0.02 105)); } .ds-spot-row button { width: 40px; height: 40px; border: 0; border-radius: 50%; background: transparent; color: var(--bg-medium-contrast, oklch(0.667 0.0134 267.1)); cursor: pointer; } .ds-spot-row button:focus-visible { outline: none; box-shadow: 0 0 0 3px oklch(from var(--accent-color, oklch(0.6892 0.1425 166.1212)) l c h / 0.2); }"
+    },
+    {
+      "name": "Search Results Popover",
+      "kind": "card",
+      "refersTo": "search-results-popover",
+      "description": "Temporary result list that appears beneath anchored search controls.",
+      "html": "<ul class=\"ds-results\" role=\"listbox\" aria-label=\"Search results\"><li role=\"option\"><em>Cafe Mogador</em><span><b>4.6</b> · East Village</span></li><li role=\"option\"><em>Yellow Rose</em><span><b>4.5</b> · East Village</span></li></ul>",
+      "css": ".ds-results { width: min(360px, 100%); display: flex; flex-direction: column; gap: 8px; list-style: none; margin: 0; padding: 8px; border: 1px solid var(--bg-low-contrast, oklch(0.9262 0.0134 267.1)); border-radius: var(--border-radius, 12px); background: var(--bg-light, oklch(0.9762 0.0134 267.1)); color: var(--bg-high-contrast, oklch(0.297 0.0134 267.1)); box-shadow: 0.25rem 0.5rem 1rem rgba(0, 0, 0, 0.1); } .ds-results li { padding: 8px; border-radius: 8px; cursor: pointer; } .ds-results li:hover { background: var(--bg-color, oklch(1 0.0134 267.1)); } .ds-results em { display: block; font-style: italic; } .ds-results span { display: flex; gap: 6px; color: var(--text-muted, oklch(0.7 0.02 105)); font-size: 0.875rem; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The City Pocketbook",
+    "overview": "Bite Marks should feel like a compact city notebook for food discovery: practical, fast to scan, and lightly marked by the texture of streets, maps, receipts, and saved places. The system is product-first. It supports search, save, tag, map, and revisit workflows without behaving like a landing page.\n\nThe current code already points toward this: warm orange action color, mint map/action accents, cool tinted neutrals, system UI typography, rounded controls, compact spacing, and mobile-first map/list surfaces. The next layer should add urban texture through restrained material cues such as fine grain, map-line rhythm, receipt-like dividers, or inked labels. Texture must never reduce readability.\n\nIt explicitly rejects the PRODUCT.md anti-references: \"marketing landing page\", \"lifestyle blog\", \"generic SaaS dashboard\", \"glossy restaurant reservation platform\", \"oversized hero sections\", \"cream-and-purple startup styling\", \"heavy cards everywhere\", \"cute food illustrations as the main identity\", and \"decorative texture that gets in the way of scanning.\"",
+    "keyCharacteristics": [
+      "Compact mobile-first surfaces for quick outdoor or between-decision use.",
+      "Restrained OKLCH palette with warm action, mint location, and cool concrete neutrals.",
+      "System UI typography with clear weight contrast and no decorative font dependency.",
+      "Tactile controls: rounded, full-border, direct, and easy to tap.",
+      "Texture as material signal, not decoration."
+    ],
+    "rules": [
+      {
+        "name": "The Street-Signal Rule",
+        "body": "Orange means commit, mint means location, red means destructive. Do not swap those meanings for variety.",
+        "section": "colors"
+      },
+      {
+        "name": "The Ten Percent Accent Rule",
+        "body": "On a product screen, saturated colors should usually occupy less than 10% of the visible area. The surface is neutral so the next action is obvious.",
+        "section": "colors"
+      },
+      {
+        "name": "The No Poster Type Rule",
+        "body": "This is a product, not a landing page. Oversized type is forbidden unless the screen is an empty state or first-run orientation with no competing workflow.",
+        "section": "typography"
+      },
+      {
+        "name": "The Zero Letter-Spacing Rule",
+        "body": "Use normal letter spacing. Do not use negative tracking; the existing percentage letter-spacing values should be treated as legacy drift and corrected as components are touched.",
+        "section": "typography"
+      },
+      {
+        "name": "The Flat-At-Rest Rule",
+        "body": "Normal app surfaces are flat. Elevation appears only for temporary, floating, or map-adjacent layers.",
+        "section": "elevation"
+      },
+      {
+        "name": "The No Heavy Card Rule",
+        "body": "Do not solve layout with card stacks. PRODUCT.md explicitly rejects \"heavy cards everywhere.\"",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "Do preserve the current OKLCH token direction and introduce new colors as OKLCH values.",
+      "Do use `city-paper`, `paper-raised`, and `concrete-line` for most of the surface.",
+      "Do reserve Burnt Orange for commit actions and Map Mint for location or map actions.",
+      "Do add texture through subtle material cues: grain, receipt dividers, map-line rhythm, small stamped tags, or ink-like labels.",
+      "Do keep tap targets at or above `40px` for buttons, inputs, and icon controls.",
+      "Do use full borders, tonal fills, or icon/label structure for emphasis.",
+      "Do keep product workflows visible: search, save, tag, map, and revisit."
+    ],
+    "donts": [
+      "Don't make it feel like a \"marketing landing page.\"",
+      "Don't make it feel like a \"lifestyle blog.\"",
+      "Don't make it feel like a \"generic SaaS dashboard.\"",
+      "Don't make it feel like a \"glossy restaurant reservation platform.\"",
+      "Don't use \"oversized hero sections\" inside the app shell.",
+      "Don't use \"cream-and-purple startup styling.\"",
+      "Don't use \"heavy cards everywhere.\"",
+      "Don't use \"cute food illustrations as the main identity.\"",
+      "Don't add \"decorative texture that gets in the way of scanning.\"",
+      "Don't keep Tailwind-style blue utility styling on product surfaces; migrate those leftovers into the shared OKLCH system.",
+      "Don't use side-stripe borders, gradient text, decorative glassmorphism, or hero-metric templates."
+    ]
+  }
+}

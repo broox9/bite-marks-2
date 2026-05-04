@@ -111,8 +111,8 @@
 
       <!-- Place Information (Read-only) -->
       <section>
-        <h1 class="text-2xl font-bold mb-2">{spot.name}</h1>
-        <div class="text-gray-600 mb-1">{spot.address}</div>
+        <h1 id="spot-name">{spot.name}</h1>
+        <div id="spot-address">{spot.address}</div>
         {#if spot.rating}
           <div class="text-sm text-gray-500">Rating: {spot.rating}</div>
         {/if}
@@ -343,5 +343,18 @@
     margin-top: 1rem;
     display: flex;
     flex-direction: column;
+  }
+
+  #spot-name {
+    font-size: 1.75rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    margin: 0 0 0.25rem;
+  }
+
+  #spot-address {
+    font-size: 0.875rem;
+    color: var(--text-low-contrast, #6b7280);
+    margin-bottom: 0.25rem;
   }
 </style>
