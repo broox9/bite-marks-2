@@ -60,7 +60,7 @@ export function transformResultToPlace(placeResult: any): ResultPlaceRecord {
     name: normalizedName,
     address: normalizedAddress,
     rating: rating,
-    websiteURI: websiteURI,
+    websiteURI: websiteURI || null,
     price_level: normalizedPriceLevel,
     lat: normalizedLat,
     lng: normalizedLng,
@@ -104,4 +104,3 @@ function normalizePriceLevel(value: unknown): "free" | "inexpensive" | "moderate
   // Default when no price info is available.
   return "free";
 }
-

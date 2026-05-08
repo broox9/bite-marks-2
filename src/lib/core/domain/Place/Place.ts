@@ -6,7 +6,7 @@ export const MasterPlaceRecordSchema = z.object({
   name: z.string(),
   address: z.string(),
   rating: z.number().optional(),
-  websiteURI: z.string(),
+  websiteURI: z.nullish(z.string()),
   price_level: z.string(),
   lat: z.number(),
   lng: z.number(),
@@ -63,4 +63,3 @@ const appwriteDocExample = {
   $databaseId: "bite_marks",
   $collectionId: "places_user",
 };
-

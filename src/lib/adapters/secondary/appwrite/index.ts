@@ -18,7 +18,7 @@ export class AppwriteAdapter implements PersistenceRepository {
 
   async saveMasterPlace(doc: ResultPlaceRecord, transactionId?: string): Promise<any> {
     const placeRecord = transformResultToPlace(doc);
-    const { document } = await this.#db().upsertRow({
+    const document = await this.#db().upsertRow({
       databaseId: DATABASE_ID,
       tableId: COLLECTIONS.masterPlaces,
       rowId: placeRecord.place_id,
@@ -29,8 +29,8 @@ export class AppwriteAdapter implements PersistenceRepository {
     return document;
   }
 
-  async saveUserSpot(doc: UserSpotRecord, transactionId?: string): Promise<any> {
-    const { document } = await this.#db().createRow({
+  async saveUserSpot(doc: Partial<UserSpotRecord>, transactionId?: string): Promise<any> {
+    const document = await this.#db().createRow({
       databaseId: DATABASE_ID,
       tableId: COLLECTIONS.userPlaces,
       rowId: ID.unique(),
@@ -50,7 +50,7 @@ export class AppwriteAdapter implements PersistenceRepository {
 
     try {
     const placeRecordInput: ResultPlaceRecord = transformResultToPlace(masterPlace);
-    const spotRecordInput: UserSpotRecord = transformPlaceToUserSpot(masterPlace, userId as string);
+    const spotRecordInput: Partial<UserSpotRecord> = transformPlaceToUserSpot(masterPlace, userId as string);
     console.log("[bs] adapter::savePlaceAndSpot::placeInput", placeRecordInput);
     console.log("[bs] adapter::savePlaceAndSpot::spotInput", spotRecordInput);
 
@@ -160,7 +160,7 @@ export class AppwriteAdapter implements PersistenceRepository {
     return (result?.total ?? result?.documents?.length ?? 0) > 0;
   }
 
-  async hasUserSpot(name: string, userId): Promise<boolean> {
+  async hasUserSpot(name: string, userId: string): Promise<boolean> {
     const result = await this.#db().listRows({
       databaseId: DATABASE_ID,
       tableId: COLLECTIONS.userPlaces,
