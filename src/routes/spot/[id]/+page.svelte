@@ -14,7 +14,7 @@
   import { page } from '$app/state';
   import { getSpotById, updateSpot } from '$lib/adapters/primary/remote-handlers/spots.remote';
   import { invalidateAll } from '$app/navigation';
-  import { getPlacePhotoUrls } from '$lib/adapters/secondary/google/google.svelte';
+  import { getPlacePhotoUrls, MAX_PLACE_PHOTOS } from '$lib/adapters/secondary/google/google.svelte';
   import { Button, Checkbox, SubmitButton } from '$components/ui';
   import PhotoLightbox from '$components/util/PhotoLightbox.svelte';
 
@@ -65,7 +65,7 @@
     photoUrls = [];
     isLightboxOpen = false;
 
-    getPlacePhotoUrls(placeId, maxPhotoWidth, maxPhotoHeight, 7)
+    getPlacePhotoUrls(placeId, maxPhotoWidth, maxPhotoHeight, MAX_PLACE_PHOTOS)
       .then((urls) => {
         if (photoRequestPlaceId !== placeId) return;
 
