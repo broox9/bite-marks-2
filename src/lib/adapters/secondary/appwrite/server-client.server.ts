@@ -1,3 +1,5 @@
+import { dev } from "$app/environment";
+import type { Cookies } from "@sveltejs/kit";
 import { Account, Client, TablesDB } from "node-appwrite";
 import { env as privateEnv } from "$env/dynamic/private";
 import { env as publicEnv } from "$env/dynamic/public";
@@ -45,6 +47,23 @@ export function createAdminAccount() {
 
 export function getSessionCookieName() {
   return `a_session_${APPWRITE_PROJECT_ID}`;
+}
+
+/** Appwrite session fields used for the httpOnly auth cookie. */
+export type SessionCookieSource = { secret: string; expire: string };
+
+export function setAppwriteSessionCookie(cookies: Cookies, session: SessionCookieSource) {
+  cookies.set(getSessionCookieName(), session.secret, {
+    httpOnly: true,
+    secure: !dev,
+    sameSite: "lax",
+    expires: new Date(session.expire),
+    path: "/",
+  });
+}
+
+export function clearAppwriteSessionCookie(cookies: Cookies) {
+  cookies.delete(getSessionCookieName(), { path: "/" });
 }
 
 // NOTE: This re-export is kept for compatibility with existing adapter code.

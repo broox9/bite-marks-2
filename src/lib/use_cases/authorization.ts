@@ -19,10 +19,16 @@ export class AuthorizationUseCase implements AuthRepository {
     const result = await this.#authLib.register(email, password);
     return result;
   }
-  async logout() {
+  async logout(sessionSecret: string) {
     console.log("[bs] authorization::logout");
-    const result = await this.#authLib.logout();
+    const result = await this.#authLib.logout(sessionSecret);
     return result;
+  }
+  async getGoogleOAuthRedirectUrl(successUrl: string, failureUrl: string) {
+    return this.#authLib.getGoogleOAuthRedirectUrl(successUrl, failureUrl);
+  }
+  async completeOAuthLogin(userId: string, secret: string) {
+    return this.#authLib.completeOAuthLogin(userId, secret);
   }
   getCookieName() {
     return this.#authLib.getCookieName();

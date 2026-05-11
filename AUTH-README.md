@@ -6,76 +6,84 @@ This project is mid-migration, so there are *two* sets of auth-related folders i
 
 ## Overview
 
-- **Login is server-driven**: the login form submits to a server action, which creates an Appwrite session and sets an HTTP-only cookie.
+- **Login is server-driven**: email/password uses a SvelteKit remote form action; Google uses server routes that set the same HTTP-only session cookie.
 - **Auth is enforced server-side**: `src/hooks.server.ts` loads the user into `event.locals`, and `src/routes/+layout.server.ts` redirects based on `locals.user`.
-- **Hex/ports-adapters style**: UI → remote handler → use-case → repository → Appwrite.
+- **Hex/ports-adapters style**: UI → remote handler / routes → use-case → repository → Appwrite.
 
 ## Source of truth (files)
 
 - **Login UI**: `src/routes/login/+page.svelte`
-- **Login action (sets cookie, redirects)**: `src/lib/adapters/primary/remote-handlers/login.remote.ts`
-- **Route protection (redirects to/from /login)**: `src/routes/+layout.server.ts`
+- **Email login action (sets cookie, redirects)**: `src/lib/adapters/primary/remote-handlers/login.remote.ts`
+- **Google OAuth start**: `src/routes/auth/google/+server.ts`
+- **Google OAuth callback (session + cookie)**: `src/routes/auth/google/callback/+server.ts`
+- **Logout (delete Appwrite session + clear cookie)**: `src/routes/logout/+server.ts`
+- **Route protection**: `src/routes/+layout.server.ts`
 - **Server hook (hydrates `locals.user`)**: `src/hooks.server.ts`
 - **Use case**: `src/lib/use_cases/authorization.ts`
 - **Port interface**: `src/lib/ports/auth.repository.ts`
 - **Appwrite auth adapter**: `src/lib/adapters/secondary/appwrite/auth.ts`
-- **Server-side Appwrite client factories + env**: `src/lib/adapters/secondary/appwrite/server-client.server.ts`
+- **Session cookie helpers + Appwrite clients**: `src/lib/adapters/secondary/appwrite/server-client.server.ts`
+- **Public base URL for OAuth redirects**: `src/lib/adapters/secondary/appwrite/app-base-url.server.ts` (`PUBLIC_APP_URL` optional)
 
-## How login works (happy path)
+## How email/password login works
 
-### 1) User submits the login form
+1. User submits the login form (`loginAction` on `src/routes/login/+page.svelte`).
+2. `login.remote.ts` validates with Zod, calls `authorizationUseCase.login`, then `setAppwriteSessionCookie` and redirects to `/list`.
 
-The login page uses SvelteKit form actions (via `loginAction`):
+## How Google OAuth works (server-side, Appwrite SSR pattern)
 
-- **File**: `src/routes/login/+page.svelte`
-- **Action**: `loginAction` from `src/lib/adapters/primary/remote-handlers/login.remote.ts`
+Matches [Appwrite SSR — OAuth2](https://appwrite.io/docs/products/auth/server-side-rendering#oauth2):
 
-### 2) Server login action creates the Appwrite session + sets the cookie
+1. User opens **`GET /auth/google`**, which calls `createOAuth2Token` (Google) with **success** = `{origin}/auth/google/callback` and **failure** = `{origin}/login?oauth=error`.
+2. Appwrite redirects the browser through Google, then back to the **success** URL with **`userId`** and **`secret`** query parameters.
+3. **`GET /auth/google/callback`** reads those params, calls `createSession({ userId, secret })`, sets the same session cookie as email login, and redirects to `/list`.
 
-- **File**: `src/lib/adapters/primary/remote-handlers/login.remote.ts`
-- **What it does**:
-  - Validates `{ email, password }` with Zod.
-  - Calls `authorizationUseCase.login(email, password)`.
-  - Sets the session cookie using `auth.getCookieName()`:
-    - **Name**: `a_session_${APPWRITE_PROJECT_ID}`
-    - **Value**: `session.secret`
-    - **Flags**: `httpOnly`, `sameSite: "strict"`, `expires` from Appwrite.
-    - **Secure**: `secure: !dev` (secure in prod, not secure in dev).
-  - Redirects to `/list`.
+**Appwrite Console (you must configure):**
 
-### 3) Every request hydrates `locals.user` from the cookie
+1. **Auth → Providers → Google**: enable and paste **Client ID** and **Client secret** from [Google Cloud Console](https://console.cloud.google.com/apis/credentials) (OAuth 2.0 Client). Use the **Authorized redirect URI** shown in the Appwrite Google provider settings (Google redirects to Appwrite, not directly to your app).
+2. **Project → Platforms**: ensure your dev and production **hostnames** are allowed; OAuth `success` / `failure` URLs must use hostnames listed there (Appwrite blocks open redirects otherwise).
+3. **API keys**: the server API key used in `APPWRITE_API_KEY` needs permission to create sessions (see Appwrite docs: e.g. **`sessions.write`** scope for session-related server calls).
 
-- **File**: `src/hooks.server.ts`
-- **What it does**:
-  - Reads `a_session_${APPWRITE_PROJECT_ID}` from cookies.
-  - Creates session-scoped Appwrite clients (`Account`, `TablesDB`) using that session secret.
-  - Tries `account.get()` and stores the result on `event.locals.user` (or `null` if unauthenticated).
+**Session length (~1 week):**
 
-### 4) Route protection is enforced in the server layout
+- In Appwrite **Auth → Security** (wording may vary by version), set **session length** to **7 days** (or equivalent).
+- The app sets the browser cookie **`expires`** from Appwrite’s `session.expire`, so new logins pick up the new TTL automatically. Existing sessions keep their original expiry until they expire or the user logs out.
 
-- **File**: `src/routes/+layout.server.ts`
-- **Behavior**:
-  - If `!locals.user` and you’re not on `/login` → redirect to `/login`
-  - If `locals.user` and you are on `/login` → redirect to `/`
-  - Otherwise returns `{ user: locals.user }` for the UI
+## Session cookie
 
-## What “logged in” means in this app
+- **Name**: `a_session_${APPWRITE_PROJECT_ID}` (see `getSessionCookieName()`).
+- **Value**: `session.secret` from Appwrite.
+- **Flags**: `httpOnly`, `path: /`, `secure: !dev`, **`sameSite: "lax"`** (used for both email and OAuth). `lax` avoids issues where the session cookie would not be sent on the **first** navigation back from the OAuth provider when using `strict`.
 
-- The “session” is Appwrite’s email/password session.
-- The app’s durable auth state is the **HTTP-only cookie**:
-  - **Cookie name**: `a_session_${APPWRITE_PROJECT_ID}`
-  - **Cookie value**: `session.secret`
-- The **server** is the authority for whether a user is logged in, via `hooks.server.ts`.
+## `PUBLIC_APP_URL` (optional)
 
-## Configuration (Appwrite)
+OAuth success/failure URLs must be absolute. By default the app uses `event.url.origin`. If you are behind a reverse proxy or need a fixed canonical URL (e.g. production only), set **`PUBLIC_APP_URL`** (no trailing slash), e.g. `https://yourdomain.com`. Implemented in `app-base-url.server.ts`.
 
-Server-side Appwrite config is sourced from env in:
+## Route protection (`+layout.server.ts`)
 
-- `src/lib/adapters/secondary/appwrite/server-client.server.ts`
+Unauthenticated users may access:
 
-It expects:
+- `/login`
+- `/all-spots`
+- Paths under **`/auth/google`** (OAuth start + callback)
+- **`/logout`** (no-op clear + redirect if already signed out)
 
-- **Public**: `PUBLIC_APPWRITE_ENDPOINT`
+If `locals.user` is set, **`/login`** and **`/auth/google`** redirect to **`/`**.
+
+## Logout
+
+- **`GET /logout`**: deletes the current Appwrite session using the cookie secret, clears the session cookie, redirects to `/login`.
+- The main layout footer uses `goto("/logout")` so the server clears the **httpOnly** cookie (browser-only `Account.deleteSession` is not sufficient for this setup).
+
+## What “logged in” means
+
+- The durable state is the **HTTP-only Appwrite session cookie**; `hooks.server.ts` calls `account.get()` with a session-scoped client to populate `locals.user`.
+
+## Configuration (env)
+
+From `server-client.server.ts` and `app-base-url.server.ts`:
+
+- **Public**: `PUBLIC_APPWRITE_ENDPOINT`, optional `PUBLIC_APP_URL`
 - **Private**: `APPWRITE_PROJECT_ID`, `APPWRITE_API_KEY`
 
 ## Migration / legacy notes (why there are duplicate folders)
@@ -91,11 +99,12 @@ Those are **legacy/migration-era** code paths and may be partially unused. The l
 
 ## Security notes (important)
 
-- **Do not log secrets**: `src/lib/adapters/secondary/appwrite/server-client.server.ts` currently logs env values (including the API key) to the console. That’s convenient for debugging but risky—remove/redact it before shipping.
-- **HTTP-only cookie**: good XSS hardening (JS can’t read the session secret).
-- **SameSite strict**: helps reduce CSRF exposure.
+- **Do not log secrets**: avoid logging `APPWRITE_API_KEY` or session secrets.
+- **HTTP-only cookie**: JS cannot read the session secret (XSS hardening).
+- **`sameSite: lax`**: slightly broader cookie send behavior than `strict`; required for reliable OAuth return + still limits many cross-site cookie scenarios.
 
 ## Related docs
 
-- [Appwrite Auth docs](https://appwrite.io/docs/products/auth)
+- [Appwrite Auth](https://appwrite.io/docs/products/auth)
+- [Appwrite SSR / OAuth2](https://appwrite.io/docs/products/auth/server-side-rendering#oauth2)
 - [SvelteKit form actions](https://kit.svelte.dev/docs/form-actions)
