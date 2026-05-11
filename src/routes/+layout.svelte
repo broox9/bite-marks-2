@@ -5,8 +5,6 @@
   import { goto } from "$app/navigation";
   import { page } from "$app/state";
 
-  // do these CLEAN, don't use them directily
-  import { storeDeleteUser } from "$lib/adapters/primary/stores/user.store.svelte";
   import { locationStore } from "$lib/adapters/primary/stores/location.store.svelte";
 
   import ContainedZone from "../components/util/ContainedZone.svelte";
@@ -17,9 +15,8 @@
   // const isLoginPage = $derived(page.route === LOGIN_ROUTE) // makes changes reactive
   let currentPlace = $derived(locationStore);
 
-  const logout = async () => {
-    await storeDeleteUser();
-    goto("/login");
+  const logout = () => {
+    goto("/logout");
   };
 </script>
 

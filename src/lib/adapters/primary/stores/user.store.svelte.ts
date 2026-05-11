@@ -20,9 +20,6 @@ export const storeSetCurrentUser = (incomingUser: unknown) => {
 }
 
 export const storeDeleteUser = async () => {
-  // user = null
-  await account.deleteSession('current').then(() => {
-    console.log('User deleted');
-    storeSetCurrentUser(null)
-  })
+  user = null;
+  storeSetCurrentUser(null);
 }

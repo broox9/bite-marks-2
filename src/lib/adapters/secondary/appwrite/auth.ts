@@ -1,12 +1,17 @@
 import type { AuthRepository } from "$lib/ports/auth.repository";
-import { APPWRITE_PROJECT_ID, createAdminAccount, ID } from "./server-client.server";
+import { OAuthProvider } from "node-appwrite";
+
+import {
+  APPWRITE_PROJECT_ID,
+  createAdminAccount,
+  createSessionAccount,
+  ID,
+} from "./server-client.server";
 
 export class AppwriteAuthRepository implements AuthRepository {
   constructor() {}
 
   async login(email: string, password: string) {
-    // Creating a session does not require an API key; however, this adapter is currently server-side only.
-    // We use the shared server client factory to avoid leaking configuration into the browser bundle.
     const session = await createAdminAccount().createEmailPasswordSession(email, password);
     return session;
   }
@@ -14,9 +19,20 @@ export class AppwriteAuthRepository implements AuthRepository {
     const result = await createAdminAccount().create(ID.unique(), email, password);
     return result;
   }
-  async logout() {
-    const result = await createAdminAccount().deleteSession("current");
-    return !!result;
+  async logout(sessionSecret: string) {
+    if (!sessionSecret) return false;
+    await createSessionAccount(sessionSecret).deleteSession({ sessionId: "current" });
+    return true;
+  }
+  async getGoogleOAuthRedirectUrl(successUrl: string, failureUrl: string) {
+    return createAdminAccount().createOAuth2Token({
+      provider: OAuthProvider.Google,
+      success: successUrl,
+      failure: failureUrl,
+    });
+  }
+  async completeOAuthLogin(userId: string, secret: string) {
+    return createAdminAccount().createSession({ userId, secret });
   }
   getCookieName() {
     return `a_session_${APPWRITE_PROJECT_ID}`;

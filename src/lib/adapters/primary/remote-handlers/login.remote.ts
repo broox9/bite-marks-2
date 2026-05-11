@@ -1,9 +1,9 @@
 import { form, getRequestEvent } from "$app/server";
-import { dev } from "$app/environment";
 import { redirect } from "@sveltejs/kit";
 import { z } from "zod";
 
 import { authorizationUseCase as auth } from "$lib/use_cases/authorization";
+import { setAppwriteSessionCookie } from "$lib/adapters/secondary/appwrite/server-client.server";
 
 const loginSchema = z.object({
   email: z.email(),
@@ -17,15 +17,7 @@ export const loginAction = form(loginSchema, async ({ email, password }) => {
   console.log("[bs] loginRemoteHandler::login::session", session);
 
   const { cookies } = getRequestEvent();
-
-  cookies.set(auth.getCookieName(), session.secret, {
-    // use the session secret as the cookie value
-    httpOnly: true,
-    secure: !dev,
-    sameSite: "strict",
-    expires: new Date(session.expire),
-    path: "/",
-  });
+  setAppwriteSessionCookie(cookies, session);
 
   throw redirect(302, "/list");
 });

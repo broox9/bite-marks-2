@@ -1,10 +1,16 @@
 <script lang="ts">
-  // import { account, ID } from '$lib/infrastructure/database/appwrite.client';
-  import  { storeGetCurrentUser, storeSetCurrentUser } from '$lib/adapters/primary/stores/user.store.svelte';
   import { loginAction } from '$lib/adapters/primary/remote-handlers/login.remote'
   import { Input, SubmitButton } from '$components/ui'
+  import { page } from '$app/state';
 
   let loggedInUser = $state<any | null>(null)
+
+  const oauthErrorMessage = $derived.by(() => {
+    const code = page.url.searchParams.get('oauth');
+    if (code === 'error' || code === 'failed') return 'Google sign-in did not complete. Try again.';
+    if (code === 'invalid') return 'Sign-in link was incomplete. Start again from the login page.';
+    return '';
+  });
 </script>
 
 
@@ -13,6 +19,9 @@
       <strong>
           {loggedInUser ? `Logged in as ${loggedInUser.name}` : 'Login'}
       </strong>
+    {#if oauthErrorMessage}
+      <p class="oauth-error" role="alert">{oauthErrorMessage}</p>
+    {/if}
     <label for="email">
       <span>Email</span>
       <Input {...loginAction.fields.email.as('text')} placeholder="email" />
@@ -28,6 +37,11 @@
     </div>
     <!-- <SubmitButton data-type="register">Register</SubmitButton> -->
   </form>
+
+  <p class="oauth-divider"><span>or</span></p>
+  <div class="oauth-action">
+    <a class="google-signin" href="/auth/google">Continue with Google</a>
+  </div>
 
   <div class="text-center">
     <em>just looking for <a href="/all-spots">all the spots?</a></em>
@@ -81,5 +95,55 @@ form {
   .form-action {
     width: var(--field-width);
     margin-inline: auto;
+  }
+
+  .oauth-error {
+    color: var(--color-danger, #b42318);
+    font-size: 0.9rem;
+    margin: 0;
+    max-width: var(--field-width);
+    margin-inline: auto;
+  }
+
+  .oauth-divider {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    max-width: var(--field-width);
+    margin: 1rem auto 0.75rem;
+    color: var(--color-muted, #666);
+    font-size: 0.85rem;
+  }
+
+  .oauth-divider::before,
+  .oauth-divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--color-border, #ccc);
+  }
+
+  .oauth-action {
+    max-width: var(--field-width);
+    margin: 0 auto 1.5rem;
+  }
+
+  .google-signin {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    width: 100%;
+    padding: 0.65rem 1rem;
+    border: 1px solid var(--color-border, #ccc);
+    border-radius: 0.375rem;
+    text-decoration: none;
+    font-weight: 600;
+    color: inherit;
+    background: var(--color-surface, #fff);
+  }
+
+  .google-signin:hover {
+    filter: brightness(0.97);
   }
 </style>
