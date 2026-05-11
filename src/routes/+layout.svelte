@@ -8,6 +8,7 @@
   import { locationStore } from "$lib/adapters/primary/stores/location.store.svelte";
 
   import ContainedZone from "../components/util/ContainedZone.svelte";
+  import MainNavLinks from "../components/MainNavLinks.svelte";
 
   let { data, children }: LayoutProps = $props();
   // const HOME_ROUTE = '/'
@@ -40,13 +41,7 @@
           </a>
         </strong>
 
-        <nav>
-          <ul>
-            <li><a href="/list">Spots</a></li>
-            <li><a href="/">Search</a></li>
-            <li><a href="/tags">Tags</a></li>
-          </ul>
-        </nav>
+        <MainNavLinks ariaLabel="Main navigation" />
       </div>
       <!-- <button onclick={logout}>Logout</button> -->
 
@@ -65,10 +60,12 @@
   <section id="bottom-sheet">Bottom Sheet here</section>
 
   <footer>
-    <a href="/login">Login</a>
-    <a href="/">Home</a>
-    <button onclick={logout} type="button">Logout</button>
-    <!-- <button type='button' disabled={true}>disabled</button> -->
+    <a class="footer-link" href="/">Home</a>
+    {#if data.user}
+      <button class="footer-link footer-link--button" onclick={logout} type="button"
+        >Logout</button
+      >
+    {/if}
   </footer>
 </div>
 
@@ -117,16 +114,6 @@
     font-size: 1.25rem;
   }
 
-  nav ul {
-    display: flex;
-    list-style: none;
-    gap: 1rem;
-  }
-
-  nav ul li a {
-    color: var(--accent-color);
-  }
-
   footer {
     grid-area: footer;
     width: 100%;
@@ -136,7 +123,22 @@
     display: flex;
     justify-content: flex-start;
     align-items: center;
-    gap: 0.5rem;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+
+  .footer-link {
+    color: var(--accent-color);
+    text-decoration: none;
+  }
+
+  .footer-link--button {
+    margin: 0;
+    padding: 0;
+    border: none;
+    background: none;
+    font: inherit;
+    cursor: pointer;
   }
 
   #page-content {
