@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { browser } from '$app/environment';
   import { ChevronLeft, ChevronRight, X } from '@lucide/svelte';
 
   let {
@@ -15,11 +16,46 @@
 
   let currentPhotoIndex = $state(0);
   const currentPhotoUrl = $derived(photos[currentPhotoIndex] ?? null);
+  const isLightboxVisible = $derived(isOpen && currentPhotoUrl !== null);
 
   $effect(() => {
     if (isOpen) {
       currentPhotoIndex = 0;
     }
+  });
+
+  $effect(() => {
+    if (!browser || !isLightboxVisible) return;
+
+    const scrollY = window.scrollY;
+    const bodyStyle = document.body.style;
+    const rootStyle = document.documentElement.style;
+    const previousBodyOverflow = bodyStyle.overflow;
+    const previousBodyPosition = bodyStyle.position;
+    const previousBodyTop = bodyStyle.top;
+    const previousBodyLeft = bodyStyle.left;
+    const previousBodyRight = bodyStyle.right;
+    const previousBodyWidth = bodyStyle.width;
+    const previousRootOverflow = rootStyle.overflow;
+
+    rootStyle.overflow = 'hidden';
+    bodyStyle.overflow = 'hidden';
+    bodyStyle.position = 'fixed';
+    bodyStyle.top = `-${scrollY}px`;
+    bodyStyle.left = '0';
+    bodyStyle.right = '0';
+    bodyStyle.width = '100%';
+
+    return () => {
+      rootStyle.overflow = previousRootOverflow;
+      bodyStyle.overflow = previousBodyOverflow;
+      bodyStyle.position = previousBodyPosition;
+      bodyStyle.top = previousBodyTop;
+      bodyStyle.left = previousBodyLeft;
+      bodyStyle.right = previousBodyRight;
+      bodyStyle.width = previousBodyWidth;
+      window.scrollTo(0, scrollY);
+    };
   });
 
   function showPreviousPhoto() {
@@ -31,7 +67,7 @@
   }
 
   function handleKeydown(event: KeyboardEvent) {
-    if (!isOpen) return;
+    if (!isLightboxVisible) return;
 
     if (event.key === 'Escape') {
       event.preventDefault();
@@ -68,7 +104,16 @@
       tabindex="-1"
     >
       <div class="lightbox-header">
-        <h2 id="lightbox-title">{title}</h2>
+        <div class="lightbox-header-title">
+          <!-- <span class="photo-count-eyebrow">
+            {currentPhotoIndex + 1} / {photos.length} {photos.length === 1 ? 'photo' : 'photos'}
+          </span> -->
+          <small>
+            {currentPhotoIndex + 1} / {photos.length} {photos.length === 1 ? 'photo' : 'photos'}
+          </small>
+          <h2 id="lightbox-title">{title}</h2>
+        </div>
+
         <button
           type="button"
           class="lightbox-close"
@@ -84,10 +129,6 @@
           src={currentPhotoUrl}
           alt={`${title} photo ${currentPhotoIndex + 1} of ${photos.length}`}
         />
-
-        <span class="photo-count-eyebrow">
-          {currentPhotoIndex + 1} / {photos.length} {photos.length === 1 ? 'photo' : 'photos'}
-        </span>
 
         {#if currentPhotoIndex > 0}
           <button
@@ -130,7 +171,7 @@
     display: grid;
     place-items: center;
     padding: var(--padding-2);
-    background-color: oklch(from var(--bg-medium-contrast) l c h / 0.46);
+    background-color: oklch(from var(--cta-primary-tint-1) l c h / 0.46);
     backdrop-filter: blur(3px) grayscale(1);
   }
 
@@ -151,8 +192,8 @@
     overflow: hidden;
     border: 1px solid oklch(from var(--bg-color) l c h / 0.2);
     border-radius: var(--border-radius);
-    background-color: var(--bg-high-contrast);
-
+    background-color: oklch(from var(--bg-light) l c h / 0.8);
+    backdrop-filter: blur(3px);
     box-shadow: 0 1.5rem 4rem oklch(0.05 0.02 267 / 0.5);
   }
 
@@ -162,19 +203,33 @@
     justify-content: space-between;
     gap: var(--padding-1);
     padding: var(--padding-1) var(--padding-2);
-    color: white;
+    color: var(--text-color);
   }
 
   .lightbox-header h2 {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
     min-width: 0;
     margin: 0;
     overflow: hidden;
-    font-size: 1rem;
-    font-weight: 650;
+    font-size: 1.5rem;
+    font-weight: 600;
     letter-spacing: 0;
     line-height: 1.25;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+  }
+
+  .lightbox-header-title {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--padding-1);
+    padding-bottom: 1rem;
+
+    & > small {
+      font-size: 0.75rem;
+      font-weight: 300;
+    }
   }
 
   .lightbox-close {
@@ -184,15 +239,16 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    border: 1px solid oklch(1 0 0 / 0.18);
+    border: 1px solid var(--bg-low-contrast);
     border-radius: 999px;
-    background-color: oklch(1 0 0 / 0.08);
-    color: white;
+    background-color: var(--bg-light);
+    color: var(--bg-medium-contrast);
   }
 
   .lightbox-stage {
     position: relative;
-    min-height: min(68svh, 42rem);
+    /*min-height: min(68svh, 42rem);*/
+    min-height: 200px;
     display: grid;
     place-items: center;
     /*background-color: oklch(0.11 0.02 267);*/
@@ -204,21 +260,6 @@
     max-height: min(72svh, 46rem);
     display: block;
     object-fit: contain;
-  }
-
-  .photo-count-eyebrow {
-    position: absolute;
-    top: var(--padding-1);
-    left: var(--padding-1);
-    border: 1px solid oklch(1 0 0 / 0.2);
-    border-radius: 999px;
-    background-color: oklch(0.16 0.02 267 / 0.74);
-    color: white;
-    padding: 0.25rem 0.625rem;
-    font-size: 0.75rem;
-    font-weight: 750;
-    line-height: 1.2;
-    box-shadow: 0 0.35rem 1rem oklch(0.04 0.02 267 / 0.32);
   }
 
   .carousel-button {

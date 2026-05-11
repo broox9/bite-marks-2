@@ -46,9 +46,9 @@
       <!-- <button onclick={logout}>Logout</button> -->
 
       <div class="sub-header">
-        <small
-          >{currentPlace.name || "???"} ({currentPlace.radiusMiles} miles)</small
-        >
+        <small>
+          <a href="/">{currentPlace.name || "???"} ({currentPlace.radiusMiles} miles)</a>
+        </small>
       </div>
     </ContainedZone>
   </header>
@@ -93,11 +93,14 @@
   }
 
   #page-header .sub-header {
-    background-color: var(--bg-light);
+    background-color: oklch(from var(--bg-low-contrast) l c h / 0.5);
+    color: var(--text-muted);
     padding: 0.25rem;
     text-align: center;
-    border-radius: var(--border-radius) var(--border-radius) 0 0;
-    margin-bottom: -0.5rem;
+    border-radius: var(--border-radius);
+    font-style: italic;
+    font-weight:300;
+    letter-spacing: 0.05ch;
   }
 
   .main-header {
