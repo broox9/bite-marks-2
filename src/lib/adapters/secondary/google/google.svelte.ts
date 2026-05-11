@@ -236,28 +236,30 @@ export async function getLocationByAddress(address: string) {
 
 
 /**
- * Fetches a photo URL for a place by its place ID
+ * Fetches photo URLs for a place by its place ID
  * @param placeId - The Google Place ID
  * @param maxHeight - Maximum height of the photo in pixels (default: 400)
  * @param maxWidth - Maximum width of the photo in pixels (optional)
- * @returns The photo URL or null if no photo is available
+ * @param maxPhotos - Maximum number of photos to return (default: 7)
+ * @returns Photo URLs, or an empty array if no photos are available
  */
-export async function getPlacePhotoUrl(
+export async function getPlacePhotoUrls(
   placeId: string,
   maxHeight: number = 400,
-  maxWidth?: number
-): Promise<string | null> {
+  maxWidth?: number,
+  maxPhotos: number = 7,
+): Promise<string[]> {
   if (!google) {
     // Wait for google to load if not ready yet
     try {
       await window.resolveGoogleLoaded?.();
     } catch (e) {
       console.error('[bs] Failed to load Google Maps', e);
-      return null;
+      return [];
     }
   }
   
-  if (!google) return null;
+  if (!google) return [];
 
   try {
     const { Place } = await google.maps.importLibrary("places") as google.maps.PlacesLibrary;
@@ -271,19 +273,37 @@ export async function getPlacePhotoUrl(
     // Check if photos exist
     if (!place.photos || place.photos.length === 0) {
       console.log('[bs] No photos found for place:', placeId);
-      return null;
+      return [];
     }
     
-    // Get the first photo URL
     const photoOptions: google.maps.places.PhotoOptions = { maxHeight };
     if (maxWidth) {
       photoOptions.maxWidth = maxWidth;
     }
     
-    const photoUrl = place.photos[0].getURI(photoOptions);
-    return photoUrl;
+    const photoLimit = Math.min(Math.max(maxPhotos, 0), 7);
+
+    return place.photos
+      .slice(0, photoLimit)
+      .map((photo) => photo.getURI(photoOptions));
   } catch (error) {
-    console.error('[bs] Error fetching place photo:', error);
-    return null;
+    console.error('[bs] Error fetching place photos:', error);
+    return [];
   }
+}
+
+/**
+ * Fetches a photo URL for a place by its place ID
+ * @param placeId - The Google Place ID
+ * @param maxHeight - Maximum height of the photo in pixels (default: 400)
+ * @param maxWidth - Maximum width of the photo in pixels (optional)
+ * @returns The photo URL or null if no photo is available
+ */
+export async function getPlacePhotoUrl(
+  placeId: string,
+  maxHeight: number = 400,
+  maxWidth?: number
+): Promise<string | null> {
+  const photos = await getPlacePhotoUrls(placeId, maxHeight, maxWidth, 1);
+  return photos[0] ?? null;
 }

@@ -14,8 +14,9 @@
   import { page } from '$app/state';
   import { getSpotById, updateSpot } from '$lib/adapters/primary/remote-handlers/spots.remote';
   import { invalidateAll } from '$app/navigation';
-  import { getPlacePhotoUrl } from '$lib/adapters/secondary/google/google.svelte';
+  import { getPlacePhotoUrls } from '$lib/adapters/secondary/google/google.svelte';
   import { Button, Checkbox, SubmitButton } from '$components/ui';
+  import PhotoLightbox from '$components/util/PhotoLightbox.svelte';
 
   const spotQuery = getSpotById({ id: page.params.id ?? '' });
   const maxPhotoWidth = 800;
@@ -27,10 +28,13 @@
   let socialLinks = $state<string[]>([]);
   let rowId = $state<string | null>(null);
   let isSaving = $state(false);
-  let photoUrl = $state<string | null>(null);
+  let photoUrls = $state<string[]>([]);
+  let isLightboxOpen = $state(false);
   let photoLoading = $state(false);
+  let photoRequestPlaceId = $state<string | null>(null);
   let saveError = $state<string | null>(null);
   let saveMessage = $state<string | null>(null);
+  const previewPhotoUrl = $derived(photoUrls[0] ?? null);
 
   // Update local state when spot data loads
   $effect(() => {
@@ -46,16 +50,32 @@
 
   // Load place photo when spot data is available
   $effect(() => {
-    if (spotQuery.current?.place_id && !photoUrl && !photoLoading) {
-      photoLoading = true;
-      getPlacePhotoUrl(spotQuery.current.place_id, maxPhotoWidth, maxPhotoHeight)
-        .then((url) => {
-          photoUrl = url;
-        })
-        .finally(() => {
-          photoLoading = false;
-        });
+    const placeId = spotQuery.current?.place_id;
+    if (!placeId) {
+      photoUrls = [];
+      isLightboxOpen = false;
+      photoRequestPlaceId = null;
+      return;
     }
+
+    if (photoRequestPlaceId === placeId) return;
+
+    photoRequestPlaceId = placeId;
+    photoLoading = true;
+    photoUrls = [];
+    isLightboxOpen = false;
+
+    getPlacePhotoUrls(placeId, maxPhotoWidth, maxPhotoHeight, 7)
+      .then((urls) => {
+        if (photoRequestPlaceId !== placeId) return;
+
+        photoUrls = urls;
+      })
+      .finally(() => {
+        if (photoRequestPlaceId === placeId) {
+          photoLoading = false;
+        }
+      });
   });
 
   async function handleSave() {
@@ -98,6 +118,16 @@
   function updateSocialLink(index: number, value: string) {
     socialLinks = socialLinks.map((link, i) => (i === index ? value : link));
   }
+
+  function openLightbox() {
+    if (!photoUrls.length) return;
+
+    isLightboxOpen = true;
+  }
+
+  function closeLightbox() {
+    isLightboxOpen = false;
+  }
 </script>
 
 <div class="spot-page">
@@ -122,9 +152,19 @@
       <section class="spot-hero" aria-labelledby="spot-name">
         <div id="photo-container" data-loading={photoLoading}>
           {#if photoLoading}
-            <span>Loading photo</span>
-          {:else if photoUrl}
-            <img src={photoUrl} alt={spot.name} />
+            <span class="loading-photo-indicator">Loading photo</span>
+          {:else if previewPhotoUrl}
+            <button
+              type="button"
+              class="photo-preview-button"
+              aria-label={`Open ${spot.name} photos`}
+              onclick={openLightbox}
+            >
+              <img src={previewPhotoUrl} alt={spot.name} />
+              <span class="photo-count-eyebrow">
+                {photoUrls.length} {photoUrls.length === 1 ? 'photo' : 'photos'}
+              </span>
+            </button>
           {:else}
             <MapPin size={28} />
           {/if}
@@ -270,6 +310,13 @@
         </div>
       </section>
     </article>
+
+    <PhotoLightbox
+      photos={photoUrls}
+      title={spot.name}
+      isOpen={isLightboxOpen}
+      onClose={closeLightbox}
+    />
   {:else}
     <section class="state-panel">
       <h1>Spot not found</h1>
@@ -314,6 +361,7 @@
 
   .back-link:focus-visible,
   .website-link:focus-visible,
+  .photo-preview-button:focus-visible,
   .remove-link-button:focus-visible {
     outline: none;
     box-shadow: 0 0 0 3px oklch(from var(--accent-color) l c h / 0.26);
@@ -342,6 +390,7 @@
     background-color: var(--bg-low-contrast);
     color: var(--bg-medium-contrast);
     overflow: hidden;
+    position: relative;
   }
 
   #photo-container[data-loading='true'] {
@@ -355,7 +404,7 @@
     animation: skeleton-shimmer 1.3s ease-out infinite;
   }
 
-  #photo-container span {
+  #photo-container .loading-photo-indicator {
     border: 1px solid var(--bg-low-contrast);
     border-radius: 999px;
     background-color: oklch(from var(--bg-light) l c h / 0.92);
@@ -365,10 +414,37 @@
     font-weight: 650;
   }
 
-  #photo-container > img {
+  .photo-preview-button {
+    inline-size: 100%;
+    block-size: 100%;
+    display: block;
+    border: 0;
+    background: transparent;
+    padding: 0;
+    position: relative;
+    cursor: zoom-in;
+  }
+
+  .photo-preview-button img {
     width: 100%;
     height: 100%;
+    display: block;
     object-fit: cover;
+  }
+
+  .photo-count-eyebrow {
+    position: absolute;
+    top: var(--padding-1);
+    left: var(--padding-1);
+    border: 1px solid oklch(from var(--bg-color) l c h / 0.58);
+    border-radius: 999px;
+    background-color: oklch(from var(--bg-color) l c h / 0.26);
+    color: var(--bg-light);
+    padding: 0.25rem 0.625rem;
+    font-size: 0.75rem;
+    font-weight: 750;
+    line-height: 1.2;
+    box-shadow: 0 0.35rem 1rem oklch(0.24 0.02 267 / 0.14);
   }
 
   .spot-summary {
