@@ -26,6 +26,7 @@ type ResultHandler = (places: any[]) => void;
 
 let google: any = $state(null);
 let PlaceLib: any = $state(null);
+export const MAX_PLACE_PHOTOS = 15;
 const AREA_FIELDS = [
   "id",
   "displayName",
@@ -240,14 +241,14 @@ export async function getLocationByAddress(address: string) {
  * @param placeId - The Google Place ID
  * @param maxHeight - Maximum height of the photo in pixels (default: 400)
  * @param maxWidth - Maximum width of the photo in pixels (optional)
- * @param maxPhotos - Maximum number of photos to return (default: 7)
+ * @param maxPhotos - Maximum number of photos to return (default: 15)
  * @returns Photo URLs, or an empty array if no photos are available
  */
 export async function getPlacePhotoUrls(
   placeId: string,
   maxHeight: number = 400,
   maxWidth?: number,
-  maxPhotos: number = 7,
+  maxPhotos: number = MAX_PLACE_PHOTOS,
 ): Promise<string[]> {
   if (!google) {
     // Wait for google to load if not ready yet
@@ -281,7 +282,7 @@ export async function getPlacePhotoUrls(
       photoOptions.maxWidth = maxWidth;
     }
     
-    const photoLimit = Math.min(Math.max(maxPhotos, 0), 7);
+    const photoLimit = Math.min(Math.max(maxPhotos, 0), MAX_PLACE_PHOTOS);
 
     return place.photos
       .slice(0, photoLimit)
