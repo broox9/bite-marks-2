@@ -131,13 +131,6 @@
         </div>
 
         <div class="spot-summary">
-          <div class="spot-kicker">
-            <span class="eyebrow">Saved spot</span>
-            {#if isVisited}
-              <span class="status-chip"><CircleCheck size={15} />Visited</span>
-            {/if}
-          </div>
-
           <h1 id="spot-name">{spot.name}</h1>
 
           <p id="spot-address"><MapPin size={16} />{spot.address}</p>
@@ -162,6 +155,10 @@
                 <ExternalLink size={14} />
               </a>
             {/if}
+
+            {#if isVisited}
+              <span class="status-chip"><CircleCheck size={15} />Visited</span>
+            {/if}
           </div>
         </div>
       </section>
@@ -170,7 +167,6 @@
         <div class="section-heading">
           <NotebookText size={20} />
           <div>
-            <span class="eyebrow">Your notes</span>
             <h2 id="details-heading">Personal details</h2>
           </div>
         </div>
@@ -185,6 +181,7 @@
               min="0"
               max="5"
               step="0.25"
+              size="5"
               bind:value={personalRating}
               placeholder="0-5"
             />
@@ -380,7 +377,6 @@
     gap: var(--padding-1);
   }
 
-  .spot-kicker,
   .metadata-row,
   .section-heading,
   .field-group-header {
@@ -389,18 +385,8 @@
     gap: var(--padding-1);
   }
 
-  .spot-kicker,
   .field-group-header {
     justify-content: space-between;
-  }
-
-  .eyebrow {
-    display: block;
-    margin-bottom: 0.125rem;
-    color: var(--bg-medium-contrast);
-    font-size: 0.8125rem;
-    font-weight: 650;
-    line-height: 1.2;
   }
 
   #spot-name {
@@ -489,7 +475,7 @@
 
   .rating-grid {
     display: grid;
-    grid-template-columns: minmax(7.5rem, 9rem) max-content;
+    grid-template-columns: max-content max-content;
     align-items: end;
     gap: var(--padding-1);
   }
@@ -508,8 +494,10 @@
     line-height: 1.2;
   }
 
+  /* ~3 digits + decimal (e.g. 4.25); size + auto width avoids stretching the grid column */
   #personal-rating {
-    width: 100%;
+    width: auto;
+    max-inline-size: 7rem;
   }
 
   #is-visited-label {
@@ -521,20 +509,23 @@
     border: 1px solid var(--bg-low-contrast);
     border-radius: var(--border-radius);
     background-color: var(--bg-color);
-    padding: 0 var(--padding-1);
+    padding: 0 var(--padding-2);
     font-weight: 650;
   }
 
-  #is-visited {
-    --ui-control-min-block-size: 1.25rem;
-    --ui-control-radius: 6px;
-    inline-size: 1.25rem;
-    block-size: 1.25rem;
-    min-block-size: 1.25rem;
+  /* Input lives inside Checkbox.svelte; scoped #is-visited would not apply. */
+  :global(#is-visited) {
+    --ui-control-tap-area: 1.125rem;
+    --ui-control-min-block-size: 1.125rem;
+    --ui-control-radius: 5px;
+    inline-size: 1.125rem;
+    block-size: 1.125rem;
+    min-inline-size: 1.125rem;
+    min-block-size: 1.125rem;
   }
 
-  #is-visited:checked::before {
-    font-size: 0.8125rem;
+  :global(#is-visited:checked::before) {
+    font-size: 0.625rem;
   }
 
   .field-group-header {
@@ -687,7 +678,7 @@
     }
 
     .rating-grid {
-      grid-template-columns: minmax(9rem, 12rem) max-content;
+      grid-template-columns: max-content max-content;
       gap: var(--padding-2);
     }
   }
