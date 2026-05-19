@@ -201,4 +201,27 @@
    * ──────────────────────────────────────────────────────────────────────── */
   --comp-focus-ring: 0 0 0 3px oklch(from var(--sys-color-accent) l c h / 0.26);
 
+  /* ─── Input ───────────────────────────────────────────────────────────────
+   * Base single-line text input. Used directly and via InputGroup / InputWithButton.
+   * ──────────────────────────────────────────────────────────────────────── */
+  --comp-input-bg:             var(--sys-color-surface);
+  --comp-input-border:         var(--sys-color-border);
+  --comp-input-text:           var(--sys-color-text);
+  --comp-input-placeholder:    var(--sys-color-text-muted);
+  --comp-input-radius:         var(--sys-radius-control);
+
+  /* Search variant — pill-shaped, sunken bg, no border. Search drawer. */
+  --comp-input-search-bg:      var(--sys-color-surface-sunken);
+  --comp-input-search-border:  transparent;
+  --comp-input-search-radius:  var(--sys-radius-pill);
+
+  /* ─── Textarea ────────────────────────────────────────────────────────────
+   * Multi-line notes field. Same surface/border treatment as input.
+   * ──────────────────────────────────────────────────────────────────────── */
+  --comp-textarea-bg:          var(--sys-color-surface);
+  --comp-textarea-border:      var(--sys-color-border);
+  --comp-textarea-text:        var(--sys-color-text);
+  --comp-textarea-placeholder: var(--sys-color-text-muted);
+  --comp-textarea-radius:      var(--sys-radius-control);
+
 }

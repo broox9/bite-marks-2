@@ -42,9 +42,36 @@
     width: 100%;
   }
 
+  .ui-input {
+    --ui-control-bg: var(--comp-input-bg);
+    --ui-control-border-color: var(--comp-input-border);
+    --ui-control-text: var(--comp-input-text);
+    --ui-control-radius: var(--comp-input-radius);
+  }
+
   .ui-textarea {
+    --ui-control-bg: var(--comp-textarea-bg);
+    --ui-control-border-color: var(--comp-textarea-border);
+    --ui-control-text: var(--comp-textarea-text);
+    --ui-control-radius: var(--comp-textarea-radius);
     min-height: 6rem;
     resize: vertical;
+  }
+
+  .ui-input::placeholder,
+  .ui-textarea::placeholder {
+    color: var(--comp-input-placeholder);
+    opacity: 1;
+  }
+
+  /* Search variant — pill shape, sunken bg, no border */
+  .ui-input[data-variant='search'],
+  .ui-input-group[data-variant='search'],
+  .ui-input-with-button[data-variant='search'],
+  label.ui-input-with-button[data-variant='search'] {
+    --ui-control-bg: var(--comp-input-search-bg);
+    --ui-control-border-color: var(--comp-input-search-border);
+    --ui-control-radius: var(--comp-input-search-radius);
   }
 
   .ui-button {

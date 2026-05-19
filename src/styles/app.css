@@ -6,7 +6,7 @@
 @import './tokens/system.css';
 @import './tokens/components.css';
 @import './typography.css';
-@import './components.css';
+/* @import './components.css'; */
 @import '../components/ui/ui.css';
 
 
