@@ -1,0 +1,204 @@
+/* tokens/components.css
+ * Component-scoped design tokens referencing the sys layer.
+ * Named by component then property: --comp-{component}-{property}.
+ * Use these in component <style> blocks instead of raw sys/ref tokens.
+ */
+
+:root {
+
+  /* ─── Button — Primary ───────────────────────────────────────────────────
+   * Solid orange. Used for "Save changes" and all primary actions.
+   * ──────────────────────────────────────────────────────────────────────── */
+  --comp-btn-primary-bg:          var(--sys-color-brand);
+  --comp-btn-primary-border:      var(--sys-color-brand);
+  --comp-btn-primary-text:        var(--sys-color-text-on-brand);
+  --comp-btn-primary-bg-hover:    var(--sys-color-brand-hover);
+  --comp-btn-primary-bg-press:    var(--sys-color-brand-active);
+  --comp-btn-primary-bg-disabled: var(--sys-color-brand-disabled);
+  --comp-btn-primary-radius:      var(--sys-radius-control);
+
+  /* Full-width pill variant (full-bleed CTAs like "Save changes") */
+  --comp-btn-pill-radius:         var(--sys-radius-pill);
+
+  /* ─── Button — Ghost ─────────────────────────────────────────────────────
+   * Bordered, transparent bg. Used for secondary actions & icon buttons.
+   * ──────────────────────────────────────────────────────────────────────── */
+  --comp-btn-ghost-bg:            transparent;
+  --comp-btn-ghost-border:        var(--sys-color-border);
+  --comp-btn-ghost-text:          var(--sys-color-text);
+  --comp-btn-ghost-bg-hover:      var(--sys-color-surface-raised);
+
+  /* ─── Button — Link / Text ───────────────────────────────────────────────
+   * No border, no bg. Used for "Cancel" and "+ Add" in the drawer.
+   * ──────────────────────────────────────────────────────────────────────── */
+  --comp-btn-link-text:           var(--sys-color-brand);
+  --comp-btn-link-text-hover:     var(--sys-color-brand-hover);
+
+  /* ─── Button — Danger ────────────────────────────────────────────────────
+   * Solid red. Used for delete actions (currently hidden in swipe row).
+   * ──────────────────────────────────────────────────────────────────────── */
+  --comp-btn-danger-bg:           var(--sys-color-error);
+  --comp-btn-danger-border:       var(--sys-color-error);
+  --comp-btn-danger-text:         var(--sys-color-text-on-dark);
+
+  /* ─── Pill Tabs / Segmented Control ──────────────────────────────────────
+   * Independent pill buttons — "All 70", "Visited 38", "To try 32".
+   * ──────────────────────────────────────────────────────────────────────── */
+  --comp-pill-radius:              var(--sys-radius-pill);
+  --comp-pill-gap:                 0.375rem;
+  --comp-pill-padding-block:       0.375rem;
+  --comp-pill-padding-inline:      0.875rem;
+
+  --comp-pill-selected-bg:         var(--sys-color-text);
+  --comp-pill-selected-border:     var(--sys-color-text);
+  --comp-pill-selected-text:       var(--sys-color-text-on-dark);
+
+  --comp-pill-unselected-bg:       transparent;
+  --comp-pill-unselected-border:   var(--sys-color-border);
+  --comp-pill-unselected-text:     var(--sys-color-text-muted);
+
+  /* ─── Quick Filter Chips (search drawer) ─────────────────────────────────
+   * Ghost pills for "Open now", "Steak", "★ 4.5+", etc.
+   * ──────────────────────────────────────────────────────────────────────── */
+  --comp-filter-chip-radius:       var(--sys-radius-pill);
+  --comp-filter-chip-padding:      0.375rem 0.875rem;
+
+  --comp-filter-chip-bg:           transparent;
+  --comp-filter-chip-border:       var(--sys-color-border);
+  --comp-filter-chip-text:         var(--sys-color-text);
+
+  --comp-filter-chip-sel-bg:       var(--sys-color-text);
+  --comp-filter-chip-sel-border:   var(--sys-color-text);
+  --comp-filter-chip-sel-text:     var(--sys-color-text-on-dark);
+
+  /* ─── Chip — Google Rating ────────────────────────────────────────────────
+   * Warm gold tint. "★ 4.3" badge on hero and list rows.
+   * ──────────────────────────────────────────────────────────────────────── */
+  --comp-chip-rating-bg:           var(--sys-color-warning-tint);
+  --comp-chip-rating-border:       var(--sys-color-warning-border);
+  --comp-chip-rating-text:         var(--sys-color-warning-text);
+  --comp-chip-rating-icon:         var(--sys-color-warning);
+
+  /* ─── Chip — Visited / Status ────────────────────────────────────────────
+   * Green tint. "✓ Visited · Jan '26" on detail and list rows.
+   * ──────────────────────────────────────────────────────────────────────── */
+  --comp-chip-visited-bg:          var(--sys-color-success-tint);
+  --comp-chip-visited-border:      var(--sys-color-success-border);
+  --comp-chip-visited-text:        var(--sys-color-success-text);
+
+  /* ─── Chip — Count badge ─────────────────────────────────────────────────
+   * Near-black pill. "70" inside filter tabs; "7 spots in view" on map.
+   * ──────────────────────────────────────────────────────────────────────── */
+  --comp-chip-count-bg:            var(--sys-color-text);
+  --comp-chip-count-text:          var(--sys-color-text-on-dark);
+  --comp-chip-count-radius:        var(--sys-radius-pill);
+
+  /* ─── List Item ──────────────────────────────────────────────────────────
+   * Clean chevron row: name · subtitle · star · distance · ›
+   * ──────────────────────────────────────────────────────────────────────── */
+  --comp-list-item-bg:             var(--sys-color-surface);
+  --comp-list-item-bg-hover:       var(--sys-color-surface-raised);
+  --comp-list-item-divider:        var(--sys-color-border);
+  --comp-list-item-text:           var(--sys-color-text);
+  --comp-list-item-text-sub:       var(--sys-color-text-muted);
+  --comp-list-item-chevron:        var(--sys-color-text-muted);
+  --comp-list-item-star:           var(--sys-color-brand);  /* orange fill */
+
+  /* ─── Map Markers ────────────────────────────────────────────────────────
+   * Pill-shaped labels with name visible. Color encodes visited state.
+   * ──────────────────────────────────────────────────────────────────────── */
+  --comp-marker-visited-bg:        var(--sys-color-success);
+  --comp-marker-to-try-bg:         var(--sys-color-brand);
+  --comp-marker-selected-bg:       var(--sys-color-text);
+  --comp-marker-text:              var(--sys-color-text-on-dark);
+  --comp-marker-border:            var(--sys-color-surface); /* white ring  */
+  --comp-marker-shadow:            var(--ref-shadow-sm);
+  --comp-marker-radius:            var(--sys-radius-pill);
+
+  /* ─── Map — Spots-in-view chip ───────────────────────────────────────────
+   * "7 spots in view" overlaid on bottom-left of map.
+   * ──────────────────────────────────────────────────────────────────────── */
+  --comp-map-count-bg:             var(--sys-color-text);
+  --comp-map-count-text:           var(--sys-color-text-on-dark);
+  --comp-map-count-radius:         var(--sys-radius-pill);
+  --comp-map-count-padding:        0.25rem 0.75rem;
+
+  /* ─── FAB (Floating Action Button) ──────────────────────────────────────
+   * Green circle, bottom-right of map. Triggers the search drawer.
+   * ──────────────────────────────────────────────────────────────────────── */
+  --comp-fab-bg:                   var(--sys-color-success);
+  --comp-fab-text:                 var(--sys-color-text-on-dark);
+  --comp-fab-shadow:               var(--sys-shadow-fab);
+  --comp-fab-size:                 3rem;
+
+  /* ─── Location Pill (map overlay) ───────────────────────────────────────
+   * "Midtown, New York · 29 mi" — centered above map controls.
+   * ──────────────────────────────────────────────────────────────────────── */
+  --comp-location-bg:              var(--sys-color-surface);
+  --comp-location-border:          var(--sys-color-border);
+  --comp-location-text:            var(--sys-color-text-muted);
+  --comp-location-radius:          var(--sys-radius-pill);
+  --comp-location-padding:         0.375rem 0.875rem;
+
+  /* ─── Bottom Navigation Bar ──────────────────────────────────────────────
+   * Fixed 5-tab nav: Spots · List · Tags · Nearby · Me
+   * ──────────────────────────────────────────────────────────────────────── */
+  --comp-nav-bg:                   var(--sys-color-surface);
+  --comp-nav-border:               var(--sys-color-border);
+  --comp-nav-height:               3.5rem;
+  --comp-nav-active:               var(--sys-color-brand);
+  --comp-nav-inactive:             var(--sys-color-text-muted);
+
+  /* ─── Search Drawer (bottom sheet) ──────────────────────────────────────
+   * Slides up from bottom. Contains search input, top matches, filters.
+   * ──────────────────────────────────────────────────────────────────────── */
+  --comp-drawer-bg:                var(--sys-color-surface);
+  --comp-drawer-radius:            var(--sys-radius-control); /* top corners  */
+  --comp-drawer-shadow:            var(--sys-shadow-overlay);
+  --comp-drawer-backdrop:          var(--sys-overlay-bg);
+  --comp-drawer-input-bg:          var(--sys-color-surface-sunken);
+  --comp-drawer-input-radius:      var(--sys-radius-pill);
+  --comp-drawer-section-text:      var(--sys-color-text-muted);
+  --comp-drawer-cancel-text:       var(--sys-color-brand);
+  --comp-drawer-match-text:        var(--sys-color-brand); /* highlighted chars */
+
+  /* ─── Header ─────────────────────────────────────────────────────────────
+   * Top bar: 🍔 Bite Marks + hamburger menu icon.
+   * ──────────────────────────────────────────────────────────────────────── */
+  --comp-header-brand-text:        var(--sys-color-brand);
+  --comp-header-menu-border:       var(--sys-color-border);
+  --comp-header-menu-text:         var(--sys-color-text);
+  --comp-header-menu-bg-hover:     var(--sys-color-surface-raised);
+
+  /* ─── Detail — Eyebrow ───────────────────────────────────────────────────
+   * "STEAKHOUSE · JERSEY CITY, NJ" above the spot name.
+   * ──────────────────────────────────────────────────────────────────────── */
+  --comp-eyebrow-text:             var(--sys-color-brand);
+  --comp-eyebrow-size:             0.6875rem;
+  --comp-eyebrow-weight:           700;
+  --comp-eyebrow-spacing:          0.08em;
+
+  /* ─── Detail — Section Labels ────────────────────────────────────────────
+   * All-caps small labels: MY RATING · STATUS · NOTES · LINKS
+   * ──────────────────────────────────────────────────────────────────────── */
+  --comp-section-label-text:       var(--sys-color-text-muted);
+  --comp-section-label-size:       0.6875rem;
+  --comp-section-label-weight:     700;
+  --comp-section-label-spacing:    0.06em;
+
+  /* ─── Detail — Link Grid Cards ───────────────────────────────────────────
+   * Two-column grid of link cards: WEBSITE / felinajc.com
+   * ──────────────────────────────────────────────────────────────────────── */
+  --comp-link-card-bg:             var(--sys-color-surface);
+  --comp-link-card-border:         var(--sys-color-border);
+  --comp-link-card-label-text:     var(--sys-color-text-muted);
+  --comp-link-card-value-text:     var(--sys-color-text);
+  --comp-link-card-radius:         var(--sys-radius-control);
+  --comp-link-card-padding:        0.5rem 0.75rem;
+
+  /* ─── Focus Ring ─────────────────────────────────────────────────────────
+   * Applied to :focus-visible on all interactive elements.
+   * ──────────────────────────────────────────────────────────────────────── */
+  --comp-focus-ring: 0 0 0 3px oklch(from var(--sys-color-accent) l c h / 0.26);
+
+}

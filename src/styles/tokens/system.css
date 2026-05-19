@@ -1,0 +1,152 @@
+/* tokens/system.css
+ * Semantic layer — maps design intent onto ref palette tokens.
+ * Tokens carry meaning ("brand primary", "surface raised", "text muted").
+ * Use sys tokens in component tokens; never raw ref values directly.
+ *
+ * Also contains backward-compat aliases so existing component code
+ * (--bg-color, --cta-primary, etc.) keeps working without a sweep.
+ */
+
+:root {
+
+  /* ─── Brand ──────────────────────────────────────────────────────────────  */
+  --sys-color-brand:          var(--ref-orange-500);
+  --sys-color-brand-hover:    var(--ref-orange-400);
+  --sys-color-brand-active:   var(--ref-orange-600);
+  --sys-color-brand-disabled: var(--ref-orange-200);
+  --sys-color-brand-tint:     var(--ref-orange-50);
+  --sys-color-brand-tint-2:   var(--ref-orange-100);
+
+  /* ─── Surface / Background ───────────────────────────────────────────────  */
+  --sys-color-surface:        var(--ref-neutral-0);    /* page & card bg      */
+  --sys-color-surface-raised: var(--ref-neutral-50);   /* list hover, drawer  */
+  --sys-color-surface-sunken: var(--ref-neutral-100);  /* inputs, recessed    */
+
+  /* ─── Border ─────────────────────────────────────────────────────────────  */
+  --sys-color-border:         var(--ref-neutral-100);
+  --sys-color-border-strong:  var(--ref-neutral-400);
+
+  /* ─── Text ───────────────────────────────────────────────────────────────  */
+  --sys-color-text:           var(--ref-neutral-800);
+  --sys-color-text-muted:     var(--ref-neutral-400);
+  --sys-color-text-on-brand:  var(--ref-neutral-0);   /* white on orange bg   */
+  --sys-color-text-on-dark:   var(--ref-neutral-0);   /* white on dark/green  */
+
+  /* ─── Success ────────────────────────────────────────────────────────────  */
+  --sys-color-success:        var(--ref-green-500);
+  --sys-color-success-tint:   var(--ref-green-50);
+  --sys-color-success-border: var(--ref-green-300);
+  --sys-color-success-text:   var(--ref-green-700);
+
+  /* ─── Warning ────────────────────────────────────────────────────────────  */
+  --sys-color-warning:        var(--ref-gold-500);
+  --sys-color-warning-tint:   var(--ref-gold-50);
+  --sys-color-warning-border: var(--ref-gold-300);
+  --sys-color-warning-text:   var(--ref-gold-700);
+
+  /* ─── Error ──────────────────────────────────────────────────────────────  */
+  --sys-color-error:          var(--ref-red-500);
+  --sys-color-error-tint:     var(--ref-red-50);
+  --sys-color-error-border:   var(--ref-red-300);
+  --sys-color-error-text:     var(--ref-red-700);
+
+  /* ─── Notification ───────────────────────────────────────────────────────  */
+  --sys-color-notification:       var(--ref-blue-500);
+  --sys-color-notification-tint:  var(--ref-blue-50);
+
+  /* ─── Accent (focus rings, map markers) ──────────────────────────────────  */
+  --sys-color-accent:         var(--ref-mint-500);
+  --sys-color-accent-tint:    var(--ref-mint-50);
+
+  /* ─── Secondary CTA (indigo) ─────────────────────────────────────────────  */
+  --sys-color-secondary:          var(--ref-indigo-500);
+  --sys-color-secondary-hover:    var(--ref-indigo-400);
+  --sys-color-secondary-active:   var(--ref-indigo-600);
+  --sys-color-secondary-disabled: var(--ref-indigo-200);
+
+  /* ─── Shape ──────────────────────────────────────────────────────────────  */
+  --sys-radius-control: var(--ref-radius-md);    /* inputs, cards, panels     */
+  --sys-radius-pill:    var(--ref-radius-pill);  /* chips, full-round buttons */
+  --sys-radius-sm:      var(--ref-radius-sm);    /* checkboxes, small badges  */
+
+  /* ─── Spacing ────────────────────────────────────────────────────────────  */
+  --sys-space-xs: var(--ref-space-1);   /* 0.5rem */
+  --sys-space-sm: var(--ref-space-2);   /* 1rem   */
+  --sys-space-md: var(--ref-space-3);   /* 1.5rem */
+  --sys-space-lg: var(--ref-space-4);   /* 2rem   */
+
+  /* ─── Elevation ──────────────────────────────────────────────────────────  */
+  --sys-shadow-card:    var(--ref-shadow-lg);
+  --sys-shadow-overlay: var(--ref-shadow-up);
+  --sys-shadow-fab:     var(--ref-shadow-md);
+  --sys-overlay-bg:     var(--ref-overlay-dark);
+
+  /* ────────────────────────────────────────────────────────────────────────
+   * Backward-compat aliases
+   * Maps existing token names onto sys tokens so component styles written
+   * before this token system keep working without any changes.
+   * ──────────────────────────────────────────────────────────────────────── */
+
+  /* --- CTA primary ramp --- */
+  --cta-primary:             var(--sys-color-brand);
+  --cta-primary-hover:       var(--sys-color-brand-hover);
+  --cta-primary-active:      var(--sys-color-brand-active);
+  --cta-primary-disabled:    var(--sys-color-brand-disabled);
+  --cta-primary-tint-1:      var(--sys-color-brand-tint);
+  --cta-primary-tint-2:      var(--sys-color-brand-tint-2);
+
+  /* --- Legacy single-name CTA --- */
+  --cta-color:               var(--sys-color-brand);
+  --cta-dark:                var(--sys-color-brand-hover);
+  --cta-dark-super:          var(--sys-color-brand-active);
+  --cta-box-shadow: 0 0.5rem 1rem oklch(from var(--ref-mint-500) 0.34 calc(c * 0.45) h / 0.24);
+
+  /* --- Secondary CTA --- */
+  --cta-secondary:           var(--sys-color-secondary);
+  --cta-secondary-hover:     var(--sys-color-secondary-hover);
+  --cta-secondary-active:    var(--sys-color-secondary-active);
+  --cta-secondary-disabled:  var(--sys-color-secondary-disabled);
+
+  /* --- Surfaces --- */
+  --bg-color:                var(--sys-color-surface);
+  --bg-light:                var(--sys-color-surface-raised);
+  --bg-low-contrast:         var(--sys-color-surface-sunken);
+  --bg-medium-contrast:      var(--sys-color-text-muted);
+  --bg-high-contrast:        var(--sys-color-text);
+
+  /* --- Text --- */
+  --text-color:              var(--sys-color-text);
+  --text-muted:              var(--sys-color-text-muted);
+
+  /* --- Semantic --- */
+  --success:                 var(--sys-color-success);
+  --success-tint:            var(--sys-color-success-tint);
+
+  --warning:                 var(--sys-color-warning);
+  --warning-tint:            var(--sys-color-warning-tint);
+
+  --error:                   var(--sys-color-error);
+  --error-tint:              var(--sys-color-error-tint);
+
+  --notification:            var(--sys-color-notification);
+  --notification-tint:       var(--sys-color-notification-tint);
+
+  /* --- Accent --- */
+  --accent-color:            var(--sys-color-accent);
+  --accent-color-tint:       var(--sys-color-accent-tint);
+
+  /* --- Shape & spacing --- */
+  --border-radius:           var(--sys-radius-control);
+
+  --padding-1:               var(--ref-space-1);
+  --padding-2:               var(--ref-space-2);
+  --padding-3:               var(--ref-space-3);
+  --padding-4:               var(--ref-space-4);
+  --padding-5:               var(--ref-space-5);
+  --padding-6:               var(--ref-space-6);
+
+  /* --- Disabled state --- */
+  --disabled:                var(--sys-color-surface-sunken);
+  --disabled-text:           var(--sys-color-text-muted);
+
+}

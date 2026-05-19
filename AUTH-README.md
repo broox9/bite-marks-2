@@ -105,6 +105,7 @@ Those are **legacy/migration-era** code paths and may be partially unused. The l
 
 ## Related docs
 
+- [docs/oauth-social-sign-in.md](docs/oauth-social-sign-in.md) — OAuth / social sign-in plan, Console setup, adding providers, checklist
 - [Appwrite Auth](https://appwrite.io/docs/products/auth)
 - [Appwrite SSR / OAuth2](https://appwrite.io/docs/products/auth/server-side-rendering#oauth2)
 - [SvelteKit form actions](https://kit.svelte.dev/docs/form-actions)

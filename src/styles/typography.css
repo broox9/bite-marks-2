@@ -4,15 +4,7 @@ https://uncut.wft - font
 https://typescale.net - typescale
 */
 
-:root {
-  --padding-1: 0.5rem;
-  --padding-2: 1rem;
-  --padding-3: 1.5rem;
-  --padding-4: 2rem;
-  --padding-5: 2.5rem;
-  --padding-6: 3rem;
-  --border-radius: 0.75rem;
-}
+/* Spacing and radius tokens live in tokens/reference.css + tokens/system.css */
 
 body {
   /* set font family as you will - everyone uses Roboto Open Sans, or Montserrat so don't use those */
