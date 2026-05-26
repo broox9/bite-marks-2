@@ -40,25 +40,24 @@
     console.log('[bs] locationStore', locationStore)
   }
 
-  const anchorName = '--location-search-anchor'
 </script>
 
   <h3>Current Location</h3>
   <strong>{locationStore.name}</strong>
-  
+
   <label for="radius">
     <div>Radius: <em>{locationRadius} miles</em></div>
     <input name="radius" id="radius" type="range" step="5" min="5" max="30" bind:value={locationRadius} aria-label="Search Radius" title="SearchRadius"/>
   </label>
 
     <form onsubmit={searchHandler}>
-    <label for="location-search" class="ui-input-with-button" style="anchor-name: {anchorName};">
+    <label for="location-search" class="ui-input-with-button">
       <input type="search" name="location-search" id="location-search" placeholder="Search for a location" bind:value={locationInput}/>
       <button type="submit" aria-label="Set location" title="Set location"><Pin size={18} /></button>
     </label>
   </form>
   {#if locationList.length && locationInput.length}
-    <ResultList items={locationList} onSelect={selectAreaResult} anchorName={anchorName}/>
+    <ResultList items={locationList} onSelect={selectAreaResult} />
   {/if}
 
   <!-- <pre>
