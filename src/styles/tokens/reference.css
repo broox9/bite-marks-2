@@ -1,0 +1,97 @@
+/* tokens/reference.css
+ * Raw design primitives — named palette values with no semantic meaning.
+ * System and component tokens reference these. Never use ref tokens directly
+ * in component styles.
+ */
+
+:root {
+
+  /* ─── Orange (brand) ─────────────────────────────────────────────────────
+   * Hue 52 · warm orange. Pre-calculated from --cta-primary oklch(0.63 0.21 52)
+   * ──────────────────────────────────────────────────────────────────────── */
+  --ref-orange-50:  oklch(0.94 0.038 52);   /* near-white peach wash         */
+  --ref-orange-100: oklch(0.87 0.067 52);   /* soft peach tint               */
+  --ref-orange-200: oklch(0.81 0.053 52);   /* disabled / muted orange       */
+  --ref-orange-400: oklch(0.69 0.23 52);    /* hover (raised lightness)      */
+  --ref-orange-500: oklch(0.63 0.21 52);    /* base — primary brand          */
+  --ref-orange-600: oklch(0.54 0.23 52);    /* active / pressed              */
+
+  /* ─── Green (success / visited) ─────────────────────────────────────────
+   * Hue 148 · fresh green. Base: oklch(0.70 0.17 148)
+   * ──────────────────────────────────────────────────────────────────────── */
+  --ref-green-50:  oklch(0.94 0.031 148);   /* success tint bg               */
+  --ref-green-300: oklch(0.84 0.058 148);   /* success border                */
+  --ref-green-500: oklch(0.70 0.17 148);    /* base — success / visited      */
+  --ref-green-700: oklch(0.34 0.162 148);   /* dark success text             */
+
+  /* ─── Gold (warning / ratings) ──────────────────────────────────────────
+   * Hue 78 · golden amber. Base: oklch(0.76 0.17 78)
+   * ──────────────────────────────────────────────────────────────────────── */
+  --ref-gold-50:  oklch(0.95 0.027 78);     /* warning tint bg               */
+  --ref-gold-300: oklch(0.84 0.058 78);     /* warning border                */
+  --ref-gold-500: oklch(0.76 0.17 78);      /* base — warning / star ratings */
+  --ref-gold-700: oklch(0.34 0.162 78);     /* dark warning text             */
+
+  /* ─── Red (error / destructive) ─────────────────────────────────────────
+   * Hue 24 · warm crimson. Base: oklch(0.62 0.20 24)
+   * ──────────────────────────────────────────────────────────────────────── */
+  --ref-red-50:  oklch(0.94 0.036 24);      /* error tint bg                 */
+  --ref-red-300: oklch(0.84 0.068 24);      /* error border                  */
+  --ref-red-500: oklch(0.62 0.20 24);       /* base — error / destructive    */
+  --ref-red-700: oklch(0.38 0.17 24);       /* dark error text               */
+
+  /* ─── Blue (notification) ────────────────────────────────────────────────
+   * Hue 235 · blue-cyan. Base: oklch(0.66 0.15 235)
+   * ──────────────────────────────────────────────────────────────────────── */
+  --ref-blue-50:  oklch(0.94 0.027 235);    /* notification tint bg          */
+  --ref-blue-500: oklch(0.66 0.15 235);     /* base — notification           */
+
+  /* ─── Neutral (cool-tinted) ──────────────────────────────────────────────
+   * Hue 267.1 · slight blue-violet cast. Five stops matching the bg-* vars.
+   * ──────────────────────────────────────────────────────────────────────── */
+  --ref-neutral-0:   oklch(1 0.0134 267.1);      /* white / page bg          */
+  --ref-neutral-50:  oklch(0.9762 0.0134 267.1); /* off-white surface        */
+  --ref-neutral-100: oklch(0.9262 0.0134 267.1); /* light border / input bg  */
+  --ref-neutral-400: oklch(0.667 0.0134 267.1);  /* muted / medium text      */
+  --ref-neutral-800: oklch(0.297 0.0134 267.1);  /* near-black / body text   */
+
+  /* ─── Mint (accent / focus) ──────────────────────────────────────────────
+   * Hue 166 · cool mint. Used for focus rings and accent details.
+   * ──────────────────────────────────────────────────────────────────────── */
+  --ref-mint-50:  oklch(0.94 0.026 166.12); /* accent tint                   */
+  --ref-mint-500: oklch(0.6892 0.1425 166.12); /* accent base               */
+
+  /* ─── Indigo (secondary CTA) ─────────────────────────────────────────────
+   * Hue 265 · warm-cool contrast pair to orange. Base: oklch(0.50 0.16 265)
+   * ──────────────────────────────────────────────────────────────────────── */
+  --ref-indigo-200: oklch(0.70 0.04 265);   /* secondary disabled            */
+  --ref-indigo-400: oklch(0.57 0.18 265);   /* secondary hover               */
+  --ref-indigo-500: oklch(0.50 0.16 265);   /* base — secondary CTA          */
+  --ref-indigo-600: oklch(0.41 0.18 265);   /* secondary active              */
+
+  /* ─── Elevation (box-shadows) ────────────────────────────────────────────
+   * Pre-composed shadow values. Component tokens pick the right level.
+   * ──────────────────────────────────────────────────────────────────────── */
+  --ref-shadow-sm:  0 0.125rem 0.5rem oklch(0.24 0.02 267 / 0.14);
+  --ref-shadow-md:  0 0.5rem 1.25rem oklch(0.24 0.02 267 / 0.14);
+  --ref-shadow-lg:  0 0.75rem 1.75rem oklch(0.3 0.02 267 / 0.08);
+  --ref-shadow-up:  0 -0.5rem 2rem oklch(0.2 0.02 267 / 0.18);
+
+  /* Overlay / backdrop */
+  --ref-overlay-dark: oklch(0.15 0.02 267 / 0.45);
+
+  /* ─── Shape ──────────────────────────────────────────────────────────────  */
+  --ref-radius-sm:   0.375rem;
+  --ref-radius-md:   0.75rem;
+  --ref-radius-lg:   1rem;
+  --ref-radius-pill: 999px;
+
+  /* ─── Spacing ────────────────────────────────────────────────────────────  */
+  --ref-space-1: 0.5rem;
+  --ref-space-2: 1rem;
+  --ref-space-3: 1.5rem;
+  --ref-space-4: 2rem;
+  --ref-space-5: 2.5rem;
+  --ref-space-6: 3rem;
+
+}

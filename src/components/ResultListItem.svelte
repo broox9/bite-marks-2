@@ -28,7 +28,7 @@
       <div class="spot-title-row">
         <a href={`/spot/${item.id}`} aria-label={`Open ${item.name}`}>{item.name}</a>
         {#if item.is_visited}
-          <span class="visited-check">v</span>
+          <strong class="visited-dot"></strong>
         {/if}
       </div>
       <p>{item.address}</p>
@@ -152,16 +152,29 @@
     overflow-wrap: anywhere;
   }
 
-  .visited-check {
+  /* .visited-check {
     flex: 0 0 auto;
     border: 1px solid var(--accent-color);
     border-radius: 1rem;
-    /* background-color: var(--bg-low-contrast); */
     color: var(--text-muted);
     padding: 0.125rem 0.5rem;
     font-size: 0.75rem;
     font-weight: 500;
     line-height: 1;
+  } */
+
+  .visited-dot {
+    color: var(--success);
+    /* font-size: 1.25rem; */
+    /* font-weight: 800; */
+    /* line-height: 1; */
+    /* vertical-align: middle; */
+    background-color: var(--success);
+    border-radius: 100%;
+    width: 0.5rem;
+    height: 0.5rem;
+    /* font-weight: 500; */
+    /* line-height: 1; */
   }
 
   .tool-buttons {
