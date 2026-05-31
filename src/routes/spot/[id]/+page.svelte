@@ -329,10 +329,10 @@
 <style>
   .spot-page {
     min-height: calc(100svh - 7rem);
-    background:
+    /*background:
       linear-gradient(90deg, oklch(from var(--bg-low-contrast) l c h / 0.42) 1px, transparent 1px),
       var(--bg-color);
-    background-size: 3.75rem 3.75rem;
+    background-size: 3.75rem 3.75rem;*/
     color: var(--bg-high-contrast);
   }
 
@@ -342,7 +342,7 @@
     width: 100%;
     max-width: 62rem;
     margin: 0 auto;
-    padding: var(--padding-2);
+    padding: 0 var(--padding-2);
   }
 
   .back-link {
@@ -466,7 +466,8 @@
   }
 
   #spot-name {
-    max-width: 16ch;
+    /*max-width: 16ch;*/
+    text-wrap: pretty;
     margin: 0;
     font-size: 2rem;
     font-weight: 750;

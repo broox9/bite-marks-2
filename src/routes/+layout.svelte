@@ -1,6 +1,9 @@
 <script lang="ts">
   import { Hamburger } from "@lucide/svelte";
   import "../styles/app.css";
+  import DotLogo from '$lib/assets/bite-marks-dot.svg'
+  import BookmarkLogo from '../components/BookmarkLogo.svelte'
+
   import type { LayoutProps, LayoutData, PageData } from "./$types";
   import { goto } from "$app/navigation";
   import { page } from "$app/state";
@@ -34,9 +37,12 @@
     <ContainedZone>
       <div class="main-header">
         <strong>
-          <!-- <img src="/new-bite-marks-logo.png" alt="Bite Marks" width="32" height="48" /> -->
+
           <a href="/">
-            <Hamburger size={24} />
+            <!-- <img src="/new-bite-marks-logo.png" alt="Bite Marks" width="32" height="48" /> -->
+            <img src={DotLogo} alt="Bite Marks" height="28" />
+            <!-- <BookmarkLogo heightProp={24} /> -->
+            <!-- <Hamburger size={24} /> -->
             Bite Marks
           </a>
         </strong>
@@ -93,14 +99,19 @@
   }
 
   #page-header .sub-header {
-    background-color: oklch(from var(--bg-low-contrast) l c h / 0.5);
-    color: var(--text-muted);
-    padding: 0.25rem;
-    text-align: center;
+    /*background-color: oklch(from var(--bg-low-contrast) l c h / 0.5);*/
+    /*background-color: var(--bg-light);*/
+    /*border: 1px solid var(--bg-low-contrast);*/
+    padding: 0.5rem 0 0 0.5rem;
+    /*text-align: center;*/
     border-radius: var(--border-radius);
     font-style: italic;
     font-weight:300;
     letter-spacing: 0.05ch;
+
+    & a {
+      color: var(--cta-dark-super);
+    }
   }
 
   .main-header {
@@ -110,11 +121,12 @@
     padding: 0 0.25rem;
   }
 
-  .main-header strong {
+  .main-header strong a {
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    font-size: 1.25rem;
+    font-size: 1.5rem;
+    color: var(--text-color);
   }
 
   footer {
