@@ -1,35 +1,41 @@
 <script lang="ts">
-  import { loginAction } from '$lib/adapters/primary/remote-handlers/login.remote'
-  import { Input, SubmitButton } from '$components/ui'
-  import { page } from '$app/state';
+  import { loginAction } from "$lib/adapters/primary/remote-handlers/login.remote";
+  import { Input, SubmitButton } from "$components/ui";
+  import { page } from "$app/state";
 
-  let loggedInUser = $state<any | null>(null)
+  let loggedInUser = $state<any | null>(null);
+  const APPWRITE_OAUTH_URL =
+    "https://cloud.appwrite.io/v1/account/sessions/oauth2/callback/google/665bda0c000ab78d998f";
 
   const oauthErrorMessage = $derived.by(() => {
-    const code = page.url.searchParams.get('oauth');
-    if (code === 'error' || code === 'failed') return 'Google sign-in did not complete. Try again.';
-    if (code === 'invalid') return 'Sign-in link was incomplete. Start again from the login page.';
-    return '';
+    const code = page.url.searchParams.get("oauth");
+    if (code === "error" || code === "failed")
+      return "Google sign-in did not complete. Try again.";
+    if (code === "invalid")
+      return "Sign-in link was incomplete. Start again from the login page.";
+    return "";
   });
 </script>
 
-
 <section class="container">
   <form {...loginAction}>
-      <strong>
-          {loggedInUser ? `Logged in as ${loggedInUser.name}` : 'Login'}
-      </strong>
+    <strong>
+      {loggedInUser ? `Logged in as ${loggedInUser.name}` : "Login"}
+    </strong>
     {#if oauthErrorMessage}
       <p class="oauth-error" role="alert">{oauthErrorMessage}</p>
     {/if}
     <label for="email">
       <span>Email</span>
-      <Input {...loginAction.fields.email.as('text')} placeholder="email" />
+      <Input {...loginAction.fields.email.as("text")} placeholder="email" />
     </label>
 
     <label for="password">
       <span>Password</span>
-      <Input {...loginAction.fields.password.as('password')} placeholder="password" />
+      <Input
+        {...loginAction.fields.password.as("password")}
+        placeholder="password"
+      />
     </label>
 
     <div class="form-action">
@@ -40,7 +46,7 @@
 
   <p class="oauth-divider"><span>or</span></p>
   <div class="oauth-action">
-    <a class="google-signin" href="/auth/google">Continue with Google</a>
+    <a class="google-signin" href={APPWRITE_OAUTH_URL}>Continue with Google</a>
   </div>
 
   <div class="text-center">
@@ -48,24 +54,21 @@
   </div>
 </section>
 
-
-
 <style>
-
   .container {
     max-width: 30rem;
     margin-inline: auto;
     text-align: center;
   }
 
-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 1rem;
-}
+  header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+  }
 
-form {
+  form {
     display: flex;
     box-sizing: border-box;
     max-width: 400px;
@@ -78,7 +81,6 @@ form {
     border-radius: 0.5rem;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);*/
   }
-
 
   label {
     display: flex;
@@ -117,7 +119,7 @@ form {
 
   .oauth-divider::before,
   .oauth-divider::after {
-    content: '';
+    content: "";
     flex: 1;
     height: 1px;
     background: var(--color-border, #ccc);

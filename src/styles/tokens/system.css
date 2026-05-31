@@ -99,7 +99,7 @@
   --cta-color:               var(--sys-color-brand);
   --cta-dark:                var(--sys-color-brand-hover);
   --cta-dark-super:          var(--sys-color-brand-active);
-  --cta-box-shadow: 0 0.5rem 1rem oklch(from var(--ref-mint-500) 0.34 calc(c * 0.45) h / 0.24);
+  --cta-box-shadow: 0 0.25rem 0.5rem oklch(from var(--ref-mint-500) 0.34 calc(c * 0.45) h / 0.24);
 
   /* --- Secondary CTA --- */
   --cta-secondary:           var(--sys-color-secondary);

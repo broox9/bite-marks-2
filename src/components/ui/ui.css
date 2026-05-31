@@ -99,6 +99,13 @@
     background-color: var(--cta-color);
     border-color: var(--cta-color);
     color: var(--bg-light);
+    color: var(--cta-super-dark);
+    transition: all 0.25s;
+
+    &:hover {
+      background-color: var(--cta-primary-hover);
+      box-shadow: var(--cta-box-shadow);
+    }
   }
 
   .ui-button:disabled,

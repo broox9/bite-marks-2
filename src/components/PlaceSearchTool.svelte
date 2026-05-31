@@ -66,7 +66,7 @@
   {#if resultList.length > 0}
     <ResultList items={resultList} onSelect={selectResult} query={currentSearchValue} />
   {:else}
-    <div class="drawer-section">
+    <!-- <div class="drawer-section">
       <p class="section-label">Quick Filters</p>
       <div class="filter-chips">
         {#each QUICK_FILTERS as row}
@@ -77,7 +77,7 @@
           </div>
         {/each}
       </div>
-    </div>
+    </div> -->
 
     {#if RECENT.length > 0}
       <div class="drawer-section">

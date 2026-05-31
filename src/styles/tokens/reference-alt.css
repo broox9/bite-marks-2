@@ -1,0 +1,97 @@
+/* tokens/reference-alt.css
+ * Alternate raw design primitives.
+ *
+ * This file mirrors reference.css with updated color ramps. It keeps the same
+ * ref token names so the existing system and component token layers can use it
+ * as a drop-in alternate reference palette.
+ */
+
+:root {
+
+  /* Orange (brand)
+   * Base: oklch(0.8186 0.1495 80.77)
+   */
+  --ref-orange-50:  oklch(0.97 0.024 80.77);
+  --ref-orange-100: oklch(0.94 0.045 80.77);
+  --ref-orange-200: oklch(0.89 0.06 80.77);
+  --ref-orange-400: oklch(0.85 0.142 80.77);
+  --ref-orange-500: oklch(0.8186 0.1495 80.77);
+  --ref-orange-600: oklch(0.72 0.16 80.77);
+
+  /* Green (success / visited)
+   * Harmonized with the alternate mint accent hue.
+   */
+  --ref-green-50:  oklch(0.95 0.028 139.51);
+  --ref-green-300: oklch(0.84 0.058 139.51);
+  --ref-green-500: oklch(0.70 0.15 139.51);
+  --ref-green-700: oklch(0.36 0.145 139.51);
+
+  /* Gold (warning / ratings)
+   * Shifted toward the warmer alternate brand hue.
+   */
+  --ref-gold-50:  oklch(0.96 0.028 80.77);
+  --ref-gold-300: oklch(0.84 0.06 80.77);
+  --ref-gold-500: oklch(0.74 0.145 80.77);
+  --ref-gold-700: oklch(0.36 0.135 80.77);
+
+  /* Red (error / destructive)
+   * Warmed slightly to sit beside the new brand ramp.
+   */
+  --ref-red-50:  oklch(0.95 0.035 28);
+  --ref-red-300: oklch(0.84 0.068 28);
+  --ref-red-500: oklch(0.62 0.20 28);
+  --ref-red-700: oklch(0.38 0.17 28);
+
+  /* Blue (notification)
+   * Kept cool for clear contrast against the warmer brand ramp.
+   */
+  --ref-blue-50:  oklch(0.95 0.027 235);
+  --ref-blue-500: oklch(0.66 0.15 235);
+
+  /* Neutral (cool-tinted)
+   * Retains the blue-violet cast to balance the warmer brand palette.
+   */
+  --ref-neutral-0:   oklch(1 0.0134 267.1);
+  --ref-neutral-50:  oklch(0.9762 0.0134 267.1);
+  --ref-neutral-100: oklch(0.9262 0.0134 267.1);
+  --ref-neutral-400: oklch(0.667 0.0134 267.1);
+  --ref-neutral-800: oklch(0.297 0.0134 267.1);
+
+  /* Mint (accent / focus)
+   * Base: oklch(0.686 0.1356 139.51)
+   */
+  --ref-mint-50:  oklch(0.94 0.026 139.51);
+  --ref-mint-500: oklch(0.686 0.1356 139.51);
+
+  /* Indigo (secondary CTA)
+   * Complementary counterpoint to the alternate brand hue.
+   */
+  --ref-indigo-200: oklch(0.70 0.04 260.77);
+  --ref-indigo-400: oklch(0.57 0.18 260.77);
+  --ref-indigo-500: oklch(0.50 0.16 260.77);
+  --ref-indigo-600: oklch(0.41 0.18 260.77);
+
+  /* Elevation (box-shadows) */
+  --ref-shadow-sm:  0 0.125rem 0.5rem oklch(0.24 0.02 267 / 0.14);
+  --ref-shadow-md:  0 0.5rem 1.25rem oklch(0.24 0.02 267 / 0.14);
+  --ref-shadow-lg:  0 0.75rem 1.75rem oklch(0.3 0.02 267 / 0.08);
+  --ref-shadow-up:  0 -0.5rem 2rem oklch(0.2 0.02 267 / 0.18);
+
+  /* Overlay / backdrop */
+  --ref-overlay-dark: oklch(0.15 0.02 267 / 0.45);
+
+  /* Shape */
+  --ref-radius-sm:   0.375rem;
+  --ref-radius-md:   0.75rem;
+  --ref-radius-lg:   1rem;
+  --ref-radius-pill: 999px;
+
+  /* Spacing */
+  --ref-space-1: 0.5rem;
+  --ref-space-2: 1rem;
+  --ref-space-3: 1.5rem;
+  --ref-space-4: 2rem;
+  --ref-space-5: 2.5rem;
+  --ref-space-6: 3rem;
+
+}

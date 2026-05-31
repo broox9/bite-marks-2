@@ -2,7 +2,8 @@
 
 /* src/app.css */
 /* Design token layers — reference → system → components */
-@import './tokens/reference.css';
+/*@import './tokens/reference.css';*/
+@import './tokens/reference-alt.css';
 @import './tokens/system.css';
 @import './tokens/components.css';
 @import './typography.css';
