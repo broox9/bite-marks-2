@@ -1,12 +1,12 @@
 <script lang="ts">
-  import { Hamburger } from "@lucide/svelte";
+  // import { Hamburger } from "@lucide/svelte";
   import "../styles/app.css";
   import DotLogo from '$lib/assets/bite-marks-dot.svg'
-  import BookmarkLogo from '../components/BookmarkLogo.svelte'
+  // import BookmarkLogo from '../components/BookmarkLogo.svelte'
 
   import type { LayoutProps, LayoutData, PageData } from "./$types";
   import { goto } from "$app/navigation";
-  import { page } from "$app/state";
+  // import { page } from "$app/state";
 
   import { locationStore } from "$lib/adapters/primary/stores/location.store.svelte";
 
@@ -26,6 +26,7 @@
 
 <svelte:head>
   <title>Bite Marks</title>
+  <link rel="icon" href={DotLogo} />
   <link
     href="https://api.mapbox.com/mapbox-gl-js/v3.19.0/mapbox-gl.css"
     rel="stylesheet"

@@ -122,8 +122,8 @@
   >
     <div class="search-panel-header">
       <div>
-        <span class="eyebrow">Add a spot</span>
-        <h2>Search nearby places</h2>
+        <!-- <span class="eyebrow">Add a spot</span> -->
+        <h2>Add a spot</h2>
       </div>
       <button
         class="search-panel-close icon-button"

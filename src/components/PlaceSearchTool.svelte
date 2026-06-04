@@ -103,7 +103,7 @@
     display: flex;
     flex-direction: column;
     gap: 1.25rem;
-    padding: 0.75rem 1rem 1rem;
+    padding: 0.75rem 0;
   }
 
   .search-bar-row {
