@@ -1,5 +1,7 @@
 <script lang='ts'>
-  import { Pin } from '@lucide/svelte';
+  import { Pin, Search } from '@lucide/svelte';
+  import SearchInput from './ui/Search.svelte';
+
   import ContainedZone from "./util/ContainedZone.svelte"
 
    // do these proper, don't use them directily
@@ -24,7 +26,7 @@
       console.log('[bs] LOCATIONTOOLS::SEARCH RESULT', result)
       locationList = result.map(transformResultToPlace)//.filter(r => !r.primaryType)
     }
-    
+
     // const autoCompleteRegions = await areaPlaceAutoComplete(locationInput)
     // console.log('[bs] autocomplete regions', autoCompleteRegions)
     await searchForAreas(locationInput, resultHandler)
@@ -55,6 +57,13 @@
       <input type="search" name="location-search" id="location-search" placeholder="Search for a location" bind:value={locationInput}/>
       <button type="submit" aria-label="Set location" title="Set location"><Pin size={18} /></button>
     </label>
+
+
+    <!-- <SearchInput Icon={Pin} placeholder="Search for a location" bind:value={locationInput} onSearch={searchHandler} onInput={searchHandler} /> -->
+
+
+
+
   </form>
   {#if locationList.length && locationInput.length}
     <ResultList items={locationList} onSelect={selectAreaResult} />

@@ -1,0 +1,29 @@
+{
+  "name": "Bite Marks",
+  "start_url": "/",
+  "display": "minimal-ui",
+  "theme_color": "#f5b83d",
+  "description": "Find and save nearby places to eat",
+  "icons": [
+    {
+      "src": "bite-marks-dot.svg",
+      "sizes": "96x96 128x128 512x512",
+      "type": "image/svg+xml"
+    },
+    {
+      "src": "bite-marks-dot.svg",
+      "sizes": "48x48",
+      "type": "image/svg+xml"
+    },
+    {
+      "src": "bite-marks-dot.svg",
+      "sizes": "72x72 128x128 512x512",
+      "type": "image/svg+xml"
+    },
+    {
+      "src": "bite-marks-logo.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
+}
