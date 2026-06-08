@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Food App CTA Color Ramps — OKLCH</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Playfair+Display:wght@500;700&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0f0e0d;
+    --surface: #1a1917;
+    --border: rgba(255,255,255,0.07);
+    --text: #f5f0eb;
+    --muted: #7a7570;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+    padding: 48px 32px 80px;
+  }
+
+  header {
+    max-width: 860px;
+    margin: 0 auto 56px;
+  }
+
+  .eyebrow {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 12px;
+  }
+
+  h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(28px, 4vw, 42px);
+    font-weight: 500;
+    line-height: 1.15;
+    margin-bottom: 14px;
+  }
+
+  .subtitle {
+    font-size: 14px;
+    color: var(--muted);
+    line-height: 1.6;
+    max-width: 520px;
+  }
+
+  .palette-grid {
+    max-width: 860px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 48px;
+  }
+
+  .palette-block {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    overflow: hidden;
+  }
+
+  .palette-header {
+    padding: 24px 28px 20px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .palette-swatch {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    flex-shrink: 0;
+  }
+
+  .palette-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 20px;
+    font-weight: 500;
+  }
+
+  .palette-tagline {
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 2px;
+  }
+
+  /* Ramp strip */
+  .ramp {
+    display: grid;
+    grid-template-columns: repeat(9, 1fr);
+  }
+
+  .stop {
+    aspect-ratio: 1 / 1.3;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 8px 6px;
+    position: relative;
+    transition: transform 0.15s ease;
+    cursor: default;
+  }
+
+  .stop:hover { transform: scaleY(1.04); z-index: 2; }
+
+  .stop-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    line-height: 1.5;
+    opacity: 0;
+    transition: opacity 0.15s;
+    mix-blend-mode: overlay;
+  }
+
+  .stop:hover .stop-label { opacity: 1; }
+
+  .stop-num {
+    font-size: 9px;
+    font-family: 'DM Mono', monospace;
+    position: absolute;
+    top: 7px;
+    left: 7px;
+    mix-blend-mode: overlay;
+    opacity: 0.5;
+  }
+
+  /* Usage section */
+  .usage {
+    padding: 24px 28px 28px;
+    border-top: 1px solid var(--border);
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+  }
+
+  .usage-item {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .usage-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .btn-demo {
+    border: none;
+    border-radius: 8px;
+    padding: 10px 16px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    width: 100%;
+    transition: filter 0.15s;
+  }
+
+  .btn-demo:hover { filter: brightness(1.1); }
+  .btn-demo:active { filter: brightness(0.9); }
+
+  .callout-demo {
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-size: 12px;
+    line-height: 1.5;
+  }
+
+  .input-demo {
+    border-radius: 8px;
+    padding: 9px 14px;
+    font-size: 12px;
+    font-family: 'DM Sans', sans-serif;
+    outline: none;
+    width: 100%;
+    border: 2px solid transparent;
+    transition: border-color 0.15s;
+    background: rgba(255,255,255,0.06);
+    color: var(--text);
+  }
+
+  .input-demo:focus { /* done inline */ }
+
+  /* Divider row between ramp and usage */
+  .oklch-table {
+    padding: 0 28px 0;
+    overflow-x: auto;
+  }
+
+  .oklch-row {
+    display: grid;
+    grid-template-columns: 60px 1fr 1fr 1fr 1fr;
+    gap: 0;
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .oklch-row.head {
+    color: var(--muted);
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 14px 0 8px;
+  }
+
+  .oklch-row:not(.head) {
+    padding: 8px 0;
+    color: #c4bfba;
+  }
+
+  .oklch-row:last-child {
+    border-bottom: none;
+    margin-bottom: 4px;
+  }
+
+  .col { padding-right: 16px; }
+  .dot {
+    width: 10px; height: 10px; border-radius: 50%;
+    display: inline-block; margin-right: 6px; vertical-align: middle;
+  }
+
+  /* ── SAFFRON PALETTE ── */
+  .s50  { background: oklch(97% 0.03 80); }
+  .s100 { background: oklch(93% 0.07 80); }
+  .s200 { background: oklch(87% 0.12 75); }
+  .s300 { background: oklch(80% 0.17 72); }
+  .s400 { background: oklch(73% 0.19 68); }
+  .s500 { background: oklch(66% 0.20 58); }
+  .s600 { background: oklch(57% 0.19 55); }
+  .s700 { background: oklch(47% 0.16 52); }
+  .s800 { background: oklch(36% 0.11 50); }
+
+  /* ── HERB GREEN PALETTE ── */
+  .g50  { background: oklch(97% 0.03 148); }
+  .g100 { background: oklch(92% 0.07 148); }
+  .g200 { background: oklch(85% 0.12 148); }
+  .g300 { background: oklch(76% 0.16 148); }
+  .g400 { background: oklch(67% 0.19 148); }
+  .g500 { background: oklch(57% 0.20 148); }
+  .g600 { background: oklch(47% 0.18 148); }
+  .g700 { background: oklch(38% 0.15 148); }
+  .g800 { background: oklch(28% 0.10 148); }
+
+  /* ── TOMATO RED PALETTE ── */
+  .r50  { background: oklch(97% 0.02 22); }
+  .r100 { background: oklch(92% 0.06 22); }
+  .r200 { background: oklch(85% 0.11 22); }
+  .r300 { background: oklch(76% 0.16 22); }
+  .r400 { background: oklch(67% 0.20 22); }
+  .r500 { background: oklch(58% 0.22 22); }
+  .r600 { background: oklch(49% 0.21 22); }
+  .r700 { background: oklch(40% 0.18 22); }
+  .r800 { background: oklch(30% 0.13 22); }
+</style>
+</head>
+<body>
+
+<header>
+  <p class="eyebrow">Food Bookmarking App — CTA System</p>
+  <h1>Color Ramps in OKLCH</h1>
+  <p class="subtitle">Perceptually uniform ramps using OKLCH — equal lightness steps, consistent chroma, predictable contrast at every stop.</p>
+</header>
+
+<div class="palette-grid">
+
+  <!-- ══ SAFFRON ══ -->
+  <div class="palette-block">
+    <div class="palette-header">
+      <div class="palette-swatch s500"></div>
+      <div>
+        <div class="palette-name">Warm Saffron</div>
+        <div class="palette-tagline">oklch(66% 0.20 58) · appetite-forward, spice-coded</div>
+      </div>
+    </div>
+
+    <div class="ramp">
+      <div class="stop s50"><span class="stop-num">50</span><span class="stop-label">oklch(97% 0.03 80)</span></div>
+      <div class="stop s100"><span class="stop-num">100</span><span class="stop-label">oklch(93% 0.07 80)</span></div>
+      <div class="stop s200"><span class="stop-num">200</span><span class="stop-label">oklch(87% 0.12 75)</span></div>
+      <div class="stop s300"><span class="stop-num">300</span><span class="stop-label">oklch(80% 0.17 72)</span></div>
+      <div class="stop s400"><span class="stop-num">400</span><span class="stop-label">oklch(73% 0.19 68)</span></div>
+      <div class="stop s500"><span class="stop-num">500</span><span class="stop-label">oklch(66% 0.20 58)</span></div>
+      <div class="stop s600"><span class="stop-num">600</span><span class="stop-label">oklch(57% 0.19 55)</span></div>
+      <div class="stop s700"><span class="stop-num">700</span><span class="stop-label">oklch(47% 0.16 52)</span></div>
+      <div class="stop s800"><span class="stop-num">800</span><span class="stop-label">oklch(36% 0.11 50)</span></div>
+    </div>
+
+    <div class="oklch-table">
+      <div class="oklch-row head">
+        <div class="col">Stop</div>
+        <div class="col">OKLCH</div>
+        <div class="col">L (lightness)</div>
+        <div class="col">C (chroma)</div>
+        <div class="col">H (hue)</div>
+      </div>
+      <div class="oklch-row"><div class="col"><span class="dot s50"></span>50</div><div class="col">oklch(97% 0.03 80)</div><div class="col">97%</div><div class="col">0.03</div><div class="col">80</div></div>
+      <div class="oklch-row"><div class="col"><span class="dot s100"></span>100</div><div class="col">oklch(93% 0.07 80)</div><div class="col">93%</div><div class="col">0.07</div><div class="col">80</div></div>
+      <div class="oklch-row"><div class="col"><span class="dot s200"></span>200</div><div class="col">oklch(87% 0.12 75)</div><div class="col">87%</div><div class="col">0.12</div><div class="col">75</div></div>
+      <div class="oklch-row"><div class="col"><span class="dot s300"></span>300</div><div class="col">oklch(80% 0.17 72)</div><div class="col">80%</div><div class="col">0.17</div><div class="col">72</div></div>
+      <div class="oklch-row"><div class="col"><span class="dot s400"></span>400</div><div class="col">oklch(73% 0.19 68)</div><div class="col">73%</div><div class="col">0.19</div><div class="col">68</div></div>
+      <div class="oklch-row"><div class="col"><span class="dot s500"></span>500 ★</div><div class="col">oklch(66% 0.20 58)</div><div class="col">66%</div><div class="col">0.20</div><div class="col">58</div></div>
+      <div class="oklch-row"><div class="col"><span class="dot s600"></span>600</div><div class="col">oklch(57% 0.19 55)</div><div class="col">57%</div><div class="col">0.19</div><div class="col">55</div></div>
+      <div class="oklch-row"><div class="col"><span class="dot s700"></span>700</div><div class="col">oklch(47% 0.16 52)</div><div class="col">47%</div><div class="col">0.16</div><div class="col">52</div></div>
+      <div class="oklch-row"><div class="col"><span class="dot s800"></span>800</div><div class="col">oklch(36% 0.11 50)</div><div class="col">36%</div><div class="col">0.11</div><div class="col">50</div></div>
+    </div>
+
+    <div class="usage">
+      <div class="usage-item">
+        <span class="usage-label">Primary CTA</span>
+        <button class="btn-demo" style="background:oklch(66% 0.20 58);color:#1a1208;">Bookmark this dish</button>
+        <button class="btn-demo" style="background:oklch(57% 0.19 55);color:#fff;margin-top:4px;">Hover / 600</button>
+        <button class="btn-demo" style="background:oklch(47% 0.16 52);color:#fff;margin-top:4px;">Active / 700</button>
+      </div>
+      <div class="usage-item">
+        <span class="usage-label">Callout Background</span>
+        <div class="callout-demo" style="background:oklch(93% 0.07 80);color:oklch(36% 0.11 50);">
+          🔖 You've saved 12 recipes this week!
+        </div>
+        <div class="callout-demo" style="background:oklch(87% 0.12 75);color:oklch(36% 0.11 50);margin-top:8px;border-left: 3px solid oklch(66% 0.20 58);">
+          New from a chef you follow
+        </div>
+      </div>
+      <div class="usage-item">
+        <span class="usage-label">Focus Ring / Input</span>
+        <input class="input-demo" placeholder="Search recipes…"
+          onfocus="this.style.borderColor='oklch(66% 0.20 58)'"
+          onblur="this.style.borderColor='transparent'">
+        <div style="margin-top:10px;font-size:11px;color:oklch(66% 0.20 58);font-family:'DM Mono',monospace;">
+          · 50–100: callout bg<br>
+          · 500: CTA default<br>
+          · 600–700: hover / active<br>
+          · 800: text on light
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ HERB GREEN ══ -->
+  <div class="palette-block">
+    <div class="palette-header">
+      <div class="palette-swatch g500"></div>
+      <div>
+        <div class="palette-name">Herb Green</div>
+        <div class="palette-tagline">oklch(57% 0.20 148) · fresh, save-action, collection-coded</div>
+      </div>
+    </div>
+
+    <div class="ramp">
+      <div class="stop g50"><span class="stop-num">50</span><span class="stop-label">oklch(97% 0.03 148)</span></div>
+      <div class="stop g100"><span class="stop-num">100</span><span class="stop-label">oklch(92% 0.07 148)</span></div>
+      <div class="stop g200"><span class="stop-num">200</span><span class="stop-label">oklch(85% 0.12 148)</span></div>
+      <div class="stop g300"><span class="stop-num">300</span><span class="stop-label">oklch(76% 0.16 148)</span></div>
+      <div class="stop g400"><span class="stop-num">400</span><span class="stop-label">oklch(67% 0.19 148)</span></div>
+      <div class="stop g500"><span class="stop-num">500</span><span class="stop-label">oklch(57% 0.20 148)</span></div>
+      <div class="stop g600"><span class="stop-num">600</span><span class="stop-label">oklch(47% 0.18 148)</span></div>
+      <div class="stop g700"><span class="stop-num">700</span><span class="stop-label">oklch(38% 0.15 148)</span></div>
+      <div class="stop g800"><span class="stop-num">800</span><span class="stop-label">oklch(28% 0.10 148)</span></div>
+    </div>
+
+    <div class="oklch-table">
+      <div class="oklch-row head">
+        <div class="col">Stop</div>
+        <div class="col">OKLCH</div>
+        <div class="col">L (lightness)</div>
+        <div class="col">C (chroma)</div>
+        <div class="col">H (hue)</div>
+      </div>
+      <div class="oklch-row"><div class="col"><span class="dot g50"></span>50</div><div class="col">oklch(97% 0.03 148)</div><div class="col">97%</div><div class="col">0.03</div><div class="col">148</div></div>
+      <div class="oklch-row"><div class="col"><span class="dot g100"></span>100</div><div class="col">oklch(92% 0.07 148)</div><div class="col">92%</div><div class="col">0.07</div><div class="col">148</div></div>
+      <div class="oklch-row"><div class="col"><span class="dot g200"></span>200</div><div class="col">oklch(85% 0.12 148)</div><div class="col">85%</div><div class="col">0.12</div><div class="col">148</div></div>
+      <div class="oklch-row"><div class="col"><span class="dot g300"></span>300</div><div class="col">oklch(76% 0.16 148)</div><div class="col">76%</div><div class="col">0.16</div><div class="col">148</div></div>
+      <div class="oklch-row"><div class="col"><span class="dot g400"></span>400</div><div class="col">oklch(67% 0.19 148)</div><div class="col">67%</div><div class="col">0.19</div><div class="col">148</div></div>
+      <div class="oklch-row"><div class="col"><span class="dot g500"></span>500 ★</div><div class="col">oklch(57% 0.20 148)</div><div class="col">57%</div><div class="col">0.20</div><div class="col">148</div></div>
+      <div class="oklch-row"><div class="col"><span class="dot g600"></span>600</div><div class="col">oklch(47% 0.18 148)</div><div class="col">47%</div><div class="col">0.18</div><div class="col">148</div></div>
+      <div class="oklch-row"><div class="col"><span class="dot g700"></span>700</div><div class="col">oklch(38% 0.15 148)</div><div class="col">38%</div><div class="col">0.15</div><div class="col">148</div></div>
+      <div class="oklch-row"><div class="col"><span class="dot g800"></span>800</div><div class="col">oklch(28% 0.10 148)</div><div class="col">28%</div><div class="col">0.10</div><div class="col">148</div></div>
+    </div>
+
+    <div class="usage">
+      <div class="usage-item">
+        <span class="usage-label">Primary CTA</span>
+        <button class="btn-demo" style="background:oklch(57% 0.20 148);color:#fff;">Save to collection</button>
+        <button class="btn-demo" style="background:oklch(47% 0.18 148);color:#fff;margin-top:4px;">Hover / 600</button>
+        <button class="btn-demo" style="background:oklch(38% 0.15 148);color:#fff;margin-top:4px;">Active / 700</button>
+      </div>
+      <div class="usage-item">
+        <span class="usage-label">Callout Background</span>
+        <div class="callout-demo" style="background:oklch(92% 0.07 148);color:oklch(28% 0.10 148);">
+          ✓ Saved to "Weeknight Dinners"
+        </div>
+        <div class="callout-demo" style="background:oklch(85% 0.12 148);color:oklch(28% 0.10 148);margin-top:8px;border-left: 3px solid oklch(57% 0.20 148);">
+          Fresh picks from your region
+        </div>
+      </div>
+      <div class="usage-item">
+        <span class="usage-label">Focus Ring / Input</span>
+        <input class="input-demo" placeholder="Search recipes…"
+          onfocus="this.style.borderColor='oklch(57% 0.20 148)'"
+          onblur="this.style.borderColor='transparent'">
+        <div style="margin-top:10px;font-size:11px;color:oklch(57% 0.20 148);font-family:'DM Mono',monospace;">
+          · 50–100: callout bg<br>
+          · 500: CTA default<br>
+          · 600–700: hover / active<br>
+          · 800: text on light
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ TOMATO RED ══ -->
+  <div class="palette-block">
+    <div class="palette-header">
+      <div class="palette-swatch r500"></div>
+      <div>
+        <div class="palette-name">Tomato Red</div>
+        <div class="palette-tagline">oklch(58% 0.22 22) · bold, urban, high appetite-appeal</div>
+      </div>
+    </div>
+
+    <div class="ramp">
+      <div class="stop r50"><span class="stop-num">50</span><span class="stop-label">oklch(97% 0.02 22)</span></div>
+      <div class="stop r100"><span class="stop-num">100</span><span class="stop-label">oklch(92% 0.06 22)</span></div>
+      <div class="stop r200"><span class="stop-num">200</span><span class="stop-label">oklch(85% 0.11 22)</span></div>
+      <div class="stop r300"><span class="stop-num">300</span><span class="stop-label">oklch(76% 0.16 22)</span></div>
+      <div class="stop r400"><span class="stop-num">400</span><span class="stop-label">oklch(67% 0.20 22)</span></div>
+      <div class="stop r500"><span class="stop-num">500</span><span class="stop-label">oklch(58% 0.22 22)</span></div>
+      <div class="stop r600"><span class="stop-num">600</span><span class="stop-label">oklch(49% 0.21 22)</span></div>
+      <div class="stop r700"><span class="stop-num">700</span><span class="stop-label">oklch(40% 0.18 22)</span></div>
+      <div class="stop r800"><span class="stop-num">800</span><span class="stop-label">oklch(30% 0.13 22)</span></div>
+    </div>
+
+    <div class="oklch-table">
+      <div class="oklch-row head">
+        <div class="col">Stop</div>
+        <div class="col">OKLCH</div>
+        <div class="col">L (lightness)</div>
+        <div class="col">C (chroma)</div>
+        <div class="col">H (hue)</div>
+      </div>
+      <div class="oklch-row"><div class="col"><span class="dot r50"></span>50</div><div class="col">oklch(97% 0.02 22)</div><div class="col">97%</div><div class="col">0.02</div><div class="col">22</div></div>
+      <div class="oklch-row"><div class="col"><span class="dot r100"></span>100</div><div class="col">oklch(92% 0.06 22)</div><div class="col">92%</div><div class="col">0.06</div><div class="col">22</div></div>
+      <div class="oklch-row"><div class="col"><span class="dot r200"></span>200</div><div class="col">oklch(85% 0.11 22)</div><div class="col">85%</div><div class="col">0.11</div><div class="col">22</div></div>
+      <div class="oklch-row"><div class="col"><span class="dot r300"></span>300</div><div class="col">oklch(76% 0.16 22)</div><div class="col">76%</div><div class="col">0.16</div><div class="col">22</div></div>
+      <div class="oklch-row"><div class="col"><span class="dot r400"></span>400</div><div class="col">oklch(67% 0.20 22)</div><div class="col">67%</div><div class="col">0.20</div><div class="col">22</div></div>
+      <div class="oklch-row"><div class="col"><span class="dot r500"></span>500 ★</div><div class="col">oklch(58% 0.22 22)</div><div class="col">58%</div><div class="col">0.22</div><div class="col">22</div></div>
+      <div class="oklch-row"><div class="col"><span class="dot r600"></span>600</div><div class="col">oklch(49% 0.21 22)</div><div class="col">49%</div><div class="col">0.21</div><div class="col">22</div></div>
+      <div class="oklch-row"><div class="col"><span class="dot r700"></span>700</div><div class="col">oklch(40% 0.18 22)</div><div class="col">40%</div><div class="col">0.18</div><div class="col">22</div></div>
+      <div class="oklch-row"><div class="col"><span class="dot r800"></span>800</div><div class="col">oklch(30% 0.13 22)</div><div class="col">30%</div><div class="col">0.13</div><div class="col">22</div></div>
+    </div>
+
+    <div class="usage">
+      <div class="usage-item">
+        <span class="usage-label">Primary CTA</span>
+        <button class="btn-demo" style="background:oklch(58% 0.22 22);color:#fff;">Save recipe</button>
+        <button class="btn-demo" style="background:oklch(49% 0.21 22);color:#fff;margin-top:4px;">Hover / 600</button>
+        <button class="btn-demo" style="background:oklch(40% 0.18 22);color:#fff;margin-top:4px;">Active / 700</button>
+      </div>
+      <div class="usage-item">
+        <span class="usage-label">Callout Background</span>
+        <div class="callout-demo" style="background:oklch(92% 0.06 22);color:oklch(30% 0.13 22);">
+          🔥 Trending in your city right now
+        </div>
+        <div class="callout-demo" style="background:oklch(85% 0.11 22);color:oklch(30% 0.13 22);margin-top:8px;border-left:3px solid oklch(58% 0.22 22);">
+          Limited-time menu — bookmark it
+        </div>
+      </div>
+      <div class="usage-item">
+        <span class="usage-label">Focus Ring / Input</span>
+        <input class="input-demo" placeholder="Search recipes…"
+          onfocus="this.style.borderColor='oklch(58% 0.22 22)'"
+          onblur="this.style.borderColor='transparent'">
+        <div style="margin-top:10px;font-size:11px;color:oklch(58% 0.22 22);font-family:'DM Mono',monospace;">
+          · 50–100: callout bg<br>
+          · 500: CTA default<br>
+          · 600–700: hover / active<br>
+          · 800: text on light
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /palette-grid -->
+
+<footer style="max-width:860px;margin:48px auto 0;font-family:'DM Mono',monospace;font-size:11px;color:#4a4540;line-height:1.8;">
+  ★ = primary CTA token &nbsp;·&nbsp; Hover each ramp stop to reveal OKLCH value &nbsp;·&nbsp; Ramps step ~7pts L per stop for perceptual uniformity
+</footer>
+
+</body>
+</html>

@@ -135,7 +135,7 @@
     width: 100%;
     margin-top: 3.5rem;
     background-color: var(--bg-light);
-    padding: 0.25rem;
+    padding: 0.5rem;
     display: flex;
     justify-content: flex-start;
     align-items: center;
@@ -144,7 +144,7 @@
   }
 
   .footer-link {
-    color: var(--accent-color);
+    color: var(--bg-medium-contrast);
     text-decoration: none;
   }
 
