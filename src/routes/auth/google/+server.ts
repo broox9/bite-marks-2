@@ -9,6 +9,12 @@ export const GET: RequestHandler = async (event) => {
   const success = `${base}/auth/google/callback`;
   const failure = `${base}/login?oauth=error`;
 
-  const redirectUrl = await auth.getGoogleOAuthRedirectUrl(success, failure);
+  let redirectUrl: string;
+  try {
+    redirectUrl = await auth.getGoogleOAuthRedirectUrl(success, failure);
+  } catch {
+    throw redirect(303, "/login?oauth=error");
+  }
+
   throw redirect(302, redirectUrl);
 };
