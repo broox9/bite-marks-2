@@ -13,7 +13,7 @@ vi.mock("$lib/use_cases/authorization", () => ({
   },
 }));
 
-import { GET } from "./+server";
+import { GET } from "../../../routes/auth/google/+server";
 
 function createEvent(url = "https://app.example.test/auth/google") {
   return { url: new URL(url) } as Parameters<typeof GET>[0];
