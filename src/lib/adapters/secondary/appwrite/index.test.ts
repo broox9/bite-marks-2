@@ -63,4 +63,33 @@ describe("AppwriteAdapter", () => {
     expect(result).toEqual({ success: true, spotResult: savedUserSpotRow });
     expect(db.updateTransaction).toHaveBeenCalledWith({ transactionId: "tx-1", commit: true });
   });
+
+  it("filters getUserSpots by user_id", async () => {
+    const db = {
+      listRows: vi.fn().mockResolvedValue({ total: 0, rows: [] }),
+    };
+    const adapter = new AppwriteAdapter(() => db);
+
+    await adapter.getUserSpots("user-42");
+
+    expect(db.listRows).toHaveBeenCalledWith(
+      expect.objectContaining({
+        queries: expect.arrayContaining(['equal("user_id", "user-42")']),
+      })
+    );
+  });
+
+  it("returns null from getUserSpot when user_id does not match", async () => {
+    const db = {
+      getRow: vi.fn().mockResolvedValue({
+        $id: "spot-1",
+        user_id: "other-user",
+      }),
+    };
+    const adapter = new AppwriteAdapter(() => db);
+
+    const result = await adapter.getUserSpot("spot-1", "user-1");
+
+    expect(result).toBeNull();
+  });
 });

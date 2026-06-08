@@ -57,7 +57,8 @@ export const updateSpot = command(
     if (!user) throw error(401, "Unauthorized");
 
     console.log("[bs] spots::remote::updateSpot", rowId, data);
-    const updatedSpot = await placeAndSpotUseCase.updateSpot(rowId, data);
+    const updatedSpot = await placeAndSpotUseCase.updateSpot(rowId, data, user.$id);
+    if (!updatedSpot) throw error(404, "Spot not found");
     return updatedSpot;
   }
 );
@@ -82,7 +83,7 @@ export const deleteUserSpot = command(deleteSpotSchema, async (rowId : string) =
     if (!user) throw error(401, "Unauthorized");
 
     console.log("[bs] spots::remote::deleteUserSpot", rowId);
-    const deletedSpot = await placeAndSpotUseCase.deleteSpot(rowId);
+    const deletedSpot = await placeAndSpotUseCase.deleteSpot(rowId, user.$id);
     return deletedSpot;
   }
 );

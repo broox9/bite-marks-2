@@ -73,14 +73,15 @@ export class AppwriteAdapter implements PersistenceRepository {
     return document;
   }
 
-  async getUserSpot(rowId: string): Promise<UserSpotRecord | null> {
+  async getUserSpot(rowId: string, userId: string): Promise<UserSpotRecord | null> {
     try {
-    const rowResult = await this.#db().getRow({
+      const rowResult = await this.#db().getRow({
         databaseId: DATABASE_ID,
         tableId: COLLECTIONS.userPlaces,
         rowId,
-        queries: [Query.select(['*', 'place_id.*'])]
+        queries: [Query.select(['*', 'place_id.*'])],
       });
+      if (rowResult.user_id !== userId) return null;
       return rowResult;
     } catch (error) {
       console.error("[bs] adapter::getUserSpot::error", error);
@@ -98,7 +99,14 @@ export class AppwriteAdapter implements PersistenceRepository {
     });
   }
 
-  async updateUserSpot(rowId: string, data: Partial<UserSpotRecord>): Promise<any> {
+  async updateUserSpot(
+    rowId: string,
+    data: Partial<UserSpotRecord>,
+    userId: string
+  ): Promise<any> {
+    const existing = await this.getUserSpot(rowId, userId);
+    if (!existing) return null;
+
     await this.#db().updateRow({
       databaseId: DATABASE_ID,
       tableId: COLLECTIONS.userPlaces,
@@ -124,7 +132,7 @@ export class AppwriteAdapter implements PersistenceRepository {
       databaseId: DATABASE_ID,
       tableId: COLLECTIONS.userPlaces,
       queries: [
-        // Query.equal("user_id", userId),
+        Query.equal("user_id", userId),
         Query.select(['*', 'place_id.*']),
         Query.orderDesc("$createdAt"),
         Query.limit(100),
@@ -174,9 +182,14 @@ export class AppwriteAdapter implements PersistenceRepository {
     return (result?.total ?? result?.rows?.length ?? 0) > 0;
   }
 
-  async deleteUserSpot(rowId: string): Promise<any> {
+  async deleteUserSpot(rowId: string, userId: string): Promise<any> {
     try {
-    const result = await this.#db().deleteRow({
+      const existing = await this.getUserSpot(rowId, userId);
+      if (!existing) {
+        return { success: false, error: "Spot not found or not owned by user" };
+      }
+
+      const result = await this.#db().deleteRow({
       databaseId: DATABASE_ID,
       tableId: COLLECTIONS.userPlaces,
       rowId: rowId,
