@@ -4,8 +4,6 @@
   import { page } from "$app/state";
 
   let loggedInUser = $state<any | null>(null);
-  const APPWRITE_OAUTH_URL =
-    "https://cloud.appwrite.io/v1/account/sessions/oauth2/callback/google/665bda0c000ab78d998f";
 
   const oauthErrorMessage = $derived.by(() => {
     const code = page.url.searchParams.get("oauth");
@@ -46,7 +44,7 @@
 
   <p class="oauth-divider"><span>or</span></p>
   <div class="oauth-action">
-    <a class="google-signin" href={APPWRITE_OAUTH_URL}>Continue with Google</a>
+    <a class="google-signin" href="/auth/google">Continue with Google</a>
   </div>
 
   <div class="text-center">
