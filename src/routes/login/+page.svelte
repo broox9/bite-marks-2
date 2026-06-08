@@ -40,12 +40,15 @@
       <SubmitButton data-type="login" data-width="full">Login</SubmitButton>
     </div>
     <!-- <SubmitButton data-type="register">Register</SubmitButton> -->
+
+
+    <p class="oauth-divider"><span>or</span></p>
+    <div class="oauth-action">
+      <a class="google-signin" href="/auth/google">Continue with Google</a>
+    </div>
   </form>
 
-  <p class="oauth-divider"><span>or</span></p>
-  <div class="oauth-action">
-    <a class="google-signin" href="/auth/google">Continue with Google</a>
-  </div>
+
 
   <div class="text-center">
     <em>just looking for <a href="/all-spots">all the spots?</a></em>
