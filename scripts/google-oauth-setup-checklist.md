@@ -148,11 +148,30 @@ Create or update your `.env` file (or environment configuration):
 ```bash
 # Public variables (safe for client-side)
 PUBLIC_APPWRITE_ENDPOINT=https://cloud.appwrite.io/v1  # Your Appwrite API endpoint
-PUBLIC_APP_URL=https://bitemarks.app  # Optional: canonical URL for OAuth (production)
+PUBLIC_APP_URL=https://bite.broox.us  # REQUIRED in production for OAuth (your production domain)
 
 # Private variables (server-side only)
 APPWRITE_PROJECT_ID=your-project-id-here  # Your Appwrite project ID
 APPWRITE_API_KEY=your-api-key-here  # Server API key from Appwrite
+```
+
+**⚠️ IMPORTANT FOR PRODUCTION:**
+
+The `PUBLIC_APP_URL` variable is **REQUIRED** in production environments. Without it:
+- OAuth redirect URLs will use the request origin, which may not match Appwrite's registered platforms
+- This causes the "Invalid redirect" error from Appwrite
+- Set it to your exact production domain (e.g., `https://bite.broox.us`)
+
+**For Cloudflare Workers deployment:**
+
+Add `PUBLIC_APP_URL` to your `wrangler.jsonc`:
+```jsonc
+{
+  "vars": {
+    "NODE_ENV": "production",
+    "PUBLIC_APP_URL": "https://bite.broox.us"
+  }
+}
 ```
 
 ### 3.2 Variable Checklist
@@ -160,7 +179,8 @@ APPWRITE_API_KEY=your-api-key-here  # Server API key from Appwrite
 - [ ] `PUBLIC_APPWRITE_ENDPOINT` is set to your Appwrite instance URL
 - [ ] `APPWRITE_PROJECT_ID` matches your Appwrite project
 - [ ] `APPWRITE_API_KEY` is the server API key with proper scopes
-- [ ] `PUBLIC_APP_URL` is set (optional, for production with reverse proxy)
+- [ ] `PUBLIC_APP_URL` is set to your production domain (REQUIRED for production)
+- [ ] For Cloudflare Workers: `PUBLIC_APP_URL` is in `wrangler.jsonc` vars
 
 ## Part 4: Testing
 

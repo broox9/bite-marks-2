@@ -14,6 +14,7 @@
   // SvelteKit $env/dynamic reads from platform.env at runtime. These vars are required
   // for the Appwrite server client. Set APPWRITE_API_KEY via: wrangler secret put APPWRITE_API_KEY
   "vars": {
-    "NODE_ENV": "production"
+    "NODE_ENV": "production",
+    "PUBLIC_APP_URL": "https://bite.broox.us"
   }
 }

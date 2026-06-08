@@ -16,14 +16,27 @@ export const GET: RequestHandler = async (event) => {
   const userId = event.url.searchParams.get("userId");
   const secret = event.url.searchParams.get("secret");
 
+  console.log('[OAuth Callback] Received OAuth callback', {
+    hasUserId: !!userId,
+    hasSecret: !!secret,
+    userIdLength: userId?.length,
+    secretLength: secret?.length,
+  });
+
   if (!isValidUserId(userId) || !isValidOAuthSecret(secret)) {
+    console.error('[OAuth Callback] Invalid OAuth parameters');
     throw redirect(303, "/login?oauth=invalid");
   }
 
   try {
+    console.log('[OAuth Callback] Creating session for user:', userId);
     const session = await auth.completeOAuthLogin(userId, secret);
+    console.log('[OAuth Callback] Session created successfully');
+    
     setAppwriteSessionCookie(event.cookies, session);
-  } catch {
+    console.log('[OAuth Callback] Session cookie set, redirecting to /list');
+  } catch (error) {
+    console.error('[OAuth Callback] Failed to complete OAuth login:', error);
     throw redirect(303, "/login?oauth=failed");
   }
 
