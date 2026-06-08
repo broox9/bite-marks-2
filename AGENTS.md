@@ -71,3 +71,36 @@ npm run check
 
 ### Available skills
 - `frontend-design`: Create distinctive, production-grade frontend interfaces with high design quality for component/page/application build requests. (file: `/Users/brooxm2/projects/bite-marks-2/skills/frontend-design/SKILL.md`)
+
+## Cursor Cloud specific instructions
+
+### Services
+
+| Service | Command | Notes |
+|---------|---------|-------|
+| SvelteKit dev server | `npm run dev` | Listens on port **5173** (`--host`). Only local process required. |
+| Appwrite | (remote) | Hosted at `fra.cloud.appwrite.io`; no local Appwrite or Docker. |
+
+### Environment
+
+SvelteKit reads Appwrite config from a **`.env`** file (gitignored). Cloud Agent secrets are injected as shell env vars; write them into `.env` before starting the dev server:
+
+- `PUBLIC_APPWRITE_ENDPOINT`
+- `APPWRITE_PROJECT_ID`
+- `APPWRITE_API_KEY`
+- `OPENAI_API_KEY` (optional; only needed for `/agent`)
+
+The browser Appwrite client in `src/lib/adapters/secondary/appwrite/browser-client.ts` hardcodes endpoint/project separately from server env.
+
+### Verify without login
+
+- `/` redirects unauthenticated users to `/login` (303).
+- `/all-spots` is public and loads the master places catalog (good smoke test).
+- Authenticated flows (search, save spot, `/list`) need an Appwrite email/password user.
+
+### Commands
+
+- **Typecheck:** `npm run check` (has pre-existing TS errors in legacy/experimental routes; build still succeeds).
+- **Tests:** `npm test` (Vitest, 96 tests).
+- **Build:** `npm run build` (Cloudflare adapter; uploads source maps to Sentry when `SENTRY_AUTH_TOKEN` is set).
+- **Lint:** No ESLint npm script; Prettier config exists but no format script.
