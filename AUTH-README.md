@@ -55,9 +55,22 @@ Matches [Appwrite SSR — OAuth2](https://appwrite.io/docs/products/auth/server-
 - **Value**: `session.secret` from Appwrite.
 - **Flags**: `httpOnly`, `path: /`, `secure: !dev`, **`sameSite: "lax"`** (used for both email and OAuth). `lax` avoids issues where the session cookie would not be sent on the **first** navigation back from the OAuth provider when using `strict`.
 
-## `PUBLIC_APP_URL` (optional)
+## `PUBLIC_APP_URL` (required in production)
 
-OAuth success/failure URLs must be absolute. By default the app uses `event.url.origin`. If you are behind a reverse proxy or need a fixed canonical URL (e.g. production only), set **`PUBLIC_APP_URL`** (no trailing slash), e.g. `https://yourdomain.com`. Implemented in `app-base-url.server.ts`.
+OAuth success/failure URLs must be absolute. By default the app uses `event.url.origin`. **In production (especially on Cloudflare Workers), you MUST set `PUBLIC_APP_URL`** to your canonical domain (e.g. `https://bite.broox.us`) to ensure OAuth redirect URLs match the platforms registered in Appwrite Console.
+
+**Without `PUBLIC_APP_URL` in production, you will get "Invalid redirect" errors from Appwrite.**
+
+For Cloudflare Workers, set this in `wrangler.jsonc`:
+```jsonc
+{
+  "vars": {
+    "PUBLIC_APP_URL": "https://bite.broox.us"
+  }
+}
+```
+
+For local development, `PUBLIC_APP_URL` is optional (defaults to `http://localhost:5173`).
 
 ## Route protection (`+layout.server.ts`)
 
@@ -83,8 +96,10 @@ If `locals.user` is set, **`/login`** and **`/auth/google`** redirect to **`/`**
 
 From `server-client.server.ts` and `app-base-url.server.ts`:
 
-- **Public**: `PUBLIC_APPWRITE_ENDPOINT`, optional `PUBLIC_APP_URL`
+- **Public**: `PUBLIC_APPWRITE_ENDPOINT`, **`PUBLIC_APP_URL` (REQUIRED in production)**
 - **Private**: `APPWRITE_PROJECT_ID`, `APPWRITE_API_KEY`
+
+**Production Note:** Without `PUBLIC_APP_URL` set in production, OAuth will fail with "Invalid redirect" errors because the redirect URLs won't match Appwrite's registered platforms.
 
 ## Migration / legacy notes (why there are duplicate folders)
 

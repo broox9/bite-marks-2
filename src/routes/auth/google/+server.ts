@@ -9,12 +9,20 @@ export const GET: RequestHandler = async (event) => {
   const success = `${base}/auth/google/callback`;
   const failure = `${base}/login?oauth=error`;
 
-  let redirectUrl: string;
-  try {
-    redirectUrl = await auth.getGoogleOAuthRedirectUrl(success, failure);
-  } catch {
-    throw redirect(303, "/login?oauth=error");
-  }
+  console.log('[OAuth] Initiating Google OAuth flow', { base, success, failure });
 
-  throw redirect(302, redirectUrl);
+  try {
+    const redirectUrl = await auth.getGoogleOAuthRedirectUrl(success, failure);
+    console.log('[OAuth] Redirecting to:', redirectUrl);
+    throw redirect(302, redirectUrl);
+  } catch (error) {
+    console.error('[OAuth] Failed to get OAuth redirect URL:', error);
+    
+    if (error instanceof Error && error.message.includes('Invalid redirect')) {
+      console.error('[OAuth] Redirect URL validation failed. Check Appwrite Console → Project → Platforms');
+      console.error('[OAuth] Ensure these URLs are whitelisted:', { base, success, failure });
+    }
+    
+    throw redirect(303, `${base}/login?oauth=error`);
+  }
 };
