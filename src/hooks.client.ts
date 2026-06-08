@@ -1,6 +1,6 @@
 import * as Sentry from "@sentry/sveltekit";
 import { dev } from "$app/environment";
-import type { Event as SentryEvent } from "@sentry/core";
+import type { ErrorEvent as SentryErrorEvent } from "@sentry/core";
 import {
     isLocalHostname,
     shouldDropLocalSentryEvent,
@@ -20,7 +20,7 @@ Sentry.init({
     integrations: [Sentry.replayIntegration()],
     enableLogs: true,
     sendDefaultPii: true,
-    beforeSend(event: SentryEvent) {
+    beforeSend(event: SentryErrorEvent) {
         return shouldDropLocalSentryEvent(event) ? null : event;
     },
 })

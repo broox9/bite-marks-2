@@ -1,6 +1,6 @@
 import { sequence } from "@sveltejs/kit/hooks";
 import { dev } from "$app/environment";
-import type { Event as SentryEvent } from "@sentry/core";
+import type { ErrorEvent as SentryErrorEvent } from "@sentry/core";
 import {
   initCloudflareSentryHandle,
   sentryHandle,
@@ -21,7 +21,7 @@ const sentryOptions = {
   environment: dev ? "development" : "production",
   tracesSampleRate: 1.0,
   enableLogs: true,
-  beforeSend(event: SentryEvent) {
+  beforeSend(event: SentryErrorEvent) {
     return shouldDropLocalSentryEvent(event) ? null : event;
   },
   // integrations: [
