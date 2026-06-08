@@ -20,8 +20,9 @@ export class PlaceAndSpotUseCase {
     return { ...spot, rowId: result.$id };
   }
 
-  async updateSpot(rowId: string, data: Partial<UserSpotRecord>) {
-    const result = await this.persistenceRepository.updateUserSpot(rowId, data);
+  async updateSpot(rowId: string, data: Partial<UserSpotRecord>, userId: string) {
+    const result = await this.persistenceRepository.updateUserSpot(rowId, data, userId);
+    if (!result) return null;
     const spot = transformAppwriteToUserSpotRecord(result);
     return { ...spot, rowId: result.$id };
   }
@@ -35,9 +36,9 @@ export class PlaceAndSpotUseCase {
     // return this.persistenceRepository.saveMasterPlace(place, userId);
     return this.persistenceRepository.savePlaceAndSpot(place, userId);
   }
-  async deleteSpot(rowId: string) {
+  async deleteSpot(rowId: string, userId: string) {
     console.log("[bs] use-case::deleteSpot", rowId);
-    return this.persistenceRepository.deleteUserSpot(rowId);
+    return this.persistenceRepository.deleteUserSpot(rowId, userId);
   }
 }
 

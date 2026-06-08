@@ -77,14 +77,21 @@ describe('PlaceAndSpotUseCase', () => {
   });
 
   describe('updateSpot', () => {
-    it('calls updateUserSpot with rowId and data', async () => {
-      await useCase.updateSpot('row-1', { personal_notes: 'Great!' });
-      expect(repo.updateUserSpot).toHaveBeenCalledWith('row-1', { personal_notes: 'Great!' });
+    it('calls updateUserSpot with rowId, data, and userId', async () => {
+      await useCase.updateSpot('row-1', { personal_notes: 'Great!' }, 'user-1');
+      expect(repo.updateUserSpot).toHaveBeenCalledWith('row-1', { personal_notes: 'Great!' }, 'user-1');
+    });
+
+    it('returns null when repository returns null', async () => {
+      repo = makeMockRepo({ updateUserSpot: vi.fn().mockResolvedValue(null) });
+      useCase = new PlaceAndSpotUseCase(repo);
+      const result = await useCase.updateSpot('row-1', {}, 'user-1');
+      expect(result).toBeNull();
     });
 
     it('returns transformed spot with rowId', async () => {
-      const result = await useCase.updateSpot('row-1', {});
-      expect(result.rowId).toBe('spot-1');
+      const result = await useCase.updateSpot('row-1', {}, 'user-1');
+      expect(result!.rowId).toBe('spot-1');
     });
   });
 
@@ -104,9 +111,9 @@ describe('PlaceAndSpotUseCase', () => {
   });
 
   describe('deleteSpot', () => {
-    it('calls deleteUserSpot with the rowId', async () => {
-      await useCase.deleteSpot('row-99');
-      expect(repo.deleteUserSpot).toHaveBeenCalledWith('row-99');
+    it('calls deleteUserSpot with the rowId and userId', async () => {
+      await useCase.deleteSpot('row-99', 'user-1');
+      expect(repo.deleteUserSpot).toHaveBeenCalledWith('row-99', 'user-1');
     });
   });
 });
