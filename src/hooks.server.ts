@@ -1,4 +1,6 @@
 import { sequence } from "@sveltejs/kit/hooks";
+import { dev } from "$app/environment";
+import type { Event as SentryEvent } from "@sentry/core";
 import {
   initCloudflareSentryHandle,
   sentryHandle,
@@ -11,11 +13,17 @@ import {
   createSessionAccount,
   createSessionTablesDB,
 } from "$lib/adapters/secondary/appwrite/server-client.server";
+import { shouldDropLocalSentryEvent } from "$lib/adapters/secondary/sentry/event-filter";
 
 const sentryOptions = {
   dsn: "https://7ab0ec7634448d8b30f20c5bcffb7121@o4510803666927616.ingest.us.sentry.io/4510803670663168",
+  enabled: !dev,
+  environment: dev ? "development" : "production",
   tracesSampleRate: 1.0,
   enableLogs: true,
+  beforeSend(event: SentryEvent) {
+    return shouldDropLocalSentryEvent(event) ? null : event;
+  },
   // integrations: [
   //   consoleLoggingIntegration({ levels: ["log", "warn", "error"] }),
   // ],
