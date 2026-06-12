@@ -28,6 +28,17 @@
     const result = await saveSpot({ spot: place })
     saveAction(result, place);
   };
+
+  function getPriceSymbols(priceLevel: string): string {
+    const map: Record<string, string> = {
+      'free': 'Free',
+      'inexpensive': '$',
+      'moderate': '$$',
+      'expensive': '$$$',
+      'very_expensive': '$$$$'
+    };
+    return map[priceLevel] || priceLevel;
+  }
 </script>
 
 <div class="result-card">
@@ -68,10 +79,10 @@
           <span class="metric-value">{place.rating}</span>
         </div>
       {/if}
-      {#if place.price_level}
+      {#if place.price_level && place.price_level !== 'free'}
         <div class="metric price">
           <span class="metric-label">Price</span>
-          <span class="metric-value price-symbols">{place.price_level}</span>
+          <span class="metric-value price-symbols">{getPriceSymbols(place.price_level)}</span>
         </div>
       {/if}
     </div>
@@ -203,7 +214,8 @@
   .price-symbols {
     color: var(--cta-primary);
     font-weight: 700;
-    letter-spacing: 0.05em;
+    letter-spacing: 0.1em;
+    font-size: 1.0625rem;
   }
 
   .details {
