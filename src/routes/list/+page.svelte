@@ -327,6 +327,7 @@
     border-radius: var(--border-radius) var(--border-radius) 0 0;
     position: relative;
     overflow: hidden;
+    transition: height 300ms ease-out, min-height 300ms ease-out;
 
     &.minimized {
       height: 3rem;
@@ -528,6 +529,10 @@
     .skeleton-row small {
       animation: none;
     }
+
+    #map-container {
+      transition: none;
+    }
   }
 
   @media (min-width: 768px) {
@@ -563,6 +568,7 @@
       min-height: 24rem;
       border: 1px solid var(--bg-low-contrast);
       border-radius: var(--border-radius);
+      transition: height 300ms ease-out, min-height 300ms ease-out;
     }
 
     #map-container.minimized {
