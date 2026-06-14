@@ -10,6 +10,10 @@
     Plus,
     Star,
     Trash2,
+    Instagram,
+    Facebook,
+    Twitter,
+    Youtube,
   } from '@lucide/svelte';
   import { page } from '$app/state';
   import { getSpotById, updateSpot } from '$lib/adapters/primary/remote-handlers/spots.remote';
@@ -17,6 +21,7 @@
   import { getPlacePhotoUrls, MAX_PLACE_PHOTOS } from '$lib/adapters/secondary/google/google.svelte';
   import { Button, Checkbox, SubmitButton } from '$components/ui';
   import PhotoLightbox from '$components/util/PhotoLightbox.svelte';
+  import { extractMetadata, type SocialPlatform } from '$lib/utils/social-platform';
 
   const spotQuery = getSpotById({ id: page.params.id ?? '' });
   const maxPhotoWidth = 800;
@@ -26,6 +31,8 @@
   let personalNotes = $state<string | null>(null);
   let isVisited = $state<boolean>(false);
   let socialLinks = $state<string[]>([]);
+  let editingLinkIndex = $state<number | null>(null);
+  let editingLinkValue = $state<string>('');
   let rowId = $state<string | null>(null);
   let isSaving = $state(false);
   let photoUrls = $state<string[]>([]);
@@ -109,14 +116,43 @@
 
   function addSocialLink() {
     socialLinks = [...socialLinks, ''];
+    editingLinkIndex = socialLinks.length - 1;
+    editingLinkValue = '';
   }
 
   function removeSocialLink(index: number) {
     socialLinks = socialLinks.filter((_, i) => i !== index);
+    if (editingLinkIndex === index) {
+      editingLinkIndex = null;
+      editingLinkValue = '';
+    }
   }
 
   function updateSocialLink(index: number, value: string) {
     socialLinks = socialLinks.map((link, i) => (i === index ? value : link));
+  }
+
+  function startEditingLink(index: number) {
+    editingLinkIndex = index;
+    editingLinkValue = socialLinks[index];
+  }
+
+  function saveEditingLink() {
+    if (editingLinkIndex !== null) {
+      updateSocialLink(editingLinkIndex, editingLinkValue);
+      editingLinkIndex = null;
+      editingLinkValue = '';
+    }
+  }
+
+  function cancelEditingLink() {
+    if (editingLinkIndex !== null) {
+      if (socialLinks[editingLinkIndex] === '') {
+        removeSocialLink(editingLinkIndex);
+      }
+      editingLinkIndex = null;
+      editingLinkValue = '';
+    }
   }
 
   function openLightbox() {
@@ -127,6 +163,45 @@
 
   function closeLightbox() {
     isLightboxOpen = false;
+  }
+
+  function getPlatformIcon(platform: SocialPlatform) {
+    switch (platform) {
+      case 'instagram':
+        return Instagram;
+      case 'facebook':
+        return Facebook;
+      case 'twitter':
+        return Twitter;
+      case 'youtube':
+        return Youtube;
+      case 'yelp':
+      case 'google':
+        return MapPin;
+      case 'website':
+        return Globe;
+      default:
+        return Link2;
+    }
+  }
+
+  function getPlatformColor(platform: SocialPlatform): string {
+    switch (platform) {
+      case 'instagram':
+        return '#E4405F';
+      case 'facebook':
+        return '#1877F2';
+      case 'twitter':
+        return '#1DA1F2';
+      case 'youtube':
+        return '#FF0000';
+      case 'yelp':
+        return '#D32323';
+      case 'google':
+        return '#4285F4';
+      default:
+        return 'var(--bg-medium-contrast)';
+    }
   }
 </script>
 
@@ -266,28 +341,71 @@
           {:else}
             <div class="social-link-list" aria-labelledby="social-links-label">
               {#each socialLinks as link, index}
-                <div class="social-link-row">
-                  <Link2 size={18} aria-hidden="true" />
-                  <input
-                    type="url"
-                    value={link}
-                    oninput={(e) => {
-                      const target = e.target as HTMLInputElement;
-                      updateSocialLink(index, target.value);
-                    }}
-                    class="ui-input"
-                    aria-label={`Social link ${index + 1}`}
-                    placeholder="https://..."
-                  />
-                  <button
-                    type="button"
-                    class="remove-link-button"
-                    aria-label={`Remove social link ${index + 1}`}
-                    onclick={() => removeSocialLink(index)}
-                  >
-                    <Trash2 size={17} />
-                  </button>
-                </div>
+                {#if editingLinkIndex === index}
+                  <div class="social-link-row editing">
+                    <Link2 size={18} />
+                    <input
+                      type="url"
+                      bind:value={editingLinkValue}
+                      class="ui-input"
+                      aria-label={`Edit social link ${index + 1}`}
+                      placeholder="https://..."
+                      autofocus
+                    />
+                    <button
+                      type="button"
+                      class="save-edit-button"
+                      aria-label="Save link"
+                      onclick={saveEditingLink}
+                    >
+                      <CircleCheck size={17} />
+                    </button>
+                    <button
+                      type="button"
+                      class="cancel-edit-button"
+                      aria-label="Cancel"
+                      onclick={cancelEditingLink}
+                    >
+                      <Trash2 size={17} />
+                    </button>
+                  </div>
+                {:else}
+                  {@const metadata = extractMetadata(link)}
+                  {@const IconComponent = getPlatformIcon(metadata.platform)}
+                  {@const iconColor = getPlatformColor(metadata.platform)}
+                  <div class="social-link-row">
+                    <button
+                      type="button"
+                      class="platform-icon-button"
+                      style:--icon-color={iconColor}
+                      onclick={() => startEditingLink(index)}
+                      aria-label={`Edit ${metadata.platform} link`}
+                    >
+                      <IconComponent size={20} />
+                    </button>
+                    <div class="link-metadata">
+                      <span class="platform-name">{metadata.platform}</span>
+                      <span class="link-display-text">{metadata.displayText}</span>
+                    </div>
+                    <a
+                      href={link}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      class="link-out-button"
+                      aria-label={`Open ${metadata.platform} link`}
+                    >
+                      <ExternalLink size={16} />
+                    </a>
+                    <button
+                      type="button"
+                      class="remove-link-button"
+                      aria-label={`Remove ${metadata.platform} link`}
+                      onclick={() => removeSocialLink(index)}
+                    >
+                      <Trash2 size={17} />
+                    </button>
+                  </div>
+                {/if}
               {/each}
             </div>
           {/if}
@@ -362,7 +480,10 @@
   .back-link:focus-visible,
   .website-link:focus-visible,
   .photo-preview-button:focus-visible,
-  .remove-link-button:focus-visible {
+  .remove-link-button:focus-visible,
+  .platform-icon-button:focus-visible,
+  .save-edit-button:focus-visible,
+  .cancel-edit-button:focus-visible {
     outline: none;
     box-shadow: 0 0 0 3px oklch(from var(--accent-color) l c h / 0.26);
   }
@@ -616,12 +737,128 @@
 
   .social-link-row {
     display: grid;
-    grid-template-columns: auto minmax(0, 1fr) auto;
+    grid-template-columns: auto 1fr auto auto;
     align-items: center;
     gap: var(--padding-1);
+    min-height: 3.5rem;
+    padding: var(--padding-1) var(--padding-2);
+    border: 1px solid var(--bg-low-contrast);
+    border-radius: var(--border-radius);
+    background-color: var(--bg-color);
+    transition: border-color 0.15s ease;
   }
 
-  .social-link-row > :global(svg) {
+  .social-link-row.editing {
+    border-color: var(--accent-color);
+  }
+
+  .platform-icon-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    border: 1px solid oklch(from var(--bg-low-contrast) calc(l - 0.02) c h);
+    border-radius: var(--border-radius);
+    background-color: oklch(from var(--bg-low-contrast) l c h / 0.5);
+    color: var(--icon-color);
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+
+  .platform-icon-button:hover {
+    background-color: oklch(from var(--bg-low-contrast) calc(l + 0.02) c h);
+    border-color: var(--icon-color);
+  }
+
+  .platform-icon-button:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 3px oklch(from var(--accent-color) l c h / 0.26);
+  }
+
+  .link-metadata {
+    display: flex;
+    flex-direction: column;
+    gap: 0.125rem;
+    min-width: 0;
+  }
+
+  .platform-name {
+    font-size: 0.6875rem;
+    font-weight: 650;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+    color: var(--bg-medium-contrast);
+  }
+
+  .link-display-text {
+    font-size: 0.9375rem;
+    font-weight: 550;
+    color: var(--bg-high-contrast);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .link-out-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    border: 1px solid var(--bg-low-contrast);
+    border-radius: var(--border-radius);
+    background-color: var(--bg-color);
+    color: var(--cta-color);
+    transition: all 0.15s ease;
+  }
+
+  .link-out-button:hover {
+    background-color: var(--bg-low-contrast);
+    border-color: var(--cta-color);
+  }
+
+  .link-out-button:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 3px oklch(from var(--accent-color) l c h / 0.26);
+  }
+
+  .save-edit-button {
+    inline-size: 2.5rem;
+    block-size: 2.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--success);
+    border-radius: var(--border-radius);
+    background-color: var(--success-tint);
+    color: var(--success);
+    transition: all 0.15s ease;
+  }
+
+  .save-edit-button:hover {
+    background-color: oklch(from var(--success-tint) calc(l - 0.02) c h);
+  }
+
+  .cancel-edit-button {
+    inline-size: 2.5rem;
+    block-size: 2.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--bg-low-contrast);
+    border-radius: var(--border-radius);
+    background-color: var(--bg-color);
+    color: var(--bg-medium-contrast);
+    transition: all 0.15s ease;
+  }
+
+  .cancel-edit-button:hover {
+    border-color: var(--bg-medium-contrast);
+    color: var(--bg-high-contrast);
+  }
+
+  .social-link-row.editing > :global(svg) {
     color: var(--bg-medium-contrast);
   }
 
