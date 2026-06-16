@@ -1,6 +1,7 @@
 <script lang="ts">
   import type { UserSpotRecord } from "$lib/core/domain/Spot/Spot";
   import { Trash2, MapPin, Settings2 } from "@lucide/svelte";
+  import CuisineIcon from "./CuisineIcon.svelte";
 
   type ListItemProps = {
     item: UserSpotRecord;
@@ -26,6 +27,7 @@
   >
     <div class="list-item-content">
       <div class="spot-title-row">
+        <CuisineIcon placeTypes={item.place_types} primaryType={item.primaryType} size={20} />
         <a href={`/spot/${item.id}`} aria-label={`Open ${item.name}`}>{item.name}</a>
         {#if item.is_visited}
           <strong class="visited-dot"></strong>
