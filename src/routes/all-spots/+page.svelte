@@ -1,5 +1,6 @@
 <script lang="ts">
 	import type { PageData } from './$types';
+	import CuisineIcon from '../../components/CuisineIcon.svelte';
 
 	type MasterPlace = PageData['masterPlaces'] extends Array<infer Place> ? Place : any;
 	type MasterPlacesResponse =
@@ -28,7 +29,10 @@
 		{#each places as place}
 			<div class="spot-card">
 				<div class="spot-header">
-					<h2>{place.name}</h2>
+					<div class="spot-title-row">
+						<CuisineIcon placeTypes={place.place_types} primaryType={place.primaryType} size={20} />
+						<h2>{place.name}</h2>
+					</div>
 					<p>{place.address}</p>
 				</div>
 
@@ -114,6 +118,12 @@
 
 	.spot-header {
 		margin-bottom: 1rem;
+	}
+
+	.spot-title-row {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
 	}
 
 	h2 {
