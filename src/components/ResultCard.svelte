@@ -90,11 +90,12 @@
           <span class="metric-value">{place.rating}</span>
         </div>
       {/if}
-      {@const priceSymbols = getPriceSymbols(place.price_level)}
-      {#if priceSymbols}
+      {#if getPriceSymbols(place.price_level)}
         <div class="metric price">
           <span class="metric-label">Price</span>
-          <span class="metric-value price-symbols" aria-label={`${priceSymbols} price level`}>{priceSymbols}</span>
+          <span class="metric-value price-symbols" aria-label={`${getPriceSymbols(place.price_level)} price level`}>
+            {getPriceSymbols(place.price_level)}
+          </span>
         </div>
       {/if}
     </div>
