@@ -30,14 +30,25 @@
   };
 
   function getPriceSymbols(priceLevel: string): string {
-    const map: Record<string, string> = {
-      'free': 'Free',
-      'inexpensive': '$',
-      'moderate': '$$',
-      'expensive': '$$$',
-      'very_expensive': '$$$$'
-    };
-    return map[priceLevel] || priceLevel;
+    const normalizedLevel = priceLevel.trim().toLowerCase();
+
+    if (normalizedLevel.includes("very_expensive") || normalizedLevel.includes("very expensive")) {
+      return "$$$$";
+    }
+    if (normalizedLevel.includes("inexpensive")) {
+      return "$";
+    }
+    if (normalizedLevel.includes("moderate")) {
+      return "$$";
+    }
+    if (normalizedLevel.includes("expensive")) {
+      return "$$$";
+    }
+    if (normalizedLevel.includes("free")) {
+      return "";
+    }
+
+    return "";
   }
 </script>
 
@@ -79,10 +90,11 @@
           <span class="metric-value">{place.rating}</span>
         </div>
       {/if}
-      {#if place.price_level && place.price_level !== 'free'}
+      {@const priceSymbols = getPriceSymbols(place.price_level)}
+      {#if priceSymbols}
         <div class="metric price">
           <span class="metric-label">Price</span>
-          <span class="metric-value price-symbols">{getPriceSymbols(place.price_level)}</span>
+          <span class="metric-value price-symbols" aria-label={`${priceSymbols} price level`}>{priceSymbols}</span>
         </div>
       {/if}
     </div>
