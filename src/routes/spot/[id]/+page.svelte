@@ -22,6 +22,7 @@
   import { Button, Checkbox, SubmitButton } from '$components/ui';
   import PhotoLightbox from '$components/util/PhotoLightbox.svelte';
   import { extractMetadata, type SocialPlatform } from '$lib/utils/social-platform';
+  import { getPriceSymbols } from '$lib/utils/price-level';
 
   const spotQuery = getSpotById({ id: page.params.id ?? '' });
   const maxPhotoWidth = 800;
@@ -255,6 +256,16 @@
               <span class="rating-chip" aria-label={`Google rating ${spot.rating}`}>
                 <Star size={16} />
                 {spot.rating}
+              </span>
+            {/if}
+
+            {#if getPriceSymbols(spot.price_level)}
+              <span
+                class="price-chip"
+                aria-label={`${getPriceSymbols(spot.price_level)} price level`}
+              >
+                <span class="price-chip-label">Price</span>
+                <span class="price-symbols">{getPriceSymbols(spot.price_level)}</span>
               </span>
             {/if}
 
@@ -618,6 +629,7 @@
   }
 
   .rating-chip,
+  .price-chip,
   .status-chip,
   .website-link {
     display: inline-flex;
@@ -637,6 +649,27 @@
     background-color: var(--warning-tint);
     border-color: oklch(from var(--warning) 0.84 calc(c * 0.34) h);
     color: oklch(from var(--warning) 0.34 calc(c * 0.95) h);
+  }
+
+  .price-chip {
+    gap: 0.45rem;
+    background-color: oklch(from var(--cta-color) l c h / 0.08);
+    border-color: oklch(from var(--cta-color) l c h / 0.3);
+  }
+
+  .price-chip-label {
+    color: var(--bg-medium-contrast);
+    font-size: 0.75rem;
+    font-weight: 650;
+    letter-spacing: 0.02em;
+  }
+
+  .price-symbols {
+    color: var(--cta-color);
+    font-size: 1rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    line-height: 1;
   }
 
   .status-chip {
