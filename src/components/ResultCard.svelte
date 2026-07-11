@@ -2,6 +2,7 @@
   import type { ResultPlaceRecord } from "$lib/core/domain/Place/Place";
   import { saveSpot } from '$lib/adapters/primary/remote-handlers/spots.remote';
   import { getPlacePhotoUrl } from '$lib/adapters/secondary/google/google.svelte';
+  import { getPriceSymbols } from '$lib/utils/price-level';
   import Card from "./util/Card.svelte";
   import Button from "./ui/Button.svelte";
 
@@ -29,27 +30,6 @@
     saveAction(result, place);
   };
 
-  function getPriceSymbols(priceLevel: string): string {
-    const normalizedLevel = priceLevel.trim().toLowerCase();
-
-    if (normalizedLevel.includes("very_expensive") || normalizedLevel.includes("very expensive")) {
-      return "$$$$";
-    }
-    if (normalizedLevel.includes("inexpensive")) {
-      return "$";
-    }
-    if (normalizedLevel.includes("moderate")) {
-      return "$$";
-    }
-    if (normalizedLevel.includes("expensive")) {
-      return "$$$";
-    }
-    if (normalizedLevel.includes("free")) {
-      return "";
-    }
-
-    return "";
-  }
 </script>
 
 <div class="result-card">
