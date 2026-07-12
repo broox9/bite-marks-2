@@ -38,8 +38,22 @@ describe("GET /auth/google", () => {
     );
   });
 
+  it("uses PUBLIC_APP_URL for Appwrite success and failure redirects when configured", async () => {
+    publicEnv.PUBLIC_APP_URL = "https://bite.example.test/";
+    getGoogleOAuthRedirectUrl.mockResolvedValue("https://appwrite.example.test/oauth");
+
+    await expect(GET(createEvent("https://preview.example.test/auth/google"))).rejects.toMatchObject({
+      status: 302,
+      location: "https://appwrite.example.test/oauth",
+    });
+    expect(getGoogleOAuthRedirectUrl).toHaveBeenCalledWith(
+      "https://bite.example.test/auth/google/callback",
+      "https://bite.example.test/login?oauth=error",
+    );
+  });
+
   it("redirects back to login when Appwrite rejects the OAuth redirect", async () => {
-    getGoogleOAuthRedirectUrl.mockRejectedValue(new Error("OAuth redirect rejected"));
+    getGoogleOAuthRedirectUrl.mockRejectedValue(new Error("Invalid redirect"));
 
     await expect(GET(createEvent())).rejects.toMatchObject({
       status: 303,
