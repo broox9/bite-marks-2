@@ -1,23 +1,22 @@
 import { redirect } from "@sveltejs/kit";
 import type { LayoutServerLoad } from "./$types";
+import { getAuthState } from "@mmailaender/convex-better-auth-svelte/sveltekit";
 
 export const load: LayoutServerLoad = async ({ locals, url }) => {
+  const authState = getAuthState();
   const isLoginRoute = url.pathname === "/login";
   const isAllSpotsRoute = url.pathname === "/all-spots";
-  const isGoogleOAuthRoute = url.pathname.startsWith("/auth/google");
-  const isLogoutRoute = url.pathname === "/logout";
+  const isAuthApiRoute = url.pathname.startsWith("/api/auth");
 
   if (
-    !locals.user &&
+    !authState.isAuthenticated &&
     !isLoginRoute &&
     !isAllSpotsRoute &&
-    !isGoogleOAuthRoute &&
-    !isLogoutRoute
+    !isAuthApiRoute
   ) {
     throw redirect(303, "/login");
   }
-  if (locals.user && (isLoginRoute || isGoogleOAuthRoute)) throw redirect(303, "/");
+  if (authState.isAuthenticated && isLoginRoute) throw redirect(303, "/");
 
-  return { user: locals.user };
+  return { authState, user: locals.user };
 };
-

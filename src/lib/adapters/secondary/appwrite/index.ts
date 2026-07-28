@@ -1,9 +1,9 @@
 import type { PersistenceRepository } from "$lib/ports/persistence.repository";
 import type { ResultPlaceRecord } from "$lib/core/domain/Place/Place";
 import type { UserSpotRecord } from "$lib/core/domain/Spot/Spot";
-import { appwriteAuthRepository } from "./auth";
 import { transformResultToPlace } from "./dtos/placesToRecord";
 import { transformPlaceToUserSpot } from "./dtos/placeToUserSpot";
+import { transformAppwriteToUserSpotRecord } from "./dtos/appwriteToUserSpotRecord";
 import { COLLECTIONS, DATABASE_ID, ID, Query, createAdminTablesDB } from "./server-client.server";
 
 // @TODO: review the DB factory pattern to see if we need a singleton or a new instance for each request.
@@ -73,7 +73,7 @@ export class AppwriteAdapter implements PersistenceRepository {
     return document;
   }
 
-  async getUserSpot(rowId: string, userId: string): Promise<UserSpotRecord | null> {
+  async getUserSpot(rowId: string, userId: string): Promise<any> {
     try {
       const rowResult = await this.#db().getRow({
         databaseId: DATABASE_ID,
@@ -82,7 +82,8 @@ export class AppwriteAdapter implements PersistenceRepository {
         queries: [Query.select(['*', 'place_id.*'])],
       });
       if (rowResult.user_id !== userId) return null;
-      return rowResult;
+      const spot = transformAppwriteToUserSpotRecord(rowResult);
+      return { ...spot, $id: rowResult.$id, rowId: rowResult.$id };
     } catch (error) {
       console.error("[bs] adapter::getUserSpot::error", error);
       return null;
@@ -124,7 +125,9 @@ export class AppwriteAdapter implements PersistenceRepository {
       ],
       total: true,
     });
-    return rows.length > 0 ? rows[0] : null;
+    if (!rows.length) return null;
+    const spot = transformAppwriteToUserSpotRecord(rows[0]);
+    return { ...spot, $id: rows[0].$id, rowId: rows[0].$id };
   }
 
   async getUserSpots(userId: string): Promise<any> {
@@ -139,7 +142,12 @@ export class AppwriteAdapter implements PersistenceRepository {
       ],
       total: true,
     });
-    return result;
+    const rows = (result?.rows ?? []).map((row: any) => ({
+      ...transformAppwriteToUserSpotRecord(row),
+      $id: row.$id,
+      rowId: row.$id,
+    }));
+    return { total: result?.total ?? rows.length, rows };
   }
 
   async getMasterPlaces(): Promise<any[]> {
@@ -205,4 +213,3 @@ export class AppwriteAdapter implements PersistenceRepository {
 const appwriteAdapter = new AppwriteAdapter(() => createAdminTablesDB());
 
 export default appwriteAdapter;
-export { appwriteAuthRepository };

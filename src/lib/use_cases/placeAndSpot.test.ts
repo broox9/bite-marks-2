@@ -2,19 +2,25 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { PlaceAndSpotUseCase } from './placeAndSpot';
 import type { PersistenceRepository } from '$lib/ports/persistence.repository';
 
-// Mock the DTO transformer so use case tests don't depend on its internals
-vi.mock('$lib/adapters/secondary/appwrite/dtos/appwriteToUserSpotRecord', () => ({
-  transformAppwriteToUserSpotRecord: (doc: any) => ({ id: doc.$id, ...doc }),
-}));
-
 const mockRow = {
   $id: 'spot-1',
+  id: 'spot-1',
+  rowId: 'spot-1',
   personal_rating: null,
   personal_notes: null,
   is_visited: false,
   user_id: 'user-1',
   social_links: [],
-  place_id: { $id: 'place-1', name: 'Test' },
+  place_id: 'place-1',
+  name: 'Test',
+  address: '',
+  price_level: 'free',
+  lat: 0,
+  lng: 0,
+  photos: [],
+  neighborhood: '',
+  areas: [],
+  place_types: [],
 };
 
 function makeMockRepo(overrides: Partial<PersistenceRepository> = {}): PersistenceRepository {

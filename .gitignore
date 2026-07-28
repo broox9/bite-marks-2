@@ -29,3 +29,9 @@ vite.config.ts.timestamp-*
 
 # Claude
 .claude/worktrees/*
+
+# Google OAuth client secrets (never commit)
+client_secret_*.json
+
+# Appwrite → Convex migration exports (contain user emails)
+.tmp/migration/

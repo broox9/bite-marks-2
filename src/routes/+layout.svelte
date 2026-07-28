@@ -4,9 +4,11 @@
   import DotLogo from '$lib/assets/bite-marks-dot.svg'
   // import BookmarkLogo from '../components/BookmarkLogo.svelte'
 
-  import type { LayoutProps, LayoutData, PageData } from "./$types";
+  import type { LayoutProps } from "./$types";
   import { goto } from "$app/navigation";
-  // import { page } from "$app/state";
+  import { PUBLIC_CONVEX_URL } from "$env/static/public";
+  import { createSvelteAuthClient } from "@mmailaender/convex-better-auth-svelte/svelte";
+  import { authClient } from "$lib/auth-client";
 
   import { locationStore } from "$lib/adapters/primary/stores/location.store.svelte";
 
@@ -14,13 +16,17 @@
   import MainNavLinks from "../components/MainNavLinks.svelte";
 
   let { data, children }: LayoutProps = $props();
-  // const HOME_ROUTE = '/'
-  // const LOGIN_ROUTE = '/login'
-  // const isLoginPage = $derived(page.route === LOGIN_ROUTE) // makes changes reactive
   let currentPlace = $derived(locationStore);
 
-  const logout = () => {
-    goto("/logout");
+  createSvelteAuthClient({
+    authClient,
+    convexUrl: PUBLIC_CONVEX_URL,
+    getServerState: () => data.authState,
+  });
+
+  const logout = async () => {
+    await authClient.signOut();
+    goto("/login");
   };
 </script>
 
