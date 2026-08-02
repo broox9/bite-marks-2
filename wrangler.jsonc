@@ -11,8 +11,11 @@
   "version_metadata": {
     "binding": "CF_VERSION_METADATA"
   },
-  // SvelteKit $env/dynamic reads from platform.env at runtime. Convex URLs are public
-  // deployment identifiers and are also required as build-time variables in Cloudflare Pages.
+  // Non-secret public defaults only. Convex / feature flags are set via:
+  //   npx wrangler secret put <NAME>
+  // Build-time PUBLIC_* for $env/static/public live in gitignored .env.production.local
+  // Local `wrangler dev` reads gitignored .dev.vars
+  // Set APPWRITE_API_KEY (and other secrets) via: wrangler secret put APPWRITE_API_KEY
   "vars": {
     "NODE_ENV": "production",
     "PUBLIC_APP_URL": "https://bite.broox.us",
