@@ -45,7 +45,13 @@ npx convex env set --prod SITE_URL https://bite.broox.us
 # prod Google client + GOOGLE_CLIENT_ID/SECRET on --prod
 ```
 
-Add to `wrangler.jsonc` vars: `PUBLIC_CONVEX_URL`, `PUBLIC_CONVEX_SITE_URL`, `PUBLIC_SITE_URL`, `USE_CONVEX=1`.
+Do **not** put Convex URLs in committed `wrangler.jsonc`. Instead:
+
+1. Copy URLs into gitignored `.env.production.local` (build-time `$env/static/public`).
+2. Push Worker secrets: `npm run secrets:convex`
+3. Optional local Worker preview: gitignored `.dev.vars` (same keys).
+4. Deploy: `npm run deploy` (runs `vite build` then `wrangler deploy`).
+
 
 ### 4. Prod data import
 

@@ -19,8 +19,7 @@
   "vars": {
     "NODE_ENV": "production",
     "PUBLIC_APP_URL": "https://bite.broox.us",
-    "PUBLIC_CONVEX_URL": "https://fastidious-setter-628.convex.cloud",
-    "PUBLIC_CONVEX_SITE_URL": "https://fastidious-setter-628.convex.site",
+    "PUBLIC_SITE_URL": "https://bite.broox.us",
     "USE_CONVEX": "1"
   }
 }
