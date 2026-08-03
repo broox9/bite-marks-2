@@ -7,7 +7,7 @@
 		"dev": "vite dev --host",
 		"dev:convex": "convex dev",
 		"dev:all": "convex dev & vite dev --host",
-		"build": "vite build",
+		"build": "node scripts/sync-wrangler-build-env.mjs && vite build",
 		"build:local": "export CF_P=1 && npm run build",
 		"preview": "vite preview",
 		"preview:worker": "npm run build && wrangler dev .svelte-kit/cloudflare/_worker.js",

@@ -13,7 +13,8 @@
   },
   // Non-secret public defaults only. Convex / feature flags are set via:
   //   npx wrangler secret put <NAME>
-  // Build-time PUBLIC_* for $env/static/public live in gitignored .env.production.local
+  // Build-time PUBLIC_* for $env/static/public: synced from here by scripts/sync-wrangler-build-env.mjs
+  // Optional local override: gitignored .env.production.local
   // Local `wrangler dev` reads gitignored .dev.vars
   // Set APPWRITE_API_KEY (and other secrets) via: wrangler secret put APPWRITE_API_KEY
   "vars": {
