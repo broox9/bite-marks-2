@@ -16,7 +16,16 @@ export const setPasswordForEmail = internalAction({
     email: v.string(),
     password: v.string(),
   },
-  handler: async (ctx, { email, password }) => {
+  returns: v.object({
+    status: v.union(v.literal("created"), v.literal("updated")),
+    userId: v.string(),
+    email: v.string(),
+  }),
+  handler: async (ctx, { email, password }): Promise<{
+    status: "created" | "updated";
+    userId: string;
+    email: string;
+  }> => {
     if (password.length < 8) {
       throw new Error("Password must be at least 8 characters");
     }

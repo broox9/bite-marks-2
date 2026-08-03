@@ -1,10 +1,29 @@
 import { v } from "convex/values";
-import { mutation, query } from "./_generated/server";
+import { query } from "./_generated/server";
 import type { MutationCtx } from "./_generated/server";
 import type { Doc, Id } from "./_generated/dataModel";
 
+export const placeValidator = v.object({
+  _id: v.id("places"),
+  _creationTime: v.number(),
+  placeId: v.string(),
+  name: v.string(),
+  address: v.string(),
+  rating: v.optional(v.number()),
+  websiteURI: v.optional(v.union(v.string(), v.null())),
+  priceLevel: v.string(),
+  lat: v.number(),
+  lng: v.number(),
+  photos: v.array(v.any()),
+  neighborhood: v.string(),
+  areas: v.array(v.string()),
+  placeTypes: v.array(v.string()),
+  primaryType: v.optional(v.string()),
+});
+
 export const getAll = query({
   args: {},
+  returns: v.array(placeValidator),
   handler: async (ctx) => {
     const places = await ctx.db.query("places").order("desc").take(200);
     return places;
@@ -13,6 +32,7 @@ export const getAll = query({
 
 export const getByPlaceId = query({
   args: { placeId: v.string() },
+  returns: v.union(placeValidator, v.null()),
   handler: async (ctx, { placeId }) => {
     return await ctx.db
       .query("places")
@@ -23,33 +43,13 @@ export const getByPlaceId = query({
 
 export const hasByPlaceId = query({
   args: { placeId: v.string() },
+  returns: v.boolean(),
   handler: async (ctx, { placeId }) => {
     const place = await ctx.db
       .query("places")
       .withIndex("by_place_id", (q) => q.eq("placeId", placeId))
       .unique();
     return place !== null;
-  },
-});
-
-export const upsert = mutation({
-  args: {
-    placeId: v.string(),
-    name: v.string(),
-    address: v.string(),
-    rating: v.optional(v.number()),
-    websiteURI: v.optional(v.union(v.string(), v.null())),
-    priceLevel: v.string(),
-    lat: v.number(),
-    lng: v.number(),
-    photos: v.array(v.any()),
-    neighborhood: v.string(),
-    areas: v.array(v.string()),
-    placeTypes: v.array(v.string()),
-    primaryType: v.optional(v.string()),
-  },
-  handler: async (ctx, args) => {
-    return await upsertPlaceDoc(ctx, args);
   },
 });
 

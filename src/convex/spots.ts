@@ -2,7 +2,19 @@ import { v } from "convex/values";
 import { mutation, query } from "./_generated/server";
 import type { Doc, Id } from "./_generated/dataModel";
 import { assertUser, requireUserId } from "./authHelpers";
-import { upsertPlaceDoc } from "./places";
+import { placeValidator, upsertPlaceDoc } from "./places";
+
+const flattenedSpotValidator = v.object({
+  _id: v.id("spots"),
+  userId: v.string(),
+  placeId: v.string(),
+  name: v.union(v.string(), v.null()),
+  personalRating: v.union(v.number(), v.null()),
+  personalNotes: v.union(v.string(), v.null()),
+  isVisited: v.boolean(),
+  socialLinks: v.array(v.string()),
+  place: v.union(placeValidator, v.null()),
+});
 
 /** Flattened spot + place shape consumed by the SvelteKit adapter. */
 export type FlattenedSpot = {
@@ -37,6 +49,7 @@ async function flattenSpot(
 
 export const listForUser = query({
   args: { userId: v.string() },
+  returns: v.object({ total: v.number(), rows: v.array(flattenedSpotValidator) }),
   handler: async (ctx, { userId }) => {
     const authUserId = await requireUserId(ctx);
     assertUser(userId, authUserId);
@@ -54,6 +67,7 @@ export const listForUser = query({
 
 export const getById = query({
   args: { rowId: v.id("spots"), userId: v.string() },
+  returns: v.union(flattenedSpotValidator, v.null()),
   handler: async (ctx, { rowId, userId }) => {
     const authUserId = await requireUserId(ctx);
     assertUser(userId, authUserId);
@@ -66,6 +80,7 @@ export const getById = query({
 
 export const hasForUserPlace = query({
   args: { userId: v.string(), placeId: v.string() },
+  returns: v.boolean(),
   handler: async (ctx, { userId, placeId }) => {
     const authUserId = await requireUserId(ctx);
     assertUser(userId, authUserId);
@@ -89,6 +104,7 @@ export const update = mutation({
     isVisited: v.optional(v.boolean()),
     socialLinks: v.optional(v.array(v.string())),
   },
+  returns: v.union(flattenedSpotValidator, v.null()),
   handler: async (ctx, args) => {
     const authUserId = await requireUserId(ctx);
     assertUser(args.userId, authUserId);
@@ -111,6 +127,7 @@ export const update = mutation({
 
 export const remove = mutation({
   args: { rowId: v.id("spots"), userId: v.string() },
+  returns: v.object({ success: v.boolean(), error: v.optional(v.string()) }),
   handler: async (ctx, { rowId, userId }) => {
     const authUserId = await requireUserId(ctx);
     assertUser(userId, authUserId);
@@ -143,6 +160,14 @@ export const savePlaceAndSpot = mutation({
       primaryType: v.optional(v.string()),
     }),
   },
+  returns: v.union(
+    v.object({
+      success: v.literal(true),
+      spotResult: flattenedSpotValidator,
+      alreadyExisted: v.boolean(),
+    }),
+    v.object({ success: v.literal(false), error: v.string() })
+  ),
   handler: async (ctx, { userId, place }) => {
     const authUserId = await requireUserId(ctx);
     assertUser(userId, authUserId);
@@ -156,7 +181,7 @@ export const savePlaceAndSpot = mutation({
 
     if (existing) {
       return {
-        success: true,
+        success: true as const,
         spotResult: await flattenSpot(ctx, existing),
         alreadyExisted: true,
       };
@@ -175,10 +200,10 @@ export const savePlaceAndSpot = mutation({
     });
 
     const spot = await ctx.db.get(spotId);
-    if (!spot) return { success: false, error: "Failed to create spot" };
+    if (!spot) return { success: false as const, error: "Failed to create spot" };
 
     return {
-      success: true,
+      success: true as const,
       spotResult: await flattenSpot(ctx, spot),
       alreadyExisted: false,
     };

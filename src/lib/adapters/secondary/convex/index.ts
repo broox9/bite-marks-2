@@ -57,8 +57,10 @@ export class ConvexAdapter implements PersistenceRepository {
   constructor(private client: ConvexHttpClient) {}
 
   async saveMasterPlace(document: any): Promise<any> {
-    const place = toConvexPlace(document);
-    return this.client.mutation(api.places.upsert, place);
+    void document;
+    throw new Error(
+      "saveMasterPlace is not used directly; call savePlaceAndSpot instead"
+    );
   }
 
   async saveUserSpot(_document: any): Promise<any> {
