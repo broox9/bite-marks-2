@@ -3,7 +3,7 @@ import { error } from "@sveltejs/kit";
 import { z } from "zod";
 
 import { ResultPlaceRecordSchema } from "$lib/core/domain/Place/Place";
-import { placeAndSpotUseCase } from "$lib/glue/di-container";
+import { getPlaceAndSpotUseCase } from "$lib/glue/di-container";
 
 const spotsSchema = z.object({});
 
@@ -29,10 +29,10 @@ const updateSpotSchema = z.object({
 
 export const getSpots = query(spotsSchema, async () => {
   const event = getRequestEvent();
-  const user = event.locals.user as any | null | undefined;
+  const user = event.locals.user;
   if (!user) throw error(401, "Unauthorized");
 
-  const spots = await placeAndSpotUseCase.getSpots(user.$id);
+  const spots = await getPlaceAndSpotUseCase().getSpots(user.id);
   return spots;
 });
 
@@ -40,11 +40,11 @@ export const getSpotById = query(
   getSpotByIdSchema,
   async ({ id }: z.infer<typeof getSpotByIdSchema>) => {
     const event = getRequestEvent();
-    const user = event.locals.user as any | null | undefined;
+    const user = event.locals.user;
     if (!user) throw error(401, "Unauthorized");
 
     console.log("[bs] spots::remote::getSpotById", id);
-    const spot = await placeAndSpotUseCase.getSpotByPlaceId(id, user.$id);
+    const spot = await getPlaceAndSpotUseCase().getSpotByPlaceId(id, user.id);
     return spot;
   }
 );
@@ -53,11 +53,11 @@ export const updateSpot = command(
   updateSpotSchema,
   async ({ rowId, data }: z.infer<typeof updateSpotSchema>) => {
     const event = getRequestEvent();
-    const user = event.locals.user as any | null | undefined;
+    const user = event.locals.user;
     if (!user) throw error(401, "Unauthorized");
 
     console.log("[bs] spots::remote::updateSpot", rowId, data);
-    const updatedSpot = await placeAndSpotUseCase.updateSpot(rowId, data, user.$id);
+    const updatedSpot = await getPlaceAndSpotUseCase().updateSpot(rowId, data, user.id);
     if (!updatedSpot) throw error(404, "Spot not found");
     return updatedSpot;
   }
@@ -65,7 +65,7 @@ export const updateSpot = command(
 
 export const saveSpot = command(saveSpotSchema, async ({ spot }: z.infer<typeof saveSpotSchema>) => {
   const event = getRequestEvent();
-  const user = event.locals.user as any | null | undefined;
+  const user = event.locals.user;
   if (!user) throw error(401, "Unauthorized");
 
   console.log("[bs] spots::remote::saveSpot", spot);
@@ -73,17 +73,17 @@ export const saveSpot = command(saveSpotSchema, async ({ spot }: z.infer<typeof 
   // `ResultPlaceRecordSchema` lacks `id`; the current use-case expects a master place record.
   const place = { id: spot.place_id, ...spot } as any;
 
-  const savedSpot = await placeAndSpotUseCase.upsert(place, user.$id);
+  const savedSpot = await getPlaceAndSpotUseCase().upsert(place, user.id);
   return savedSpot;
 });
 
 export const deleteUserSpot = command(deleteSpotSchema, async (rowId : string) => {
     const event = getRequestEvent();
-    const user = event.locals.user as any | null | undefined;
+    const user = event.locals.user;
     if (!user) throw error(401, "Unauthorized");
 
     console.log("[bs] spots::remote::deleteUserSpot", rowId);
-    const deletedSpot = await placeAndSpotUseCase.deleteSpot(rowId, user.$id);
+    const deletedSpot = await getPlaceAndSpotUseCase().deleteSpot(rowId, user.id);
     return deletedSpot;
   }
 );

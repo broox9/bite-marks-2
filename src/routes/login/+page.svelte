@@ -1,9 +1,14 @@
 <script lang="ts">
-  import { loginAction } from "$lib/adapters/primary/remote-handlers/login.remote";
   import { Input, SubmitButton } from "$components/ui";
+  import { goto } from "$app/navigation";
   import { page } from "$app/state";
+  import { authClient } from "$lib/auth-client";
 
-  let loggedInUser = $state<any | null>(null);
+  let email = $state("");
+  let password = $state("");
+  let errorMessage = $state("");
+  let pending = $state(false);
+  let mode = $state<"login" | "register">("login");
 
   const oauthErrorMessage = $derived.by(() => {
     const code = page.url.searchParams.get("oauth");
@@ -13,42 +18,120 @@
       return "Sign-in link was incomplete. Start again from the login page.";
     return "";
   });
+
+  const displayError = $derived(errorMessage || oauthErrorMessage);
+
+  async function handleSubmit(event: Event) {
+    event.preventDefault();
+    errorMessage = "";
+    pending = true;
+    try {
+      if (mode === "login") {
+        const result = await authClient.signIn.email({ email, password });
+        if (result.error) {
+          errorMessage = result.error.message ?? "Login failed.";
+          return;
+        }
+      } else {
+        const result = await authClient.signUp.email({
+          email,
+          password,
+          name: email.split("@")[0] || "User",
+        });
+        if (result.error) {
+          errorMessage = result.error.message ?? "Registration failed.";
+          return;
+        }
+      }
+      await goto("/list");
+    } catch (error) {
+      errorMessage =
+        error instanceof Error ? error.message : "Authentication failed.";
+    } finally {
+      pending = false;
+    }
+  }
+
+  async function handleGoogle() {
+    errorMessage = "";
+    pending = true;
+    try {
+      await authClient.signIn.social({
+        provider: "google",
+        callbackURL: "/list",
+      });
+    } catch (error) {
+      errorMessage =
+        error instanceof Error ? error.message : "Google sign-in failed.";
+      pending = false;
+    }
+  }
 </script>
 
 <section class="container">
-  <form {...loginAction}>
-    <strong>
-      {loggedInUser ? `Logged in as ${loggedInUser.name}` : "Login"}
-    </strong>
-    {#if oauthErrorMessage}
-      <p class="oauth-error" role="alert">{oauthErrorMessage}</p>
+  <form onsubmit={handleSubmit}>
+    <strong>{mode === "login" ? "Login" : "Create account"}</strong>
+    {#if displayError}
+      <p class="oauth-error" role="alert">{displayError}</p>
     {/if}
     <label for="email">
       <span>Email</span>
-      <Input {...loginAction.fields.email.as("text")} placeholder="email" />
+      <Input
+        id="email"
+        type="email"
+        value={email}
+        oninput={(e: Event) => {
+          email = (e.currentTarget as HTMLInputElement).value;
+        }}
+        placeholder="email"
+        required
+        autocomplete="email"
+      />
     </label>
 
     <label for="password">
       <span>Password</span>
       <Input
-        {...loginAction.fields.password.as("password")}
+        id="password"
+        type="password"
+        value={password}
+        oninput={(e: Event) => {
+          password = (e.currentTarget as HTMLInputElement).value;
+        }}
         placeholder="password"
+        required
+        autocomplete={mode === "login" ? "current-password" : "new-password"}
       />
     </label>
 
     <div class="form-action">
-      <SubmitButton data-type="login" data-width="full">Login</SubmitButton>
+      <SubmitButton data-type="login" data-width="full" disabled={pending}>
+        {pending ? "Please wait…" : mode === "login" ? "Login" : "Sign up"}
+      </SubmitButton>
     </div>
-    <!-- <SubmitButton data-type="register">Register</SubmitButton> -->
 
+    <p class="toggle-mode">
+      {#if mode === "login"}
+        No account?
+        <button type="button" onclick={() => (mode = "register")}>Sign up</button>
+      {:else}
+        Already have an account?
+        <button type="button" onclick={() => (mode = "login")}>Login</button>
+      {/if}
+    </p>
 
     <p class="oauth-divider"><span>or</span></p>
     <div class="oauth-action">
-      <a class="google-signin" href="/auth/google">Continue with Google</a>
+      <button
+        class="google-signin"
+        type="button"
+        onclick={handleGoogle}
+        disabled={pending}
+      >
+        Continue with Google
+      </button>
     </div>
   </form>
-
-
 
   <div class="text-center">
     <em>just looking for <a href="/all-spots">all the spots?</a></em>
@@ -62,13 +145,6 @@
     text-align: center;
   }
 
-  header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 1rem;
-  }
-
   form {
     display: flex;
     box-sizing: border-box;
@@ -78,9 +154,6 @@
     gap: 1rem;
     padding: 1rem;
     --field-width: min(100%, 20rem);
-    /*border: 1px solid #ccc;
-    border-radius: 0.5rem;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);*/
   }
 
   label {
@@ -98,6 +171,21 @@
   .form-action {
     width: var(--field-width);
     margin-inline: auto;
+  }
+
+  .toggle-mode {
+    font-size: 0.9rem;
+    color: var(--color-muted, #666);
+  }
+
+  .toggle-mode button {
+    border: none;
+    background: none;
+    color: var(--cta-dark-super, #2563eb);
+    text-decoration: underline;
+    cursor: pointer;
+    font: inherit;
+    padding: 0;
   }
 
   .oauth-error {
@@ -144,9 +232,16 @@
     font-weight: 600;
     color: inherit;
     background: var(--color-surface, #fff);
+    font: inherit;
+    cursor: pointer;
   }
 
-  .google-signin:hover {
+  .google-signin:hover:not(:disabled) {
     filter: brightness(0.97);
+  }
+
+  .google-signin:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
   }
 </style>

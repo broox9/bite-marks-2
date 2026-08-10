@@ -7,7 +7,7 @@
 		".svelte-kit/non-ambient.d.ts",
 		".svelte-kit/types/**/$types.d.ts"
 	],
-	"exclude": ["src/lib/the_clean/**/*"],
+	"exclude": [],
 	"compilerOptions": {
 		"allowJs": true,
 		"checkJs": true,

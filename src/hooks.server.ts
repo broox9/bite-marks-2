@@ -5,15 +5,14 @@ import {
   initCloudflareSentryHandle,
   sentryHandle,
   handleErrorWithSentry,
-  // consoleLoggingIntegration,
 } from "@sentry/sveltekit";
 import type { Handle } from "@sveltejs/kit";
 import {
-  getSessionCookieName,
-  createSessionAccount,
-  createSessionTablesDB,
-  clearAppwriteSessionCookie,
-} from "$lib/adapters/secondary/appwrite/server-client.server";
+  createConvexHttpClient,
+  getToken,
+} from "@mmailaender/convex-better-auth-svelte/sveltekit";
+import { withServerConvexToken } from "convex-svelte/sveltekit/server";
+import { api } from "$convex/_generated/api";
 import { shouldDropLocalSentryEvent } from "$lib/adapters/secondary/sentry/event-filter";
 
 const sentryOptions = {
@@ -25,39 +24,39 @@ const sentryOptions = {
   beforeSend(event: SentryErrorEvent) {
     return shouldDropLocalSentryEvent(event) ? null : event;
   },
-  // integrations: [
-  //   consoleLoggingIntegration({ levels: ["log", "warn", "error"] }),
-  // ],
 };
 
 export const handle: Handle = sequence(
   initCloudflareSentryHandle(sentryOptions),
   sentryHandle(),
   async ({ event, resolve }) => {
-  const sessionSecret = event.cookies.get(getSessionCookieName()) ?? "";
+    const token = getToken(event.cookies);
+    event.locals.token = token;
 
-  event.locals.appwrite = {
-    account: createSessionAccount(sessionSecret),
-    tablesDB: createSessionTablesDB(sessionSecret),
-  };
-
-  if (!sessionSecret) {
-    event.locals.user = null;
-  } else {
-    try {
-      event.locals.user = await event.locals.appwrite.account.get();
-    } catch (error) {
-      const err = error as { code?: number };
-      if (err?.code === 401) {
-        clearAppwriteSessionCookie(event.cookies);
+    return withServerConvexToken(token, async () => {
+      if (!token) {
+        event.locals.user = null;
       } else {
-        console.error('[bs] HOOKS::SERVER::error', error);
+        try {
+          const client = createConvexHttpClient();
+          const raw = (await client.query(api.auth.getCurrentUser, {})) as
+            | { id?: string; _id?: string; email?: string | null; name?: string | null }
+            | null;
+          event.locals.user = raw
+            ? {
+                id: String(raw.id ?? raw._id),
+                email: raw.email ?? null,
+                name: raw.name ?? null,
+              }
+            : null;
+        } catch (error) {
+          console.error("[bs] HOOKS::SERVER::auth", error);
+          event.locals.user = null;
+        }
       }
-      event.locals.user = null;
-    }
-  }
-
-  return resolve(event);
+      return resolve(event);
+    });
   }
 );
+
 export const handleError = handleErrorWithSentry();

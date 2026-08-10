@@ -11,10 +11,18 @@
   "version_metadata": {
     "binding": "CF_VERSION_METADATA"
   },
-  // SvelteKit $env/dynamic reads from platform.env at runtime. These vars are required
-  // for the Appwrite server client. Set APPWRITE_API_KEY via: wrangler secret put APPWRITE_API_KEY
+  // Non-secret public defaults only. Convex / feature flags are set via:
+  //   npx wrangler secret put <NAME>
+  // Build-time PUBLIC_* for $env/static/public: synced from here by scripts/sync-wrangler-build-env.mjs
+  // Optional local override: gitignored .env.production.local
+  // Local `wrangler dev` reads gitignored .dev.vars
+  // Set APPWRITE_API_KEY (and other secrets) via: wrangler secret put APPWRITE_API_KEY
   "vars": {
     "NODE_ENV": "production",
-    "PUBLIC_APP_URL": "https://bite.broox.us"
+    "PUBLIC_APP_URL": "https://bite.broox.us",
+    "PUBLIC_SITE_URL": "https://bite.broox.us",
+    "PUBLIC_CONVEX_URL":"https://agreeable-grouse-769.convex.cloud",
+    "PUBLIC_CONVEX_SITE_URL":"https://agreeable-grouse-769.convex.site",
+    "USE_CONVEX": "1"
   }
 }

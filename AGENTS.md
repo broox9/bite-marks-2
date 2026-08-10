@@ -1,106 +1,94 @@
 # Project Overview
 
-This is a Svelte-based web application that uses Appwrite for its backend services. The project is structured to follow a hexagonal (ports-and-adapters) architecture within `src/lib`, with SvelteKit for the framework, Vite for the build tool, and Tailwind CSS for styling.
+This is a Svelte-based web application migrating from Appwrite to **Convex** (auth + database).
+The project follows a hexagonal (ports-and-adapters) architecture within `src/lib`, with SvelteKit
+for the framework, Vite for the build tool, and Tailwind CSS installed (prefer CSS variables).
 
 ## Key Technologies
 
 *   **Frontend:** Svelte, SvelteKit
-*   **Backend:** Appwrite
+*   **Backend:** Convex (Better Auth + tables); Appwrite still present behind `USE_CONVEX=0` until cutover
 *   **Build Tool:** Vite
 *   **Styling:** Tailwind CSS is installed, but do not use it. Use CSS variables and custom properties instead.
 *   **Language:** TypeScript
 
 ## Architecture
 
-The project follows a hexagonal (ports-and-adapters) architecture:
-
 *   **`src/lib/core/domain`**: Domain types/schemas (core business concepts).
 *   **`src/lib/use_cases`**: Application use-cases that orchestrate behavior and depend on ports (interfaces), not concrete services.
-*   **`src/lib/ports`**: Port interfaces (e.g. persistence/auth) that use-cases depend on.
-*   **`src/lib/adapters/primary`**: Inbound adapters (how the UI/server calls into the app), such as SvelteKit remote handlers and Svelte stores/drivers.
-*   **`src/lib/adapters/secondary`**: Outbound adapters (how the app talks to external systems), such as Appwrite and Google integrations.
-*   **`src/lib/glue`**: Composition root / dependency injection wiring (e.g. binds use-cases to concrete adapters).
-*   **`src/lib/the_clean`**: Legacy clean-architecture implementation kept for reference during/after the migration.
-*   **`src/routes`**: Svelte components/routes that make up the user interface.
+*   **`src/lib/ports`**: Port interfaces (e.g. persistence) that use-cases depend on.
+*   **`src/lib/adapters/primary`**: Inbound adapters (SvelteKit remote handlers, stores).
+*   **`src/lib/adapters/secondary`**: Outbound adapters — `convex/` (active when `USE_CONVEX=1`) and `appwrite/` (legacy).
+*   **`src/lib/glue`**: Composition root (`getPlaceAndSpotUseCase()`).
+*   **`src/convex`**: Convex schema, queries/mutations, Better Auth, HTTP router.
+*   **`src/routes`**: SvelteKit UI routes.
 
 ## Auth docs
 
-- See `AUTH-README.md` for how login/session auth works in this repo.
+- See [`docs/AUTH-README.md`](docs/AUTH-README.md) for Convex + Better Auth.
+- See [`docs/oauth-social-sign-in.md`](docs/oauth-social-sign-in.md) for Google OAuth.
 
 # Building and Running
 
 ## Development
 
-To start the development server, run:
+Run Convex and Vite together:
 
 ```bash
-npm run dev
+npm run dev:convex   # terminal 1 — watches/pushes Convex functions
+npm run dev          # terminal 2 — SvelteKit on :5173
 ```
 
-Or to open the app in a new browser tab:
+Or: `npm run dev:all` (Convex in background + Vite).
 
-```bash
-npm run dev -- --open
-```
+Ensure `.env.local` has `PUBLIC_CONVEX_URL`, `PUBLIC_CONVEX_SITE_URL`, `PUBLIC_SITE_URL`, and `USE_CONVEX=1`.
 
 ## Building
 
-To create a production version of the app, run:
-
 ```bash
 npm run build
+npm run preview
+# Worker preview (catches workerd/AsyncLocalStorage issues):
+npm run preview:worker
 ```
 
-You can preview the production build with `npm run preview`.
-
-## Checking
-
-To run the Svelte and TypeScript checkers, run:
+## Checking / tests
 
 ```bash
 npm run check
+npm test
 ```
 
-# Development Conventions
+# Migration scripts
 
-*   **Code Style:** The project uses Prettier for code formatting (inferred from `.prettierrc`) and ESLint for linting (inferred from `.eslintrc.cjs`).
-*   **Testing:** There are no testing frameworks configured in the `package.json`.
-*   **Commits:** There is no commit message convention specified.
+```bash
+npx tsx scripts/export-appwrite.ts      # read-only dump → .tmp/migration/
+npx tsx scripts/rehearse-migration.ts  # import into DEV Convex
+```
 
-## Skills
-
-### Available skills
-- `frontend-design`: Create distinctive, production-grade frontend interfaces with high design quality for component/page/application build requests. (file: `/Users/brooxm2/projects/bite-marks-2/skills/frontend-design/SKILL.md`)
-
-## Cursor Cloud specific instructions
+# Cursor Cloud specific instructions
 
 ### Services
 
 | Service | Command | Notes |
 |---------|---------|-------|
-| SvelteKit dev server | `npm run dev` | Listens on port **5173** (`--host`). Only local process required. |
-| Appwrite | (remote) | Hosted at `fra.cloud.appwrite.io`; no local Appwrite or Docker. |
+| SvelteKit dev server | `npm run dev` | Port **5173** (`--host`). |
+| Convex | `npm run dev:convex` | Dev deployment; required for auth + data when `USE_CONVEX=1`. |
+| Appwrite | (remote) | Legacy only while `USE_CONVEX=0`. |
 
 ### Environment
 
-SvelteKit reads Appwrite config from a **`.env`** file (gitignored). Cloud Agent secrets are injected as shell env vars; write them into `.env` before starting the dev server:
-
-- `PUBLIC_APPWRITE_ENDPOINT`
-- `APPWRITE_PROJECT_ID`
-- `APPWRITE_API_KEY`
-- `OPENAI_API_KEY` (optional; only needed for `/agent`)
-
-The browser Appwrite client in `src/lib/adapters/secondary/appwrite/browser-client.ts` hardcodes endpoint/project separately from server env.
+- Convex: `PUBLIC_CONVEX_URL`, `PUBLIC_CONVEX_SITE_URL`, `PUBLIC_SITE_URL`, `USE_CONVEX`
+- Convex deployment secrets: `BETTER_AUTH_SECRET`, `SITE_URL`, optional `GOOGLE_CLIENT_*`
+- Legacy Appwrite (until cutover): `PUBLIC_APPWRITE_ENDPOINT`, `APPWRITE_PROJECT_ID`, `APPWRITE_API_KEY`
 
 ### Verify without login
 
 - `/` redirects unauthenticated users to `/login` (303).
-- `/all-spots` is public and loads the master places catalog (good smoke test).
-- Authenticated flows (search, save spot, `/list`) need an Appwrite email/password user.
+- `/all-spots` is public (master places catalog).
 
 ### Commands
 
-- **Typecheck:** `npm run check` (has pre-existing TS errors in legacy/experimental routes; build still succeeds).
-- **Tests:** `npm test` (Vitest, 96 tests).
-- **Build:** `npm run build` (Cloudflare adapter; uploads source maps to Sentry when `SENTRY_AUTH_TOKEN` is set).
-- **Lint:** No ESLint npm script; Prettier config exists but no format script.
+- **Typecheck:** `npm run check`
+- **Tests:** `npm test` (Vitest)
+- **Build:** `npm run build` (Cloudflare adapter)

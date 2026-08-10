@@ -18,6 +18,7 @@ Thumbs.db
 .env.*
 !.env.example
 !.env.test
+.dev.vars
 
 # Vite
 vite.config.js.timestamp-*
@@ -29,3 +30,9 @@ vite.config.ts.timestamp-*
 
 # Claude
 .claude/worktrees/*
+
+# Google OAuth client secrets (never commit)
+client_secret_*.json
+
+# Appwrite → Convex migration exports (contain user emails)
+.tmp/migration/
