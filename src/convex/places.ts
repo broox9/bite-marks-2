@@ -2,6 +2,8 @@ import { v } from "convex/values";
 import { query } from "./_generated/server";
 import type { MutationCtx } from "./_generated/server";
 import type { Doc, Id } from "./_generated/dataModel";
+import { paginationOptsValidator } from 'convex/server';
+import { requireUserId } from './authHelpers';
 
 export const placeValidator = v.object({
   _id: v.id("places"),
@@ -27,6 +29,17 @@ export const getAll = query({
   handler: async (ctx) => {
     const places = await ctx.db.query("places").order("desc").take(200);
     return places;
+  },
+});
+
+export const listPage = query({
+  args: { paginationOpts: paginationOptsValidator },
+  returns: v.object({ page: v.array(placeValidator), isDone: v.boolean(), continueCursor: v.string() }),
+  handler: async (ctx, { paginationOpts }) => {
+    await requireUserId(ctx);
+    const result = await ctx.db.query('places').order('desc')
+      .paginate({ ...paginationOpts, numItems: Math.min(100, Math.max(1, paginationOpts.numItems)) });
+    return { page: result.page, isDone: result.isDone, continueCursor: result.continueCursor };
   },
 });
 

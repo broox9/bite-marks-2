@@ -6,16 +6,20 @@ import type { DataModel } from "./_generated/dataModel";
 import { query } from "./_generated/server";
 import { v } from "convex/values";
 import authConfig from "./auth.config";
+import authSchema from './betterAuth/schema';
+import { connectorPlugins } from './oauthOptions';
+import type { BetterAuthOptions } from 'better-auth';
 
-const siteUrl = process.env.SITE_URL!;
+// Local component schema/adapter analysis runs without deployment environment variables.
+const siteUrl = process.env.SITE_URL ?? 'http://localhost:5173';
 
-export const authComponent = createClient<DataModel>(components.betterAuth);
+export const authComponent = createClient<DataModel, typeof authSchema>(components.betterAuth, { local: { schema: authSchema } });
 
-export const createAuth = (ctx: GenericCtx<DataModel>) => {
+export const createAuthOptions = (ctx: GenericCtx<DataModel>) => {
   const googleClientId = process.env.GOOGLE_CLIENT_ID;
   const googleClientSecret = process.env.GOOGLE_CLIENT_SECRET;
 
-  return betterAuth({
+  return {
     baseURL: siteUrl,
     database: authComponent.adapter(ctx),
     emailAndPassword: {
@@ -31,9 +35,11 @@ export const createAuth = (ctx: GenericCtx<DataModel>) => {
             },
           }
         : undefined,
-    plugins: [convex({ authConfig })],
-  });
+    plugins: [...connectorPlugins(siteUrl), convex({ authConfig })],
+  } satisfies BetterAuthOptions;
 };
+
+export const createAuth = (ctx: GenericCtx<DataModel>) => betterAuth(createAuthOptions(ctx));
 
 export const getCurrentUser = query({
   args: {},
