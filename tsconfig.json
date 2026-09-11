@@ -17,6 +17,7 @@
 		"skipLibCheck": true,
 		"sourceMap": true,
 		"strict": true,
+		"types": ["node", "vite/client"],
 		"moduleResolution": "bundler",
 	}
 	// Path aliases are handled by https://svelte.dev/docs/kit/configuration#alias

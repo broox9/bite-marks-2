@@ -39,5 +39,13 @@ export default defineSchema({
   tags: defineTable({
     userId: v.string(),
     tagName: v.string(),
+    updatedAt: v.optional(v.number()),
+  }).index("by_user", ["userId"]),
+
+  preferences: defineTable({
+    userId: v.string(),
+    defaultLocation: v.union(v.null(), v.object({
+      name: v.string(), lat: v.number(), lng: v.number(), radiusMeters: v.number(),
+    })),
   }).index("by_user", ["userId"]),
 });

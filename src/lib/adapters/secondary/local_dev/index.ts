@@ -1,11 +1,7 @@
 import type { PersistenceRepository } from "$lib/ports/persistence.repository";
-// import { randomUUID } from "crypto";
-import { readFile, writeFile } from "fs/promises";
-// import { join } from "path";
-//
-
-function join() { }
-function randomUUID() { }
+import { randomUUID } from "node:crypto";
+import { readFile, writeFile } from "node:fs/promises";
+import { join } from "node:path";
 
 interface LocalData {
   masterPlaces: Record<string, any>;
@@ -50,20 +46,42 @@ export class InMemoryAdapter implements PersistenceRepository {
     return documentWithId;
   }
 
+  async savePlaceAndSpot(masterPlace: any, userId: string | number): Promise<any> {
+    const placeId = String(masterPlace.place_id ?? masterPlace.placeId ?? masterPlace.id);
+    const existing = await this.hasUserSpot(placeId, String(userId));
+    if (existing) return existing;
+
+    await this.saveMasterPlace({ ...masterPlace, id: placeId, $id: placeId });
+    return this.saveUserSpot({
+      ...masterPlace,
+      id: randomUUID(),
+      place_id: placeId,
+      user_id: String(userId),
+      personal_rating: null,
+      personal_notes: null,
+      is_visited: false,
+      social_links: [],
+    });
+  }
+
   async getMasterPlace(id: string): Promise<any> {
     const data = await readDataFile();
     return data.masterPlaces[id] || null;
   }
 
-  async getUserSpot(id: string): Promise<any> {
+  async getUserSpot(id: string, userId: string): Promise<any> {
     const data = await readDataFile();
-    return data.userSpots[id] || null;
+    const spot = data.userSpots[id];
+    if (!spot) return null;
+    const ownerId = spot.user_id ?? spot.userId ?? spot.$userId;
+    return ownerId === userId ? spot : null;
   }
 
   async getUserSpots(userId: string): Promise<any[]> {
     const data = await readDataFile();
     return Object.values(data.userSpots).filter(
-      (spot: any) => spot.userId === userId || spot.$userId === userId
+      (spot: any) =>
+        spot.user_id === userId || spot.userId === userId || spot.$userId === userId
     );
   }
 
@@ -77,9 +95,34 @@ export class InMemoryAdapter implements PersistenceRepository {
     return id in data.masterPlaces;
   }
 
-  async hasUserSpot(id: string): Promise<boolean> {
+  async hasUserSpot(id: string, userId: string): Promise<boolean> {
     const data = await readDataFile();
-    return id in data.userSpots;
+    return Object.values(data.userSpots).some((spot: any) => {
+      const ownerId = spot.user_id ?? spot.userId ?? spot.$userId;
+      const placeId = spot.place_id ?? spot.placeId;
+      return ownerId === userId && (placeId === id || spot.name === id);
+    });
+  }
+
+  async updateUserSpot(rowId: string, patch: any, userId: string): Promise<any> {
+    const data = await readDataFile();
+    const existing = data.userSpots[rowId];
+    const ownerId = existing?.user_id ?? existing?.userId ?? existing?.$userId;
+    if (!existing || ownerId !== userId) return null;
+    const updated = { ...existing, ...patch, id: rowId, $id: rowId };
+    data.userSpots[rowId] = updated;
+    await writeDataFile(data);
+    return updated;
+  }
+
+  async deleteUserSpot(rowId: string, userId: string): Promise<boolean> {
+    const data = await readDataFile();
+    const existing = data.userSpots[rowId];
+    const ownerId = existing?.user_id ?? existing?.userId ?? existing?.$userId;
+    if (!existing || ownerId !== userId) return false;
+    delete data.userSpots[rowId];
+    await writeDataFile(data);
+    return true;
   }
 }
 

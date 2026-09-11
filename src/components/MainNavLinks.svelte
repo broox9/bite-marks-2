@@ -11,6 +11,7 @@
   <ul>
     <li><a href="/list">Spots</a></li>
     <li><a href="/">Search</a></li>
+    <li><a href="/settings">Settings</a></li>
     <!-- <li><a href="/tags">Tags</a></li> -->
   </ul>
 </nav>

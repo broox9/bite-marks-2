@@ -9,6 +9,7 @@
   import { PUBLIC_CONVEX_URL } from "$env/static/public";
   import { createSvelteAuthClient } from "@mmailaender/convex-better-auth-svelte/svelte";
   import { authClient } from "$lib/auth-client";
+  import { getPreferences } from '$lib/adapters/primary/remote-handlers/preferences.remote';
 
   import { locationStore } from "$lib/adapters/primary/stores/location.store.svelte";
 
@@ -17,6 +18,24 @@
 
   let { data, children }: LayoutProps = $props();
   let currentPlace = $derived(locationStore);
+  let preferencesAccount: string | null = null;
+  $effect(() => {
+    const account = data.user?.id ?? null;
+    if (account === preferencesAccount) return;
+    preferencesAccount = account;
+    let active = true;
+    locationStore.name = 'Midtown, New York';
+    locationStore.center = { lat: 40.7484, lng: -73.9857 };
+    locationStore.radiusMiles = 29;
+    if (account) getPreferences({}).then(({ defaultLocation }) => {
+      if (active && defaultLocation) {
+        locationStore.name = defaultLocation.name;
+        locationStore.center = { lat: defaultLocation.lat, lng: defaultLocation.lng };
+        locationStore.radiusMiles = defaultLocation.radiusMeters / 1609.34;
+      }
+    }).catch(() => { /* The saved default is optional; a user can retry in Settings. */ });
+    return () => { active = false; };
+  });
 
   createSvelteAuthClient({
     authClient,

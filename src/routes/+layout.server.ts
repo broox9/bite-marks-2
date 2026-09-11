@@ -7,12 +7,13 @@ export const load: LayoutServerLoad = async ({ locals, url }) => {
   const isLoginRoute = url.pathname === "/login";
   const isAllSpotsRoute = url.pathname === "/all-spots";
   const isAuthApiRoute = url.pathname.startsWith("/api/auth");
+  const isConnectorLogin = url.pathname === '/connect/login';
 
   if (
     !authState.isAuthenticated &&
     !isLoginRoute &&
     !isAllSpotsRoute &&
-    !isAuthApiRoute
+    !isAuthApiRoute && !isConnectorLogin
   ) {
     throw redirect(303, "/login");
   }
