@@ -3,8 +3,8 @@ export {};
 declare global {
   interface Window {
     /**
-     * Defined in `src/app.html` as the Google Maps JS callback.
-     * Resolves to the global `google` object once the script has loaded.
+     * Defined in `src/app.html` by the dynamic Maps JS bootstrap.
+     * Resolves to the global `google` object once `importLibrary` is ready.
      */
     resolveGoogleLoaded?: () => Promise<any>;
   }

@@ -1,6 +1,7 @@
 /// <reference types="@types/google.maps" />
 "use client";
 import { locationStore as mapState } from "$lib/adapters/primary/stores/location.store.svelte";
+import { importMapsLibrary, waitForGoogleMaps } from "./maps-loader";
 
 // const mapState = $derived({
 //     location: locationStore.center,
@@ -46,17 +47,24 @@ const FIELDS = [
   "businessStatus",
 ];
 
-if (globalThis?.window) {
-  window
-    .resolveGoogleLoaded?.()
-    ?.catch((e: Error) => {
-      throw e;
-    })
-    ?.then(async (g: any) => {
-      google = g;
-      const { Place } = await google.maps.importLibrary("places");
+async function ensureGooglePlaces(): Promise<{ google: any; Place: any } | null> {
+  try {
+    if (!google) {
+      google = await waitForGoogleMaps();
+    }
+    if (!PlaceLib) {
+      const { Place } = await importMapsLibrary<google.maps.PlacesLibrary>("places");
       PlaceLib = Place;
-    });
+    }
+    return { google, Place: PlaceLib };
+  } catch (error) {
+    console.error("[bs] Failed to initialize Google Maps Places", error);
+    return null;
+  }
+}
+
+if (globalThis?.window) {
+  void ensureGooglePlaces();
 }
 
 
@@ -68,7 +76,8 @@ if (globalThis?.window) {
 export async function searchForPlaces(text: string, handleResults: ResultHandler) {
   console.log("[bs] searchForPlaces", text);
   if (!text || text.length < 3) return;
-  if (!google || !PlaceLib) return;
+  const ready = await ensureGooglePlaces();
+  if (!ready) return;
   const request = {
     textQuery: text,
     fields: FIELDS,
@@ -97,8 +106,9 @@ export async function searchForPlaces(text: string, handleResults: ResultHandler
 export async function searchForAreas(text: string, handleResults: ResultHandler) {
   console.log("[bs] searchForAreas", text);
   if (!text || text.length < 3) return;
-  if (!google || !PlaceLib) return;
-  const { SearchByTextRankPreference } = await google.maps.importLibrary("places");
+  const ready = await ensureGooglePlaces();
+  if (!ready) return;
+  const { SearchByTextRankPreference } = await importMapsLibrary<google.maps.PlacesLibrary>("places");
   const request = {
     textQuery: text,
     fields: AREA_FIELDS,
@@ -124,11 +134,12 @@ export async function searchForAreas(text: string, handleResults: ResultHandler)
  * @param {string} value - The search box input value
  */
 export async function placeAutoComplete(value: string) : Promise<google.maps.places.Place[] | []> {
-  if (value.length < 3 || !google) return [];
+  if (value.length < 3) return [];
+  const ready = await ensureGooglePlaces();
+  if (!ready) return [];
   console.log(mapState.name, mapState.center, mapState.radiusMeters)
-  // @ts-ignore
   const { Place, AutocompleteSessionToken, AutocompleteSuggestion } =
-    (await (google as any).maps.importLibrary("places")) as google.maps.PlacesLibrary;
+    await importMapsLibrary<google.maps.PlacesLibrary>("places");
 
   // Add an initial request body.
   let request = {
@@ -179,11 +190,12 @@ export async function nearbySearch(e: Event) {
   const value = (e?.target as HTMLInputElement | null)?.value;
   console.log("[bs] nearbySearch value", value);
   if (!value || value.length < 3) return; // oops this is nearby the set center
-  if (!google) return;
+  const ready = await ensureGooglePlaces();
+  if (!ready) return;
   // let center = new google.maps.LatLng(52.369358, 4.889258);
   let center = mapState.center;
   const { Place, SearchNearbyRankPreference } =
-    (await google.maps.importLibrary("places")) as google.maps.PlacesLibrary;
+    await importMapsLibrary<google.maps.PlacesLibrary>("places");
 
   const request = {
     // required parameters
@@ -219,20 +231,26 @@ export async function nearbySearch(e: Event) {
 
 
 export async function getLocationByAddress(address: string) {
-  if (!google) return;
-  const { Geocoder } = (await (google as any).maps.importLibrary("geocoding")) as any;
+  try {
+    if (!google) {
+      google = await waitForGoogleMaps();
+    }
+    const { Geocoder } = await importMapsLibrary<{ Geocoder: any }>("geocoding");
 
-  const geocode = (new Geocoder()).geocode
-  const request = {
-    address,
-    region: 'us',
-    language: 'en-US'
+    const geocode = (new Geocoder()).geocode
+    const request = {
+      address,
+      region: 'us',
+      language: 'en-US'
+    }
+
+    geocode(request, (results: any, status: any) => {
+      console.log('[bs] GEOCODE:STATUS', status)
+      console.log('[bs] GEOCODE:RESULTS', results)
+    })
+  } catch (error) {
+    console.error("[bs] Failed to load Google Maps geocoding", error);
   }
-
-  geocode(request, (results: any, status: any) => {
-    console.log('[bs] GEOCODE:STATUS', status)
-    console.log('[bs] GEOCODE:RESULTS', results)
-  })
 }
 
 
@@ -250,20 +268,11 @@ export async function getPlacePhotoUrls(
   maxWidth?: number,
   maxPhotos: number = MAX_PLACE_PHOTOS,
 ): Promise<string[]> {
-  if (!google) {
-    // Wait for google to load if not ready yet
-    try {
-      await window.resolveGoogleLoaded?.();
-    } catch (e) {
-      console.error('[bs] Failed to load Google Maps', e);
-      return [];
-    }
-  }
-  
-  if (!google) return [];
+  const ready = await ensureGooglePlaces();
+  if (!ready) return [];
 
   try {
-    const { Place } = await google.maps.importLibrary("places") as google.maps.PlacesLibrary;
+    const { Place } = await importMapsLibrary<google.maps.PlacesLibrary>("places");
     
     // Create a Place instance with the place ID
     const place = new Place({ id: placeId });
