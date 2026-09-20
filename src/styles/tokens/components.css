@@ -41,6 +41,12 @@
   --comp-btn-danger-border:       var(--sys-color-error);
   --comp-btn-danger-text:         var(--sys-color-text-on-dark);
 
+  /* OAuth provider button on authentication screens. */
+  --comp-btn-oauth-bg:            var(--sys-color-surface);
+  --comp-btn-oauth-bg-hover:      var(--sys-color-surface-raised);
+  --comp-btn-oauth-border:        var(--sys-color-border);
+  --comp-btn-oauth-text:          var(--sys-color-text);
+
   /* ─── Pill Tabs / Segmented Control ──────────────────────────────────────
    * Independent pill buttons — "All 70", "Visited 38", "To try 32".
    * ──────────────────────────────────────────────────────────────────────── */
@@ -98,6 +104,8 @@
    * ──────────────────────────────────────────────────────────────────────── */
   --comp-list-item-bg:             var(--sys-color-page);
   --comp-list-item-bg-hover:       var(--sys-color-surface-raised);
+  --comp-list-item-bg-selected:    var(--sys-color-accent-tint);
+  --comp-list-item-selected-edge:  var(--sys-color-accent);
   --comp-list-item-divider:        var(--sys-color-border);
   --comp-list-item-text:           var(--sys-color-text);
   --comp-list-item-text-sub:       var(--sys-color-text-muted);
@@ -237,4 +245,11 @@
   --comp-textarea-placeholder: var(--sys-color-text-muted);
   --comp-textarea-radius:      var(--sys-radius-control);
 
+}
+
+:root[data-theme='night'] {
+  /* Map selection is amber in the night palette. */
+  --comp-list-item-bg-selected:    var(--sys-color-brand-tint);
+  --comp-list-item-selected-edge:  var(--sys-color-brand);
+  --comp-btn-oauth-bg:             var(--sys-color-surface-sunken);
 }

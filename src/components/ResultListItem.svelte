@@ -38,7 +38,7 @@
     data-map-active={isMapActive}
   >
     <a class="thumb" href={`/spot/${item.id}`} aria-hidden="true" tabindex="-1">
-      <CuisineIcon placeTypes={item.place_types} primaryType={item.primaryType} size={22} />
+      <CuisineIcon placeTypes={item.place_types} primaryType={item.primaryType} size={32} />
     </a>
 
     <div class="list-item-content">
@@ -118,7 +118,8 @@
   }
 
   .list-item-wrapper[data-map-active="true"] {
-    background-color: var(--sys-color-accent-tint);
+    background-color: var(--comp-list-item-bg-selected);
+    box-shadow: inset 3px 0 0 var(--comp-list-item-selected-edge);
   }
 
   .thumb {
@@ -127,9 +128,9 @@
     justify-content: center;
     width: 44px;
     height: 44px;
-    border-radius: var(--comp-thumb-radius);
+    /*border-radius: var(--comp-thumb-radius);
     background-color: var(--comp-thumb-bg);
-    border: 1px solid var(--sys-color-border);
+    border: 1px solid var(--sys-color-border);*/
     color: var(--sys-color-brand);
     flex-shrink: 0;
   }
@@ -152,7 +153,7 @@
     white-space: nowrap;
     color: var(--comp-list-item-text);
     font-weight: 700;
-    font-size: 0.9375rem;
+    font-size: 1rem;
     line-height: 1.25;
   }
 
@@ -181,7 +182,6 @@
     align-items: center;
     gap: 0.1875rem;
     color: var(--comp-list-item-star);
-    font-weight: 700;
   }
 
   .meta-distance {
@@ -193,7 +193,6 @@
     align-items: center;
     gap: 0.3125rem;
     color: var(--sys-color-success-text);
-    font-weight: 600;
   }
 
   .visited-dot {
