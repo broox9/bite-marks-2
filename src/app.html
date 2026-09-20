@@ -5,17 +5,57 @@
 		<!--<link rel="icon" href="%sveltekit.assets%/favicon.png" />-->
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
 				<script>
+					// Keep in sync with src/lib/adapters/secondary/google/maps-loader.ts
+					(function () {
+						var settled = false;
+						var timeoutId;
+						var resolveReady;
+						var rejectReady;
+						var ready = new Promise(function (resolve, reject) {
+							resolveReady = resolve;
+							rejectReady = reject;
+						});
+						ready.catch(function () {});
 
-					window.resolveGoogleLoaded = () => {
-						if (!google) {
-							console.error('[bs] GOOGLE LOAD ERROR')
-							return Promise.reject('Error loading google') // nothing catching this yet
+						function readGoogle() {
+							return window.google;
 						}
-						console.log('[bs] GOOGLE READY', true)
-						return Promise.resolve(google)
-					}
+
+						function settleResolve(value) {
+							if (settled) return;
+							settled = true;
+							if (timeoutId) clearTimeout(timeoutId);
+							resolveReady(value);
+						}
+
+						function settleReject(reason) {
+							if (settled) return;
+							settled = true;
+							if (timeoutId) clearTimeout(timeoutId);
+							rejectReady(reason instanceof Error ? reason : new Error('Google Maps failed to load'));
+						}
+
+						window.resolveGoogleLoaded = function resolveGoogleLoaded() {
+							var maps = readGoogle();
+							if (maps) settleResolve(maps);
+							return ready;
+						};
+
+						window.__googleMapsLoadFailed = function (reason) {
+							settleReject(reason);
+							return ready;
+						};
+
+						timeoutId = setTimeout(function () {
+							if (readGoogle()) {
+								window.resolveGoogleLoaded();
+								return;
+							}
+							settleReject(new Error('Google Maps load timed out'));
+						}, 20000);
+					})();
 				</script>
-		<script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDkL_zZu457B4XEsAkbVDXr8hsYsebDnOs&libraries=places&callback=resolveGoogleLoaded"></script>
+		<script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDkL_zZu457B4XEsAkbVDXr8hsYsebDnOs&libraries=places&callback=resolveGoogleLoaded" onerror="window.__googleMapsLoadFailed && window.__googleMapsLoadFailed(new Error('Google Maps script failed to load'))"></script>
 		%sveltekit.head%
 	</head>
 	<body data-sveltekit-preload-data="hover">

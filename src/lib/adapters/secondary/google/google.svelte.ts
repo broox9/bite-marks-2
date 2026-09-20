@@ -1,6 +1,7 @@
 /// <reference types="@types/google.maps" />
 "use client";
 import { locationStore as mapState } from "$lib/adapters/primary/stores/location.store.svelte";
+import { installGoogleMapsLoader } from "$lib/adapters/secondary/google/maps-loader";
 
 // const mapState = $derived({
 //     location: locationStore.center,
@@ -47,15 +48,17 @@ const FIELDS = [
 ];
 
 if (globalThis?.window) {
-  window
-    .resolveGoogleLoaded?.()
-    ?.catch((e: Error) => {
-      throw e;
-    })
+  if (!window.resolveGoogleLoaded) {
+    installGoogleMapsLoader(window);
+  }
+  void window.resolveGoogleLoaded?.()
     ?.then(async (g: any) => {
       google = g;
       const { Place } = await google.maps.importLibrary("places");
       PlaceLib = Place;
+    })
+    .catch((e: Error) => {
+      console.error("[bs] Failed to load Google Maps", e);
     });
 }
 
@@ -251,9 +254,9 @@ export async function getPlacePhotoUrls(
   maxPhotos: number = MAX_PLACE_PHOTOS,
 ): Promise<string[]> {
   if (!google) {
-    // Wait for google to load if not ready yet
     try {
-      await window.resolveGoogleLoaded?.();
+      const loaded = await window.resolveGoogleLoaded?.();
+      if (loaded) google = loaded;
     } catch (e) {
       console.error('[bs] Failed to load Google Maps', e);
       return [];
