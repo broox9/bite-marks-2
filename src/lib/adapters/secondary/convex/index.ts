@@ -1,5 +1,5 @@
 import type { ConvexHttpClient } from "convex/browser";
-import type { Id } from "$convex/_generated/dataModel";
+import type { Doc, Id } from "$convex/_generated/dataModel";
 import { api } from "$convex/_generated/api";
 import type { PersistenceRepository } from "$lib/ports/persistence.repository";
 import type { ResultPlaceRecord } from "$lib/core/domain/Place/Place";
@@ -7,7 +7,7 @@ import type { UserSpotRecord } from "$lib/core/domain/Spot/Spot";
 import { transformResultToPlace } from "$lib/adapters/secondary/appwrite/dtos/placesToRecord";
 import type { FlattenedSpot } from "$convex/spots";
 
-function toDomainSpot(flat: FlattenedSpot): UserSpotRecord & { rowId: string; $id: string } {
+export function toDomainSpot(flat: FlattenedSpot): UserSpotRecord & { rowId: string; $id: string } {
   const place = flat.place;
   return {
     id: flat._id,
@@ -100,7 +100,7 @@ export class ConvexAdapter implements PersistenceRepository {
 
   async getMasterPlaces(): Promise<any[]> {
     const places = await this.client.query(api.places.getAll, {});
-    return places.map((p) => ({
+    return places.map((p: Doc<"places">) => ({
       id: p.placeId,
       place_id: p.placeId,
       name: p.name,

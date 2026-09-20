@@ -14,7 +14,9 @@ import type * as health from "../health.js";
 import type * as http from "../http.js";
 import type * as migrations from "../migrations.js";
 import type * as migrationsNode from "../migrationsNode.js";
+import type * as oauthOptions from "../oauthOptions.js";
 import type * as places from "../places.js";
+import type * as preferences from "../preferences.js";
 import type * as spots from "../spots.js";
 import type * as tags from "../tags.js";
 
@@ -31,7 +33,9 @@ declare const fullApi: ApiFromModules<{
   http: typeof http;
   migrations: typeof migrations;
   migrationsNode: typeof migrationsNode;
+  oauthOptions: typeof oauthOptions;
   places: typeof places;
+  preferences: typeof preferences;
   spots: typeof spots;
   tags: typeof tags;
 }>;
@@ -63,5 +67,5 @@ export declare const internal: FilterApi<
 >;
 
 export declare const components: {
-  betterAuth: import("@convex-dev/better-auth/_generated/component.js").ComponentApi<"betterAuth">;
+  betterAuth: import("../betterAuth/_generated/component.js").ComponentApi<"betterAuth">;
 };

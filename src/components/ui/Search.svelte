@@ -1,16 +1,16 @@
 <script lang="ts">
-  import Input from './Input.svelte';
-  import { Search, Clock } from '@lucide/svelte';
-  // import { Component } from 'svelte'
+  import { Search as SearchIcon } from '@lucide/svelte';
+  import type { Component } from 'svelte';
 
   interface Props extends Omit<Record<string, unknown>, 'class' | 'type'> {
     class?: string
     value?: string
     'data-size'?: 'sm' | 'md' | 'lg'
     'data-variant'?: string
+    Icon?: Component<{ size?: number | string; class?: string }>
   }
 
-  let { icon, Icon,...rest }: Props = $props()
+  let { Icon = SearchIcon, ...rest }: Props = $props()
 </script>
 
 <div class="search-bar-row">

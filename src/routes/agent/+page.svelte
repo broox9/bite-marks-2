@@ -1,6 +1,5 @@
 <script lang="ts">
   // import { agentRemoteCall } from "./agent.remote";
-  let { data, children } = $props();
   let userPrompt = $state("");
   let agentResponse = $state("");
   let isButtonDisabled = $state(false);
@@ -9,11 +8,12 @@
     const response = await fetch("/agent", {
       method: "POST",
       headers: {
-        "Content-Type": "text/event-stream",
+        "Content-Type": "application/json",
       },
       body: JSON.stringify({ prompt }),
     });
 
+    if (!response.ok) throw new Error((await response.json()).error?.message ?? 'Request failed');
     const body = response.body;
     if (!body) return "";
     const reader = body.getReader();
@@ -35,8 +35,9 @@
   const handleSubmit = async (e: Event) => {
     e.preventDefault();
     isButtonDisabled = true;
-    await agentRemoteCall(userPrompt); // No need to assign, agentRemoteCall updates state
-    isButtonDisabled = false;
+    try { await agentRemoteCall(userPrompt); }
+    catch (error) { agentResponse = error instanceof Error ? error.message : 'Request failed'; }
+    finally { isButtonDisabled = false; }
   };
 </script>
 
@@ -48,7 +49,7 @@
     {/each}
   </section>
   <section class="agent-footer">
-    <form on:submit={handleSubmit}>
+    <form onsubmit={handleSubmit}>
       <input
         type="text"
         name="user-prompt"

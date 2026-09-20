@@ -6,7 +6,11 @@
   import Card from "./util/Card.svelte";
   import Button from "./ui/Button.svelte";
 
-  let { place, saveAction, clearAction } : { place: ResultPlaceRecord, saveAction: (place: ResultPlaceRecord, result: any) => undefined, clearAction: () => undefined } = $props()
+  let { place, saveAction, clearAction } : {
+    place: ResultPlaceRecord,
+    saveAction: (result: unknown, place: ResultPlaceRecord) => void,
+    clearAction: () => void
+  } = $props()
 
   let photoUrl = $state<string | null>(null);
   let photoLoading = $state(true);

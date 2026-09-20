@@ -73,4 +73,16 @@ describe("spots authorization", () => {
       userB.query(api.tags.listForUser, { userId: "user-a" })
     ).rejects.toThrow("Forbidden");
   });
+
+  it("keeps preferences private to each authenticated user", async () => {
+    const t = convexTest(schema, modules);
+    const userA = t.withIdentity({ subject: "user-a" });
+    const userB = t.withIdentity({ subject: "user-b" });
+    const location = { name: "Downtown Brooklyn", lat: 40.6928, lng: -73.9903, radiusMeters: 3200 };
+
+    await expect(t.query(api.preferences.get, {})).rejects.toThrow("Unauthorized");
+    await userA.mutation(api.preferences.update, { defaultLocation: location });
+    await expect(userA.query(api.preferences.get, {})).resolves.toEqual({ defaultLocation: location });
+    await expect(userB.query(api.preferences.get, {})).resolves.toEqual({ defaultLocation: null });
+  });
 });

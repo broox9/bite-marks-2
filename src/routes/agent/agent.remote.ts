@@ -1,33 +1,9 @@
-// import { generateText } from "ai";
-// import { openai } from "@ai-sdk/openai";
-import { Agent, run } from "@openai/agents";
-import { OPENAI_API_KEY } from '$env/dynamic/private';
-import { query, command } from '$app/server'
-import z from 'zod'
+import { command } from '$app/server';
+import { aiInputSchema } from '$lib/core/domain/api';
+import { backendForWebsite } from '$lib/glue/backend.server';
+import { operations } from '$lib/use_cases/backend';
 
-
-
-const agent = new Agent({
-  name: 'test-agent',
-  model: 'gpt-5-nano',
-  instructions: 'You are a helpful assistant. that speaks like Fredrick Douglass',
-  modelSettings: {
-    reasoning: { effort: 'low' }
-  },
-  tools: [],
-})
-
-async function sendPrompt(prompt: string) {
-  console.log('[bs] Agent::sendPrompt', prompt);
-  const result = await run(agent, prompt)
-
-  console.log('[bs] Agent::sendPrompt::response', result.output);
-  return result.output;
-}
-
-
-export const agentRemoteCall = command(z.string(), async (prompt: string) => {
-  const response = await sendPrompt(prompt);
-  console.log('[bs] Agent::agentRemoteCall', response);
-  return response;
-})
+export const agentRemoteCall = command(aiInputSchema.shape.prompt, async prompt => {
+  const result = await operations.create_ai_response.execute(backendForWebsite(), { prompt }) as { text: string };
+  return result.text;
+});

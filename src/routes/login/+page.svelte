@@ -56,6 +56,9 @@
     errorMessage = "";
     pending = true;
     try {
+      // #region agent log
+      fetch("http://127.0.0.1:7724/ingest/5ad7bcdf-f199-4e71-9ae6-e700736dd1c7",{method:"POST",headers:{"Content-Type":"application/json","X-Debug-Session-Id":"b32ac3"},body:JSON.stringify({sessionId:"b32ac3",runId:"initial",hypothesisId:"B,D",location:"src/routes/login/+page.svelte:59",message:"Google OAuth sign-in initiated in browser",data:{origin:window.location.origin,callbackURL:"/list",provider:"google"},timestamp:Date.now()})}).catch(()=>{});
+      // #endregion
       await authClient.signIn.social({
         provider: "google",
         callbackURL: "/list",

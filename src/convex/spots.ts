@@ -1,10 +1,12 @@
 import { v } from "convex/values";
+import { paginationOptsValidator } from 'convex/server';
+import { spotUpdateSchema, placeInputSchema } from '../lib/core/domain/api';
 import { mutation, query } from "./_generated/server";
 import type { Doc, Id } from "./_generated/dataModel";
 import { assertUser, requireUserId } from "./authHelpers";
 import { placeValidator, upsertPlaceDoc } from "./places";
 
-const flattenedSpotValidator = v.object({
+export const flattenedSpotValidator = v.object({
   _id: v.id("spots"),
   userId: v.string(),
   placeId: v.string(),
@@ -65,6 +67,17 @@ export const listForUser = query({
   },
 });
 
+export const listPage = query({
+  args: { paginationOpts: paginationOptsValidator },
+  returns: v.object({ page: v.array(flattenedSpotValidator), isDone: v.boolean(), continueCursor: v.string() }),
+  handler: async (ctx, { paginationOpts }) => {
+    const userId = await requireUserId(ctx);
+    const result = await ctx.db.query('spots').withIndex('by_user', q => q.eq('userId', userId))
+      .order('desc').paginate({ ...paginationOpts, numItems: Math.min(100, Math.max(1, paginationOpts.numItems)) });
+    return { page: await Promise.all(result.page.map(spot => flattenSpot(ctx, spot))), isDone: result.isDone, continueCursor: result.continueCursor };
+  },
+});
+
 export const getById = query({
   args: { rowId: v.id("spots"), userId: v.string() },
   returns: v.union(flattenedSpotValidator, v.null()),
@@ -106,8 +119,12 @@ export const update = mutation({
   },
   returns: v.union(flattenedSpotValidator, v.null()),
   handler: async (ctx, args) => {
-    const authUserId = await requireUserId(ctx);
+    const authUserId = await requireUserId(ctx, true);
     assertUser(args.userId, authUserId);
+    spotUpdateSchema.parse(Object.fromEntries(Object.entries({
+      personal_rating: args.personalRating, personal_notes: args.personalNotes,
+      is_visited: args.isVisited, social_links: args.socialLinks,
+    }).filter(([, value]) => value !== undefined)));
 
     const spot = await ctx.db.get(args.rowId);
     if (!spot || spot.userId !== args.userId) return null;
@@ -129,7 +146,7 @@ export const remove = mutation({
   args: { rowId: v.id("spots"), userId: v.string() },
   returns: v.object({ success: v.boolean(), error: v.optional(v.string()) }),
   handler: async (ctx, { rowId, userId }) => {
-    const authUserId = await requireUserId(ctx);
+    const authUserId = await requireUserId(ctx, true);
     assertUser(userId, authUserId);
 
     const spot = await ctx.db.get(rowId);
@@ -169,8 +186,14 @@ export const savePlaceAndSpot = mutation({
     v.object({ success: v.literal(false), error: v.string() })
   ),
   handler: async (ctx, { userId, place }) => {
-    const authUserId = await requireUserId(ctx);
+    const authUserId = await requireUserId(ctx, true);
     assertUser(userId, authUserId);
+    placeInputSchema.parse({
+      place_id: place.placeId, name: place.name, address: place.address,
+      rating: place.rating, websiteURI: place.websiteURI, price_level: place.priceLevel,
+      lat: place.lat, lng: place.lng, photos: place.photos, neighborhood: place.neighborhood,
+      areas: place.areas, place_types: place.placeTypes, primaryType: place.primaryType,
+    });
 
     const existing = await ctx.db
       .query("spots")
