@@ -38,7 +38,7 @@
     data-map-active={isMapActive}
   >
     <a class="thumb" href={`/spot/${item.id}`} aria-hidden="true" tabindex="-1">
-      <CuisineIcon placeTypes={item.place_types} primaryType={item.primaryType} size={32} />
+      <CuisineIcon placeTypes={item.place_types} primaryType={item.primaryType} size={28} />
     </a>
 
     <div class="list-item-content">

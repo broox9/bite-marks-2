@@ -179,6 +179,11 @@
   --comp-header-menu-text:         var(--sys-color-text);
   --comp-header-menu-bg-hover:     var(--sys-color-surface-raised);
 
+  /* ─── Mobile navigation drawer ────────────────────────────────────────── */
+  --comp-menu-bg:                  var(--sys-color-surface);
+  --comp-menu-border:              var(--sys-color-border);
+  --comp-menu-scrim:               var(--sys-overlay-bg);
+
   /* ─── Detail — Eyebrow ───────────────────────────────────────────────────
    * "STEAKHOUSE · JERSEY CITY, NJ" above the spot name.
    * ──────────────────────────────────────────────────────────────────────── */

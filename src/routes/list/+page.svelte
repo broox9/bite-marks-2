@@ -1,5 +1,13 @@
 <script lang="ts">
-  import { Search, X, Plus, Minus, LocateFixed } from "@lucide/svelte";
+  import {
+    ChevronDown,
+    ChevronUp,
+    Search,
+    X,
+    Plus,
+    Minus,
+    LocateFixed,
+  } from "@lucide/svelte";
   import { invalidateAll } from "$app/navigation";
   import {
     getSpots,
@@ -18,6 +26,7 @@
   import { onMount } from 'svelte';
 
   let showSearch = $state(false);
+  let listExpanded = $state(false);
   let filterValue = $state<"all" | "visited" | "unvisited">("all");
   const spotsQuery = getSpots({});
   const spotRows = $derived(
@@ -40,6 +49,7 @@
   let markers: mapboxgl.Marker[] = [];
   let activeMapSpotId = $state<string | null>(null);
   let spotsInView = $state(0);
+  let mapResizeTimer: ReturnType<typeof setTimeout> | undefined;
 
   const mapStyleForTheme = () =>
     document.documentElement.dataset.theme === 'night'
@@ -74,6 +84,7 @@
     });
 
     return () => {
+      if (mapResizeTimer) clearTimeout(mapResizeTimer);
       themeObserver.disconnect();
       markers.forEach((marker) => marker.remove());
       markers = [];
@@ -170,9 +181,21 @@
       map.flyTo({ center: [pos.coords.longitude, pos.coords.latitude], zoom: 13 });
     });
   }
+
+  function toggleListExpansion() {
+    listExpanded = !listExpanded;
+
+    requestAnimationFrame(() => map?.resize());
+    if (mapResizeTimer) clearTimeout(mapResizeTimer);
+    mapResizeTimer = setTimeout(() => map?.resize(), 240);
+  }
 </script>
 
-<div id="page-container" data-search-open={showSearch}>
+<div
+  id="page-container"
+  data-search-open={showSearch}
+  data-list-expanded={listExpanded}
+>
   <section id="map-section" aria-label="Saved spots map">
     <div id="map-container" bind:this={mapContainer}></div>
 
@@ -208,36 +231,57 @@
   </section>
 
   <section id="spots-panel">
-    <div class="filter-tabs" role="tablist" aria-label="Filter spots">
+    {#if listExpanded}
+      <div class="list-grab-handle" aria-hidden="true"></div>
+    {/if}
+    <div class="filter-toolbar">
+      <div class="filter-tabs" role="tablist" aria-label="Filter spots">
+        <button
+          type="button"
+          class="filter-tab"
+          class:active={filterValue === "all"}
+          onclick={() => (filterValue = "all")}
+          role="tab"
+          aria-selected={filterValue === "all"}
+        >
+          All <span class="tab-count">{spotRows.length}</span>
+        </button>
+        <button
+          type="button"
+          class="filter-tab"
+          class:active={filterValue === "visited"}
+          onclick={() => (filterValue = "visited")}
+          role="tab"
+          aria-selected={filterValue === "visited"}
+        >
+          Visited <span class="tab-count">{visitedCount}</span>
+        </button>
+        <button
+          type="button"
+          class="filter-tab"
+          class:active={filterValue === "unvisited"}
+          onclick={() => (filterValue = "unvisited")}
+          role="tab"
+          aria-selected={filterValue === "unvisited"}
+        >
+          To try <span class="tab-count">{unvisitedCount}</span>
+        </button>
+      </div>
       <button
         type="button"
-        class="filter-tab"
-        class:active={filterValue === "all"}
-        onclick={() => (filterValue = "all")}
-        role="tab"
-        aria-selected={filterValue === "all"}
+        class="list-rollup-button"
+        class:active={listExpanded}
+        aria-label={listExpanded ? 'Show map' : 'Expand list'}
+        aria-pressed={listExpanded}
+        aria-controls="map-section spots-panel"
+        title={listExpanded ? 'Show map' : 'Expand list'}
+        onclick={toggleListExpansion}
       >
-        All <span class="tab-count">{spotRows.length}</span>
-      </button>
-      <button
-        type="button"
-        class="filter-tab"
-        class:active={filterValue === "visited"}
-        onclick={() => (filterValue = "visited")}
-        role="tab"
-        aria-selected={filterValue === "visited"}
-      >
-        Visited <span class="tab-count">{visitedCount}</span>
-      </button>
-      <button
-        type="button"
-        class="filter-tab"
-        class:active={filterValue === "unvisited"}
-        onclick={() => (filterValue = "unvisited")}
-        role="tab"
-        aria-selected={filterValue === "unvisited"}
-      >
-        To try <span class="tab-count">{unvisitedCount}</span>
+        {#if listExpanded}
+          <ChevronDown size={17} strokeWidth={2.2} />
+        {:else}
+          <ChevronUp size={17} strokeWidth={2.2} />
+        {/if}
       </button>
     </div>
 
@@ -329,7 +373,8 @@
     position: relative;
     display: flex;
     flex-direction: column;
-    height: calc(100svh - 7rem);
+    height: calc(100svh - 3.6875rem);
+    height: calc(100dvh - 3.6875rem);
     overflow: hidden;
     color: var(--sys-color-text);
   }
@@ -338,6 +383,7 @@
     position: relative;
     flex: 0 0 42%;
     border-bottom: 1px solid var(--sys-color-border);
+    transition: flex-basis 220ms cubic-bezier(0.2, 0.7, 0.3, 1);
   }
 
   #map-container {
@@ -420,7 +466,7 @@
 
   #search-fab {
     position: absolute;
-    right: 1.125rem;
+    right: calc(1.125rem + 2.75rem + 0.75rem);
     bottom: -1.5rem;
     width: var(--comp-fab-size);
     height: var(--comp-fab-size);
@@ -444,14 +490,21 @@
     background-color: var(--sys-color-page);
   }
 
-  .filter-tabs {
+  .filter-toolbar {
     display: flex;
-    flex-wrap: wrap;
     align-items: center;
     gap: var(--comp-pill-gap);
     /* Reserve room for the lower half of the floating search button. */
     padding: calc(var(--comp-fab-size) / 2 + 0.5rem) 1.125rem 0.625rem;
     flex-shrink: 0;
+  }
+
+  .filter-tabs {
+    display: flex;
+    min-width: 0;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--comp-pill-gap);
   }
 
   .filter-tab {
@@ -480,6 +533,36 @@
     font-variant-numeric: tabular-nums;
     opacity: 0.65;
     font-size: 0.75rem;
+  }
+
+  .list-rollup-button {
+    display: inline-grid;
+    width: 2rem;
+    min-width: 2rem;
+    height: 2rem;
+    margin-left: auto;
+    place-items: center;
+    border: 1px solid var(--sys-color-border);
+    border-radius: var(--sys-radius-control);
+    background: transparent;
+    color: var(--sys-color-text-muted);
+    cursor: pointer;
+  }
+
+  .list-rollup-button.active {
+    border-color: var(--sys-color-text);
+    background: var(--sys-color-text);
+    color: var(--sys-color-text-on-dark);
+  }
+
+  .list-grab-handle {
+    width: 2.25rem;
+    height: 0.25rem;
+    flex: 0 0 auto;
+    align-self: center;
+    margin: 0.5rem 0 -0.125rem;
+    border-radius: 999px;
+    background: var(--sys-color-border-strong);
   }
 
   .spots-scroll {
@@ -676,9 +759,30 @@
     .skeleton-row span,
     .skeleton-row small,
     #search-container,
-    .drawer-scrim {
+    .drawer-scrim,
+    #map-section {
       animation: none;
-      transition: none;
+      transition-duration: 120ms;
+    }
+  }
+
+  @media (max-width: 767px) {
+    #page-container[data-list-expanded="true"] #map-section {
+      flex-basis: 3.25rem;
+    }
+
+    #page-container[data-list-expanded="true"] #spots-panel {
+      position: relative;
+      z-index: 4;
+      border-radius: var(--sys-radius-2xl) var(--sys-radius-2xl) 0 0;
+      box-shadow: var(--comp-drawer-shadow);
+    }
+
+    #page-container[data-list-expanded="true"] .location-pill,
+    #page-container[data-list-expanded="true"] .map-controls,
+    #page-container[data-list-expanded="true"] .in-view-chip {
+      opacity: 0;
+      pointer-events: none;
     }
   }
 
@@ -711,7 +815,12 @@
       display: none;
     }
 
-    .filter-tabs {
+    .list-rollup-button,
+    .list-grab-handle {
+      display: none;
+    }
+
+    .filter-toolbar {
       padding-top: 1.125rem;
     }
 

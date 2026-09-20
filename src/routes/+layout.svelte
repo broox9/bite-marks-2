@@ -1,7 +1,6 @@
 <script lang="ts">
   import "../styles/app.css";
   import DotLogo from '$lib/assets/bite-marks-dot.svg'
-  import { Menu } from '@lucide/svelte';
   import { onMount } from 'svelte';
 
   import type { LayoutProps } from "./$types";
@@ -17,7 +16,7 @@
 
   import ContainedZone from "../components/util/ContainedZone.svelte";
   import MainNavLinks from "../components/MainNavLinks.svelte";
-  import BottomNav from '../components/BottomNav.svelte';
+  import MobileNavDrawer from '../components/MobileNavDrawer.svelte';
 
   let { data, children }: LayoutProps = $props();
 
@@ -62,7 +61,7 @@
   />
 </svelte:head>
 
-<div id="body-container" class:has-bottom-nav={!!data.user}>
+<div id="body-container">
   <header id="page-header">
     <ContainedZone>
       <div class="main-header">
@@ -75,9 +74,7 @@
         </strong>
 
         <MainNavLinks ariaLabel="Main navigation" class="desktop-nav" />
-        <a class="mobile-menu" href="/settings" aria-label="Open settings">
-          <Menu size={18} />
-        </a>
+        <MobileNavDrawer user={data.user} />
       </div>
     </ContainedZone>
   </header>
@@ -86,9 +83,6 @@
     {@render children()}
   </section>
 
-  {#if data.user}
-    <BottomNav />
-  {/if}
 </div>
 
 <style>
@@ -105,10 +99,6 @@
     min-height: 100svh;
     padding-bottom: 0;
     background-color: var(--sys-color-page);
-  }
-
-  #body-container.has-bottom-nav {
-    padding-bottom: calc(var(--comp-nav-height) + env(safe-area-inset-bottom));
   }
 
   #page-header {
@@ -137,18 +127,6 @@
     color: var(--comp-header-brand-text);
   }
 
-  .mobile-menu {
-    width: 2.125rem;
-    height: 2.125rem;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    border: 1px solid var(--comp-header-menu-border);
-    border-radius: var(--sys-radius-control);
-    background: var(--sys-color-surface-sunken);
-    color: var(--comp-header-menu-text);
-  }
-
   #page-content {
     grid-area: content;
     /*overflow: hidden; /* Prevent page-level scrolling, allow children to scroll */
@@ -162,10 +140,6 @@
   @media (min-width: 768px) {
     #body-container {
       padding-bottom: 0;
-    }
-
-    .mobile-menu {
-      display: none;
     }
 
     :global(.desktop-nav) {
