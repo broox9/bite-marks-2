@@ -4,19 +4,15 @@
   import { resultsListController } from "$lib/adapters/primary/place-search.driver";
   import ResultList from './ResultList.svelte';
 
-  const QUICK_FILTERS = [
-    ['Open now', 'Visited', 'To try', 'Within 5 mi'],
-    ['★ 4.5+', 'Steak', 'Italian', 'Late night'],
-  ];
-
   const RECENT: string[] = [];
 
   let currentSearchValue = $state('')
   let resultList = $state<ResultPlaceRecord[] | []>([])
   let selectedResult = $state<ResultPlaceRecord | null>(null)
 
-  let props = $props()
-  let { selectResultAction } = props
+  let { selectResultAction }: {
+    selectResultAction: (selectedPlace: ResultPlaceRecord) => void;
+  } = $props()
 
   const resultHandler = (results: ResultPlaceRecord[]) => {
     resultList = results
@@ -118,10 +114,17 @@
     align-items: center;
     gap: 0.5rem;
     background-color: var(--comp-input-search-bg);
+    border: 1px solid transparent;
     border-radius: var(--comp-input-search-radius);
-    padding: 0.5rem 0.875rem;
-    min-height: 2.5rem;
+    padding: 0.625rem 0.875rem;
+    min-height: 2.75rem;
     cursor: text;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  }
+
+  .search-pill:focus-within {
+    border-color: var(--sys-color-accent);
+    box-shadow: var(--comp-focus-ring);
   }
 
   .search-pill :global(.search-icon) {
@@ -177,35 +180,6 @@
     letter-spacing: var(--comp-section-label-spacing);
     text-transform: uppercase;
     color: var(--comp-section-label-text);
-  }
-
-  .filter-chips {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-  }
-
-  .filter-row {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem;
-  }
-
-  .filter-chip {
-    background: var(--comp-filter-chip-bg);
-    border: 1px solid var(--comp-filter-chip-border);
-    border-radius: var(--comp-filter-chip-radius);
-    color: var(--comp-filter-chip-text);
-    padding: var(--comp-filter-chip-padding);
-    font: inherit;
-    font-size: 0.875rem;
-    cursor: pointer;
-    white-space: nowrap;
-    transition: background-color 0.15s ease, color 0.15s ease;
-  }
-
-  .filter-chip:hover {
-    background-color: var(--sys-color-surface-raised);
   }
 
   .recent-list {

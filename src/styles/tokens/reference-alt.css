@@ -8,39 +8,37 @@
 
 :root {
 
-  /* Orange (brand)
-   * Base: oklch(0.8186 0.1495 80.77)
-   */
-  --ref-orange-50:  oklch(0.97 0.024 80.77);
-  --ref-orange-100: oklch(0.94 0.045 80.77);
-  --ref-orange-200: oklch(0.89 0.06 80.77);
-  --ref-orange-400: oklch(0.85 0.142 80.77);
-  --ref-orange-500: oklch(0.8186 0.1495 80.77);
-  --ref-orange-600: oklch(0.72 0.16 80.77);
+  /* Orange (brand) — R1 */
+  --ref-orange-50:  oklch(from #fceadd l c h);
+  --ref-orange-100: oklch(from #f8d5bd l c h);
+  --ref-orange-200: oklch(from #f1ad80 l c h);
+  --ref-orange-400: oklch(from #eb7a3e l c h);
+  --ref-orange-500: oklch(from #e55f1a l c h);
+  --ref-orange-600: oklch(from #c94a0d l c h);
 
   /* Green (success / visited)
    * Harmonized with the alternate mint accent hue.
    */
-  --ref-green-50:  oklch(0.95 0.028 139.51);
-  --ref-green-300: oklch(0.84 0.058 139.51);
-  --ref-green-500: oklch(0.70 0.15 139.51);
-  --ref-green-700: oklch(0.36 0.145 139.51);
+  --ref-green-50:  oklch(from #dff4e9 l c h);
+  --ref-green-300: oklch(from #91d7b9 l c h);
+  --ref-green-500: oklch(from #11a36b l c h);
+  --ref-green-700: oklch(from #0e8a5b l c h);
 
   /* Gold (warning / ratings)
    * Shifted toward the warmer alternate brand hue.
    */
-  --ref-gold-50:  oklch(0.96 0.028 80.77);
-  --ref-gold-300: oklch(0.84 0.06 80.77);
-  --ref-gold-500: oklch(0.74 0.145 80.77);
-  --ref-gold-700: oklch(0.36 0.135 80.77);
+  --ref-gold-50:  oklch(from #fbefd7 l c h);
+  --ref-gold-300: oklch(from #efd29b l c h);
+  --ref-gold-500: oklch(from #d9a24b l c h);
+  --ref-gold-700: oklch(from #745019 l c h);
 
   /* Red (error / destructive)
    * Warmed slightly to sit beside the new brand ramp.
    */
-  --ref-red-50:  oklch(0.95 0.035 28);
-  --ref-red-300: oklch(0.84 0.068 28);
-  --ref-red-500: oklch(0.62 0.20 28);
-  --ref-red-700: oklch(0.38 0.17 28);
+  --ref-red-50:  oklch(from #fbe8e4 l c h);
+  --ref-red-300: oklch(from #e6a49a l c h);
+  --ref-red-500: oklch(from #d64533 l c h);
+  --ref-red-700: oklch(from #8e2b20 l c h);
 
   /* Blue (notification)
    * Kept cool for clear contrast against the warmer brand ramp.
@@ -48,14 +46,15 @@
   --ref-blue-50:  oklch(0.95 0.027 235);
   --ref-blue-500: oklch(0.66 0.15 235);
 
-  /* Neutral (cool-tinted)
-   * Retains the blue-violet cast to balance the warmer brand palette.
-   */
-  --ref-neutral-0:   oklch(1 0.0134 267.1);
-  --ref-neutral-50:  oklch(0.9762 0.0134 267.1);
-  --ref-neutral-100: oklch(0.9262 0.0134 267.1);
-  --ref-neutral-400: oklch(0.667 0.0134 267.1);
-  --ref-neutral-800: oklch(0.297 0.0134 267.1);
+  /* Warm paper neutrals — never pure white. */
+  --ref-page-bg:     oklch(0.995 0.003 75);
+  --ref-neutral-0:   oklch(0.995 0.003 75);
+  --ref-neutral-50:  oklch(from #faf7f1 l c h);
+  --ref-neutral-100: oklch(from #f2ede2 l c h);
+  --ref-neutral-200: oklch(from #e8e2d6 l c h);
+  --ref-neutral-400: oklch(from #6e6a60 l c h);
+  --ref-neutral-600: oklch(from #3a3833 l c h);
+  --ref-neutral-800: oklch(from #15140f l c h);
 
   /* Mint (accent / focus)
    * Base: oklch(0.686 0.1356 139.51)
@@ -86,6 +85,12 @@
   --ref-radius-lg:   1rem;
   --ref-radius-pill: 999px;
 
+  /* R1 spec radii — thumbnails/CTAs (xl), hero/personal-details cards (2xl),
+   * bottom-sheet top corners (3xl). See DESIGN.md §4. */
+  --ref-radius-xl:   0.75rem;
+  --ref-radius-2xl:  0.875rem;
+  --ref-radius-3xl:  1.375rem;
+
   /* Spacing */
   --ref-space-1: 0.5rem;
   --ref-space-2: 1rem;
@@ -94,4 +99,43 @@
   --ref-space-5: 2.5rem;
   --ref-space-6: 3rem;
 
+}
+
+:root[data-theme='night'] {
+  --ref-page-bg:     oklch(from #0e0b07 l c h);
+  --ref-neutral-0:   oklch(from #171310 l c h);
+  --ref-neutral-50:  oklch(from #171310 l c h);
+  --ref-neutral-100: oklch(from #221c16 l c h);
+  --ref-neutral-200: oklch(from #2e251d l c h);
+  --ref-neutral-400: oklch(from #857b6b l c h);
+  --ref-neutral-600: oklch(from #c7bca8 l c h);
+  --ref-neutral-800: oklch(from #f2ebdd l c h);
+
+  --ref-orange-50:  oklch(from #3a2a14 l c h);
+  --ref-orange-100: oklch(from #49351a l c h);
+  --ref-orange-200: oklch(from #715127 l c h);
+  --ref-orange-400: oklch(from #edb45d l c h);
+  --ref-orange-500: oklch(from #e1a444 l c h);
+  --ref-orange-600: oklch(from #c78d34 l c h);
+
+  --ref-green-50:  oklch(from #1c261a l c h);
+  --ref-green-300: oklch(from #42573a l c h);
+  --ref-green-500: oklch(from #8fb37a l c h);
+  --ref-green-700: oklch(from #a8cd91 l c h);
+
+  --ref-gold-50:  oklch(from #3a2a14 l c h);
+  --ref-gold-300: oklch(from #715127 l c h);
+  --ref-gold-500: oklch(from #e1a444 l c h);
+  --ref-gold-700: oklch(from #f0c377 l c h);
+
+  --ref-red-50:  oklch(from #2d1914 l c h);
+  --ref-red-300: oklch(from #6c3b2f l c h);
+  --ref-red-500: oklch(from #c76a4e l c h);
+  --ref-red-700: oklch(from #e69a83 l c h);
+
+  --ref-shadow-sm:  0 0.125rem 0.5rem oklch(0.05 0.01 70 / 0.5);
+  --ref-shadow-md:  0 0.5rem 1.25rem oklch(0.05 0.01 70 / 0.5);
+  --ref-shadow-lg:  0 0.75rem 1.75rem oklch(0.05 0.01 70 / 0.55);
+  --ref-shadow-up:  0 -0.5rem 2rem oklch(0.05 0.01 70 / 0.6);
+  --ref-overlay-dark: oklch(0.04 0.01 70 / 0.62);
 }

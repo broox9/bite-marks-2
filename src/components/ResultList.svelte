@@ -14,6 +14,12 @@
       { text: name.slice(idx + q.length), match: false },
     ].filter(p => p.text.length > 0);
   }
+
+  function handleOptionKeydown(event: KeyboardEvent, item: ResultPlaceRecord) {
+    if (event.key !== 'Enter' && event.key !== ' ') return;
+    event.preventDefault();
+    onSelect(item);
+  }
 </script>
 
 <section class="results-section">
@@ -23,8 +29,10 @@
       <li
         class="result-item"
         role="option"
+        tabindex="0"
         aria-selected={false}
         onclick={() => onSelect(item)}
+        onkeydown={(event) => handleOptionKeydown(event, item)}
         data-spot-id={item.place_id}
       >
         <span class="result-pin"><MapPin size={16} /></span>
@@ -59,6 +67,7 @@
     letter-spacing: var(--comp-section-label-spacing);
     text-transform: uppercase;
     color: var(--comp-section-label-text);
+    font-family: var(--sys-font-mono);
   }
 
   .results-list {
@@ -77,7 +86,7 @@
   }
 
   .result-item:hover .result-name {
-    color: var(--comp-list-item-bg-hover);
+    color: var(--comp-list-item-text);
   }
 
   .result-pin {
@@ -105,6 +114,11 @@
     font-weight: 600;
     color: var(--comp-list-item-text);
     line-height: 1.3;
+  }
+
+  .result-item:focus-visible {
+    outline: none;
+    box-shadow: var(--comp-focus-ring);
   }
 
   .match {

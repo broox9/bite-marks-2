@@ -9,6 +9,15 @@
 
 :root {
 
+  /* ─── Typography ────────────────────────────────────────────────────────  */
+  --sys-font-sans: 'Plus Jakarta Sans', system-ui, sans-serif;
+  --sys-font-display: var(--sys-font-sans);
+  --sys-font-mono: var(--sys-font-sans);
+  --sys-brand-size: 1.0625rem;
+  --sys-brand-weight: 800;
+  --sys-display-weight: 800;
+  --sys-display-tracking: -0.02em;
+
   /* ─── Brand ──────────────────────────────────────────────────────────────  */
   --sys-color-brand:          var(--ref-orange-500);
   --sys-color-brand-hover:    var(--ref-orange-400);
@@ -18,16 +27,18 @@
   --sys-color-brand-tint-2:   var(--ref-orange-100);
 
   /* ─── Surface / Background ───────────────────────────────────────────────  */
-  --sys-color-surface:        var(--ref-neutral-0);    /* page & card bg      */
+  --sys-color-page:           var(--ref-page-bg);      /* app background      */
+  --sys-color-surface:        var(--ref-neutral-0);    /* card & control bg   */
   --sys-color-surface-raised: var(--ref-neutral-50);   /* list hover, drawer  */
   --sys-color-surface-sunken: var(--ref-neutral-100);  /* inputs, recessed    */
 
   /* ─── Border ─────────────────────────────────────────────────────────────  */
-  --sys-color-border:         var(--ref-neutral-100);
+  --sys-color-border:         var(--ref-neutral-200);
   --sys-color-border-strong:  var(--ref-neutral-400);
 
   /* ─── Text ───────────────────────────────────────────────────────────────  */
   --sys-color-text:           var(--ref-neutral-800);
+  --sys-color-text-secondary: var(--ref-neutral-600);
   --sys-color-text-muted:     var(--ref-neutral-400);
   --sys-color-text-on-brand:  var(--ref-neutral-0);   /* white on orange bg   */
   --sys-color-text-on-dark:   var(--ref-neutral-0);   /* white on dark/green  */
@@ -68,6 +79,9 @@
   --sys-radius-control: var(--ref-radius-md);    /* inputs, cards, panels     */
   --sys-radius-pill:    var(--ref-radius-pill);  /* chips, full-round buttons */
   --sys-radius-sm:      var(--ref-radius-sm);    /* checkboxes, small badges  */
+  --sys-radius-xl:      var(--ref-radius-xl);    /* thumbnails, hero CTA      */
+  --sys-radius-2xl:     var(--ref-radius-2xl);   /* hero/personal-details card */
+  --sys-radius-3xl:     var(--ref-radius-3xl);   /* bottom-sheet top corners  */
 
   /* ─── Spacing ────────────────────────────────────────────────────────────  */
   --sys-space-xs: var(--ref-space-1);   /* 0.5rem */
@@ -108,7 +122,7 @@
   --cta-secondary-disabled:  var(--sys-color-secondary-disabled);
 
   /* --- Surfaces --- */
-  --bg-color:                var(--sys-color-surface);
+  --bg-color:                var(--sys-color-page);
   --bg-light:                var(--sys-color-surface-raised);
   --bg-low-contrast:         var(--sys-color-surface-sunken);
   --bg-medium-contrast:      var(--sys-color-text-muted);
@@ -149,4 +163,14 @@
   --disabled:                var(--sys-color-surface-sunken);
   --disabled-text:           var(--sys-color-text-muted);
 
+}
+
+:root[data-theme='night'] {
+  --sys-font-sans: 'Inter Tight', 'Plus Jakarta Sans', system-ui, sans-serif;
+  --sys-font-display: 'DM Serif Display', Georgia, serif;
+  --sys-font-mono: 'IBM Plex Mono', ui-monospace, monospace;
+  --sys-brand-size: 1.375rem;
+  --sys-brand-weight: 400;
+  --sys-display-weight: 400;
+  --sys-display-tracking: -0.025em;
 }

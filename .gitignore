@@ -36,3 +36,6 @@ client_secret_*.json
 
 # Appwrite → Convex migration exports (contain user emails)
 .tmp/migration/
+
+.cursor
+scripts/*

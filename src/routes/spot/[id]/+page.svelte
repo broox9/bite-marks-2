@@ -23,6 +23,12 @@
   import PhotoLightbox from '$components/util/PhotoLightbox.svelte';
   import { extractMetadata, type SocialPlatform } from '$lib/utils/social-platform';
   import { getPriceSymbols } from '$lib/utils/price-level';
+  import { locationStore } from '$lib/adapters/primary/stores/location.store.svelte';
+  import { milesBetween, formatMiles } from '$lib/utils/distance';
+  import mapboxgl from 'mapbox-gl';
+  import 'mapbox-gl/dist/mapbox-gl.css';
+  import { MAPBOX_PUBLIC_KEY } from '$lib/constants';
+  import { onMount } from 'svelte';
 
   const spotQuery = getSpotById({ id: page.params.id ?? '' });
   const maxPhotoWidth = 800;
@@ -43,6 +49,39 @@
   let saveError = $state<string | null>(null);
   let saveMessage = $state<string | null>(null);
   const previewPhotoUrl = $derived(photoUrls[0] ?? null);
+
+  let miniMapContainer = $state<HTMLElement>();
+  let miniMap: mapboxgl.Map | undefined;
+  let miniMapMarker: mapboxgl.Marker | undefined;
+  let miniMapReady = $state(false);
+
+  const mapStyleForTheme = () =>
+    document.documentElement.dataset.theme === 'night'
+      ? 'mapbox://styles/mapbox/dark-v11'
+      : 'mapbox://styles/mapbox/streets-v12';
+
+  onMount(() => {
+    miniMapReady = true;
+    let currentStyle = mapStyleForTheme();
+    const themeObserver = new MutationObserver(() => {
+      const nextStyle = mapStyleForTheme();
+      if (!miniMap || nextStyle === currentStyle) return;
+      currentStyle = nextStyle;
+      miniMap.setStyle(nextStyle);
+    });
+    themeObserver.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['data-theme'],
+    });
+
+    return () => {
+      themeObserver.disconnect();
+      miniMapMarker?.remove();
+      miniMap?.remove();
+      miniMap = undefined;
+      miniMapReady = false;
+    };
+  });
 
   // Update local state when spot data loads
   $effect(() => {
@@ -84,6 +123,50 @@
           photoLoading = false;
         }
       });
+  });
+
+  const distanceLabel = $derived.by(() => {
+    const spot = spotQuery.current;
+    if (!spot || typeof spot.lat !== 'number' || typeof spot.lng !== 'number') return null;
+    return formatMiles(milesBetween(locationStore.center, { lat: spot.lat, lng: spot.lng }));
+  });
+
+  const directionsUrl = $derived.by(() => {
+    const spot = spotQuery.current;
+    if (!spot) return '#';
+    return `https://www.google.com/maps/dir/?api=1&destination=${spot.lat},${spot.lng}`;
+  });
+
+  const ratingStars = $derived.by(() => {
+    const value = personalRating ?? 0;
+    return [1, 2, 3, 4, 5].map((n) => Math.min(1, Math.max(0, value - (n - 1))));
+  });
+
+  $effect(() => {
+    const spot = spotQuery.current;
+    if (!miniMapReady || !miniMapContainer || !spot) return;
+
+    if (!miniMap) {
+      mapboxgl.accessToken = MAPBOX_PUBLIC_KEY;
+      miniMap = new mapboxgl.Map({
+        container: miniMapContainer,
+        style: mapStyleForTheme(),
+        center: [spot.lng, spot.lat],
+        zoom: 14,
+        interactive: false,
+      });
+    } else {
+      miniMap.setCenter([spot.lng, spot.lat]);
+    }
+
+    miniMapMarker?.remove();
+    const el = document.createElement('div');
+    el.className = 'r1-pin';
+    el.dataset.state = 'active';
+    el.innerHTML = `<span>${spot.name}</span>`;
+    miniMapMarker = new mapboxgl.Marker({ element: el, anchor: 'bottom' })
+      .setLngLat([spot.lng, spot.lat])
+      .addTo(miniMap);
   });
 
   async function handleSave() {
@@ -201,7 +284,7 @@
       case 'google':
         return '#4285F4';
       default:
-        return 'var(--bg-medium-contrast)';
+        return 'var(--sys-color-text-muted)';
     }
   }
 </script>
@@ -223,8 +306,6 @@
   {:else if spotQuery.current}
     {@const spot = spotQuery.current}
     <article class="spot-shell">
-      <a href={`/list#${spot.id}`} class="back-link"><ArrowLeft size={18} />Back to list</a>
-
       <section class="spot-hero" aria-labelledby="spot-name">
         <div id="photo-container" data-loading={photoLoading}>
           {#if photoLoading}
@@ -237,57 +318,69 @@
               onclick={openLightbox}
             >
               <img src={previewPhotoUrl} alt={spot.name} />
-              <span class="photo-count-eyebrow">
-                {photoUrls.length} {photoUrls.length === 1 ? 'photo' : 'photos'}
-              </span>
             </button>
           {:else}
             <MapPin size={28} />
           {/if}
+
+          <a href="/list" class="hero-back-button" aria-label="Back to list"><ArrowLeft size={18} /></a>
+
+          {#if photoUrls.length}
+            <span class="photo-count-eyebrow">
+              {photoUrls.length} {photoUrls.length === 1 ? 'photo' : 'photos'}
+            </span>
+          {/if}
         </div>
 
-        <div class="spot-summary">
+        <div class="hero-info-card">
+          <p class="hero-eyebrow">
+            {(spot.primaryType ?? spot.place_types?.[0] ?? 'Spot').replace(/_/g, ' ')}
+            {#if spot.neighborhood}
+              &middot; {spot.neighborhood}
+            {/if}
+          </p>
           <h1 id="spot-name">{spot.name}</h1>
-
           <p id="spot-address"><MapPin size={16} />{spot.address}</p>
 
           <div class="metadata-row">
             {#if spot.rating}
-              <span class="rating-chip" aria-label={`Google rating ${spot.rating}`}>
-                <Star size={16} />
+              <span class="pill pill-rating" aria-label={`Google rating ${spot.rating}`}>
+                <Star size={12} fill="currentColor" />
                 {spot.rating}
               </span>
             {/if}
 
+            {#if isVisited}
+              <span class="pill pill-visited"><CircleCheck size={12} />Visited</span>
+            {/if}
+
+            {#if distanceLabel}
+              <span class="pill pill-neutral">{distanceLabel}</span>
+            {/if}
+
             {#if getPriceSymbols(spot.price_level)}
-              <span
-                class="price-chip"
-                aria-label={`${getPriceSymbols(spot.price_level)} price level`}
-              >
-                <span class="price-chip-label">Price</span>
-                <span class="price-symbols">{getPriceSymbols(spot.price_level)}</span>
+              <span class="pill pill-neutral" aria-label={`${getPriceSymbols(spot.price_level)} price level`}>
+                {getPriceSymbols(spot.price_level)}
               </span>
             {/if}
 
             {#if spot.websiteURI}
-              <a
-                href={spot.websiteURI}
-                target="_blank"
-                rel="noopener noreferrer"
-                class="website-link"
-              >
-                <Globe size={16} />
+              <a href={spot.websiteURI} target="_blank" rel="noopener noreferrer" class="pill pill-link">
+                <Globe size={12} />
                 Website
-                <ExternalLink size={14} />
+                <ExternalLink size={11} />
               </a>
-            {/if}
-
-            {#if isVisited}
-              <span class="status-chip"><CircleCheck size={15} />Visited</span>
             {/if}
           </div>
         </div>
       </section>
+
+      <div class="mini-map-card">
+        <div class="mini-map" bind:this={miniMapContainer}></div>
+        <a class="directions-pill" href={directionsUrl} target="_blank" rel="noopener noreferrer"
+          >Directions ↗</a
+        >
+      </div>
 
       <section id="editable-fields-section" aria-labelledby="details-heading">
         <div class="section-heading">
@@ -298,22 +391,32 @@
         </div>
 
         <div class="rating-grid">
-          <label for="personal-rating" class="field-label">
-            <span>My rating</span>
-            <input
-              id="personal-rating"
-              class="ui-input"
-              type="number"
-              min="0"
-              max="5"
-              step="0.25"
-              size="5"
-              bind:value={personalRating}
-              placeholder="0-5"
-            />
-          </label>
+          <div class="field-label">
+            <span class="eyebrow">My rating</span>
+            <div class="rating-editor">
+              <div class="rating-stars" aria-hidden="true">
+                {#each ratingStars as fill}
+                  <span class="rating-star" style:--fill={fill}
+                    ><Star size={16} /><Star size={16} class="rating-star-fill" /></span
+                  >
+                {/each}
+              </div>
+              <input
+                id="personal-rating"
+                class="ui-input rating-input"
+                type="number"
+                min="0"
+                max="5"
+                step="0.25"
+                size="5"
+                bind:value={personalRating}
+                placeholder="0–5"
+                aria-label="My rating, 0 to 5"
+              />
+            </div>
+          </div>
 
-          <label for="is-visited" id="is-visited-label">
+          <label for="is-visited" id="is-visited-label" class:on={isVisited}>
             <Checkbox
               id="is-visited"
               name="is-visited"
@@ -323,12 +426,13 @@
                 isVisited = target.checked;
               }}
             />
+            <CircleCheck size={14} />
             <span>Visited</span>
           </label>
         </div>
 
         <label for="personal-notes" class="field-label">
-          <span>Notes</span>
+          <span class="eyebrow">Notes</span>
           <textarea
             id="personal-notes"
             bind:value={personalNotes}
@@ -340,7 +444,7 @@
 
         <div class="field-group">
           <div class="field-group-header">
-            <span id="social-links-label" class="field-group-label">Social links</span>
+            <span id="social-links-label" class="eyebrow">Links</span>
             <Button type="button" data-size="sm" onclick={addSocialLink}>
               <Plus size={16} />
               Add link
@@ -361,7 +465,6 @@
                       class="ui-input"
                       aria-label={`Edit social link ${index + 1}`}
                       placeholder="https://..."
-                      autofocus
                     />
                     <button
                       type="button"
@@ -458,11 +561,7 @@
 <style>
   .spot-page {
     min-height: calc(100svh - 7rem);
-    /*background:
-      linear-gradient(90deg, oklch(from var(--bg-low-contrast) l c h / 0.42) 1px, transparent 1px),
-      var(--bg-color);
-    background-size: 3.75rem 3.75rem;*/
-    color: var(--bg-high-contrast);
+    color: var(--sys-color-text);
   }
 
   .spot-shell {
@@ -471,7 +570,7 @@
     width: 100%;
     max-width: 62rem;
     margin: 0 auto;
-    padding: 0 var(--padding-2);
+    padding: 0 var(--padding-2) var(--padding-3);
   }
 
   .back-link {
@@ -480,68 +579,64 @@
     gap: 0.4rem;
     width: fit-content;
     min-height: 2.5rem;
-    color: var(--bg-high-contrast);
+    color: var(--sys-color-text);
     font-weight: 650;
   }
 
   .back-link:hover {
-    color: var(--cta-color);
+    color: var(--sys-color-brand);
   }
 
-  .back-link:focus-visible,
-  .website-link:focus-visible,
-  .photo-preview-button:focus-visible,
-  .remove-link-button:focus-visible,
-  .platform-icon-button:focus-visible,
-  .save-edit-button:focus-visible,
-  .cancel-edit-button:focus-visible {
+  :is(
+      .back-link,
+      .pill-link,
+      .photo-preview-button,
+      .remove-link-button,
+      .platform-icon-button,
+      .save-edit-button,
+      .cancel-edit-button,
+      .hero-back-button,
+      .directions-pill
+    ):focus-visible {
     outline: none;
-    box-shadow: 0 0 0 3px oklch(from var(--accent-color) l c h / 0.26);
+    box-shadow: var(--comp-focus-ring);
   }
 
   .spot-hero {
-    display: grid;
-    gap: var(--padding-2);
-    overflow: hidden;
-    border: 1px solid oklch(from var(--bg-low-contrast) calc(l - 0.03) c h);
-    border-radius: var(--border-radius);
-    background-color: var(--bg-color);
-    box-shadow: 0 0.75rem 1.75rem oklch(0.3 0.02 267 / 0.08);
-  }
-
-  .spot-summary,
-  #editable-fields-section {
-    padding: var(--padding-2);
+    position: relative;
+    min-width: 0;
   }
 
   #photo-container {
     width: 100%;
-    aspect-ratio: 16/9;
+    aspect-ratio: 16/10;
+    max-height: 22rem;
     display: grid;
     place-items: center;
-    background-color: var(--bg-low-contrast);
-    color: var(--bg-medium-contrast);
+    background-color: var(--sys-color-surface-sunken);
+    color: var(--sys-color-text-muted);
     overflow: hidden;
     position: relative;
+    border-radius: var(--comp-card-radius);
   }
 
   #photo-container[data-loading='true'] {
     background: linear-gradient(
       90deg,
-      var(--bg-light),
-      var(--bg-low-contrast),
-      var(--bg-light)
+      var(--sys-color-surface-raised),
+      var(--sys-color-surface-sunken),
+      var(--sys-color-surface-raised)
     );
     background-size: 200% 100%;
     animation: skeleton-shimmer 1.3s ease-out infinite;
   }
 
   #photo-container .loading-photo-indicator {
-    border: 1px solid var(--bg-low-contrast);
+    border: 1px solid var(--sys-color-border);
     border-radius: 999px;
-    background-color: oklch(from var(--bg-light) l c h / 0.92);
+    background-color: var(--sys-color-surface-raised);
     padding: 0.375rem 0.75rem;
-    color: var(--bg-medium-contrast);
+    color: var(--sys-color-text-muted);
     font-size: 0.875rem;
     font-weight: 650;
   }
@@ -564,57 +659,77 @@
     object-fit: cover;
   }
 
+  .hero-back-button {
+    position: absolute;
+    top: 0.75rem;
+    left: 0.75rem;
+    width: 2.25rem;
+    height: 2.25rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--sys-radius-control);
+    background-color: var(--sys-color-surface);
+    color: var(--sys-color-text);
+    box-shadow: var(--ref-shadow-sm);
+  }
+
   .photo-count-eyebrow {
     position: absolute;
-    top: var(--padding-1);
-    left: var(--padding-1);
-    border: 1px solid oklch(from var(--bg-color) l c h / 0.58);
+    top: 0.75rem;
+    right: 0.75rem;
+    border: none;
     border-radius: 999px;
-    background-color: oklch(from var(--bg-color) l c h / 0.26);
-    color: var(--bg-light);
-    padding: 0.25rem 0.625rem;
-    font-size: 0.75rem;
-    font-weight: 750;
-    line-height: 1.2;
-    box-shadow: 0 0.35rem 1rem oklch(0.24 0.02 267 / 0.14);
+    background-color: oklch(from black 0.15 0.02 267 / 0.55);
+    color: var(--sys-color-text-on-dark);
+    padding: 0.3125rem 0.625rem;
+    font-size: 0.6875rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
   }
 
-  .spot-summary {
-    display: grid;
-    align-content: start;
-    gap: var(--padding-1);
+  .hero-info-card {
+    /* Overlap the photo without clipping the card or guessing its content height. */
+    position: relative;
+    margin: -3rem 1.125rem 0;
+    overflow-wrap: anywhere;
+    background-color: var(--comp-card-bg);
+    border: 1px solid var(--comp-card-border);
+    border-radius: var(--comp-card-radius);
+    box-shadow: var(--comp-card-shadow);
+    padding: 0.875rem;
   }
 
-  .metadata-row,
-  .section-heading,
-  .field-group-header {
-    display: flex;
-    align-items: center;
-    gap: var(--padding-1);
-  }
-
-  .field-group-header {
-    justify-content: space-between;
+  .hero-eyebrow {
+    margin: 0 0 0.25rem;
+    color: var(--comp-eyebrow-text);
+    font-size: var(--comp-eyebrow-size);
+    font-weight: var(--comp-eyebrow-weight);
+    letter-spacing: var(--comp-eyebrow-spacing);
+    text-transform: uppercase;
+    font-family: var(--sys-font-mono);
   }
 
   #spot-name {
-    /*max-width: 16ch;*/
     text-wrap: pretty;
     margin: 0;
-    font-size: 2rem;
-    font-weight: 750;
-    line-height: 1.05;
-    letter-spacing: 0;
+    color: var(--sys-color-text);
+    font-size: 1.5rem;
+    font-family: var(--sys-font-display);
+    font-weight: var(--sys-display-weight);
+    line-height: 1.1;
+    letter-spacing: -0.02em;
   }
 
   #spot-address {
     display: flex;
     align-items: flex-start;
-    gap: 0.45rem;
+    gap: 0.4rem;
     max-width: 58ch;
-    margin: 0;
-    color: var(--bg-medium-contrast);
-    font-size: 0.9375rem;
+    margin: 0.375rem 0 0;
+    color: var(--sys-color-text-muted);
+    font-size: 0.8125rem;
     line-height: 1.4;
   }
 
@@ -624,89 +739,106 @@
   }
 
   .metadata-row {
+    display: flex;
     flex-wrap: wrap;
-    margin-top: 0.25rem;
+    align-items: center;
+    gap: 0.375rem;
+    margin-top: 0.625rem;
   }
 
-  .rating-chip,
-  .price-chip,
-  .status-chip,
-  .website-link {
+  .pill {
     display: inline-flex;
     align-items: center;
-    gap: 0.4rem;
-    min-height: 2rem;
-    border: 1px solid var(--bg-low-contrast);
+    gap: 0.3125rem;
     border-radius: 999px;
-    background-color: var(--bg-color);
-    color: var(--bg-high-contrast);
-    padding: 0.25rem 0.625rem;
-    font-size: 0.875rem;
-    font-weight: 650;
-  }
-
-  .rating-chip {
-    background-color: var(--warning-tint);
-    border-color: oklch(from var(--warning) 0.84 calc(c * 0.34) h);
-    color: oklch(from var(--warning) 0.34 calc(c * 0.95) h);
-  }
-
-  .price-chip {
-    gap: 0.45rem;
-    background-color: oklch(from var(--cta-color) l c h / 0.08);
-    border-color: oklch(from var(--cta-color) l c h / 0.3);
-  }
-
-  .price-chip-label {
-    color: var(--bg-medium-contrast);
+    padding: 0.25rem 0.5625rem;
     font-size: 0.75rem;
-    font-weight: 650;
-    letter-spacing: 0.02em;
+    font-weight: 700;
+    line-height: 1.2;
   }
 
-  .price-symbols {
-    color: var(--cta-color);
-    font-size: 1rem;
-    font-weight: 800;
-    letter-spacing: 0.08em;
-    line-height: 1;
+  .pill-rating {
+    background-color: var(--comp-chip-rating-bg);
+    border: 1px solid var(--comp-chip-rating-border);
+    color: var(--comp-chip-rating-text);
   }
 
-  .status-chip {
-    background-color: var(--success-tint);
-    border-color: oklch(from var(--success) 0.84 calc(c * 0.34) h);
-    color: oklch(from var(--success) 0.34 calc(c * 0.95) h);
+  .pill-rating :global(svg) {
+    color: var(--comp-chip-rating-icon);
   }
 
-  .website-link {
-    color: var(--cta-color);
+  .pill-visited {
+    background-color: var(--comp-chip-visited-bg);
+    border: 1px solid var(--comp-chip-visited-border);
+    color: var(--comp-chip-visited-text);
+  }
+
+  .pill-neutral {
+    background-color: var(--sys-color-surface-sunken);
+    color: var(--sys-color-text-muted);
+  }
+
+  .pill-link {
+    background-color: var(--sys-color-surface);
+    border: 1px solid var(--sys-color-border);
+    color: var(--sys-color-brand);
+  }
+
+  .mini-map-card {
+    position: relative;
+    height: 8.75rem;
+    border-radius: var(--sys-radius-control);
+    overflow: hidden;
+    border: 1px solid var(--sys-color-border);
+  }
+
+  .mini-map {
+    position: absolute;
+    inset: 0;
+  }
+
+  .directions-pill {
+    position: absolute;
+    right: 0.5rem;
+    top: 0.5rem;
+    background-color: var(--sys-color-surface);
+    color: var(--sys-color-brand);
+    border-radius: var(--sys-radius-control);
+    padding: 0.375rem 0.625rem;
+    font-size: 0.75rem;
+    font-weight: 700;
+    box-shadow: var(--ref-shadow-sm);
+    z-index: 1;
   }
 
   #editable-fields-section {
     display: grid;
     gap: var(--padding-2);
-    border: 1px solid oklch(from var(--bg-low-contrast) calc(l - 0.03) c h);
-    border-radius: var(--border-radius);
-    background-color: var(--bg-color);
-    box-shadow: 0 0.75rem 1.75rem oklch(0.3 0.02 267 / 0.07);
+    border: 1px solid var(--comp-card-border);
+    border-radius: var(--comp-card-radius);
+    background-color: var(--comp-card-bg);
+    box-shadow: var(--comp-card-shadow);
+    padding: var(--padding-2);
   }
 
   .section-heading {
+    display: flex;
     align-items: flex-start;
+    gap: var(--padding-1);
     padding-bottom: var(--padding-1);
-    border-bottom: 1px solid var(--bg-low-contrast);
+    border-bottom: 1px solid var(--sys-color-border);
   }
 
   .section-heading h2 {
     margin: 0;
-    font-size: 1.25rem;
+    font-size: 1.125rem;
     line-height: 1.2;
     letter-spacing: 0;
   }
 
   .rating-grid {
     display: grid;
-    grid-template-columns: max-content max-content;
+    grid-template-columns: 1fr auto;
     align-items: end;
     gap: var(--padding-1);
   }
@@ -717,34 +849,64 @@
     gap: 0.5rem;
   }
 
-  .field-label > span,
-  .field-group-label {
-    color: var(--bg-high-contrast);
-    font-size: 0.875rem;
-    font-weight: 650;
-    line-height: 1.2;
+  .eyebrow {
+    color: var(--comp-section-label-text);
+    font-size: var(--comp-section-label-size);
+    font-weight: var(--comp-section-label-weight);
+    letter-spacing: var(--comp-section-label-spacing);
+    text-transform: uppercase;
+    font-family: var(--sys-font-mono);
   }
 
-  /* ~3 digits + decimal (e.g. 4.25); size + auto width avoids stretching the grid column */
+  .rating-editor {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .rating-stars {
+    display: flex;
+    gap: 0.125rem;
+    color: var(--sys-color-border-strong);
+  }
+
+  .rating-star {
+    position: relative;
+    display: inline-flex;
+  }
+
+  .rating-star :global(.rating-star-fill) {
+    position: absolute;
+    inset: 0;
+    color: var(--sys-color-warning);
+    clip-path: inset(0 calc(100% * (1 - var(--fill))) 0 0);
+  }
+
   #personal-rating {
     width: auto;
-    max-inline-size: 7rem;
+    max-inline-size: 6rem;
   }
 
   #is-visited-label {
     display: inline-flex;
     align-items: center;
-    gap: 0.625rem;
-    min-height: 2.75rem;
+    gap: 0.5rem;
+    min-height: 2.5rem;
     width: fit-content;
-    border: 1px solid var(--bg-low-contrast);
-    border-radius: var(--border-radius);
-    background-color: var(--bg-color);
-    padding: 0 var(--padding-2);
-    font-weight: 650;
+    border: 1px solid var(--comp-chip-visited-border);
+    border-radius: var(--sys-radius-control);
+    background-color: var(--sys-color-surface);
+    color: var(--sys-color-text-muted);
+    padding: 0 0.75rem;
+    font-weight: 700;
+    font-size: 0.8125rem;
   }
 
-  /* Input lives inside Checkbox.svelte; scoped #is-visited would not apply. */
+  #is-visited-label.on {
+    background-color: var(--comp-chip-visited-bg);
+    color: var(--comp-chip-visited-text);
+  }
+
   :global(#is-visited) {
     --ui-control-tap-area: 1.125rem;
     --ui-control-min-block-size: 1.125rem;
@@ -760,7 +922,9 @@
   }
 
   .field-group-header {
-    align-items: flex-end;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
   }
 
   .social-link-list {
@@ -775,14 +939,14 @@
     gap: var(--padding-1);
     min-height: 3.5rem;
     padding: var(--padding-1) var(--padding-2);
-    border: 1px solid var(--bg-low-contrast);
-    border-radius: var(--border-radius);
-    background-color: var(--bg-color);
+    border: 1px solid var(--comp-link-card-border);
+    border-radius: var(--comp-link-card-radius);
+    background-color: var(--comp-link-card-bg);
     transition: border-color 0.15s ease;
   }
 
   .social-link-row.editing {
-    border-color: var(--accent-color);
+    border-color: var(--sys-color-accent);
   }
 
   .platform-icon-button {
@@ -791,22 +955,17 @@
     justify-content: center;
     width: 2.5rem;
     height: 2.5rem;
-    border: 1px solid oklch(from var(--bg-low-contrast) calc(l - 0.02) c h);
-    border-radius: var(--border-radius);
-    background-color: oklch(from var(--bg-low-contrast) l c h / 0.5);
+    border: 1px solid var(--sys-color-border);
+    border-radius: var(--sys-radius-control);
+    background-color: var(--sys-color-surface-sunken);
     color: var(--icon-color);
     cursor: pointer;
     transition: all 0.15s ease;
   }
 
   .platform-icon-button:hover {
-    background-color: oklch(from var(--bg-low-contrast) calc(l + 0.02) c h);
+    background-color: var(--sys-color-surface-raised);
     border-color: var(--icon-color);
-  }
-
-  .platform-icon-button:focus-visible {
-    outline: none;
-    box-shadow: 0 0 0 3px oklch(from var(--accent-color) l c h / 0.26);
   }
 
   .link-metadata {
@@ -821,13 +980,13 @@
     font-weight: 650;
     text-transform: uppercase;
     letter-spacing: 0.02em;
-    color: var(--bg-medium-contrast);
+    color: var(--comp-link-card-label-text);
   }
 
   .link-display-text {
     font-size: 0.9375rem;
     font-weight: 550;
-    color: var(--bg-high-contrast);
+    color: var(--comp-link-card-value-text);
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -839,21 +998,16 @@
     justify-content: center;
     width: 2.5rem;
     height: 2.5rem;
-    border: 1px solid var(--bg-low-contrast);
-    border-radius: var(--border-radius);
-    background-color: var(--bg-color);
-    color: var(--cta-color);
+    border: 1px solid var(--sys-color-border);
+    border-radius: var(--sys-radius-control);
+    background-color: var(--sys-color-surface);
+    color: var(--sys-color-brand);
     transition: all 0.15s ease;
   }
 
   .link-out-button:hover {
-    background-color: var(--bg-low-contrast);
-    border-color: var(--cta-color);
-  }
-
-  .link-out-button:focus-visible {
-    outline: none;
-    box-shadow: 0 0 0 3px oklch(from var(--accent-color) l c h / 0.26);
+    background-color: var(--sys-color-surface-raised);
+    border-color: var(--sys-color-brand);
   }
 
   .save-edit-button {
@@ -862,15 +1016,15 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    border: 1px solid var(--success);
-    border-radius: var(--border-radius);
-    background-color: var(--success-tint);
-    color: var(--success);
+    border: 1px solid var(--sys-color-success);
+    border-radius: var(--sys-radius-control);
+    background-color: var(--sys-color-success-tint);
+    color: var(--sys-color-success);
     transition: all 0.15s ease;
   }
 
   .save-edit-button:hover {
-    background-color: oklch(from var(--success-tint) calc(l - 0.02) c h);
+    background-color: oklch(from var(--sys-color-success-tint) calc(l - 0.02) c h);
   }
 
   .cancel-edit-button {
@@ -879,20 +1033,16 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    border: 1px solid var(--bg-low-contrast);
-    border-radius: var(--border-radius);
-    background-color: var(--bg-color);
-    color: var(--bg-medium-contrast);
+    border: 1px solid var(--sys-color-border);
+    border-radius: var(--sys-radius-control);
+    background-color: var(--sys-color-surface);
+    color: var(--sys-color-text-muted);
     transition: all 0.15s ease;
   }
 
   .cancel-edit-button:hover {
-    border-color: var(--bg-medium-contrast);
-    color: var(--bg-high-contrast);
-  }
-
-  .social-link-row.editing > :global(svg) {
-    color: var(--bg-medium-contrast);
+    border-color: var(--sys-color-text-muted);
+    color: var(--sys-color-text);
   }
 
   .remove-link-button {
@@ -901,37 +1051,37 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    border: 1px solid var(--error);
-    border-radius: var(--border-radius);
-    background-color: var(--error-tint);
-    color: var(--error);
+    border: 1px solid var(--sys-color-error);
+    border-radius: var(--sys-radius-control);
+    background-color: var(--sys-color-error-tint);
+    color: var(--sys-color-error);
   }
 
   .quiet-note,
   .save-message,
   .state-panel p {
     margin: 0;
-    color: var(--bg-medium-contrast);
+    color: var(--sys-color-text-muted);
     line-height: 1.5;
   }
 
   .save-message {
-    border: 1px solid var(--bg-low-contrast);
-    border-radius: var(--border-radius);
+    border: 1px solid var(--sys-color-border);
+    border-radius: var(--sys-radius-control);
     padding: var(--padding-1) var(--padding-2);
     font-weight: 650;
   }
 
   .error-message {
-    border-color: var(--error);
-    background-color: var(--error-tint);
-    color: oklch(from var(--error) 0.38 calc(c * 0.85) h);
+    border-color: var(--sys-color-error);
+    background-color: var(--sys-color-error-tint);
+    color: var(--sys-color-error-text);
   }
 
   .success-message {
-    border-color: oklch(from var(--success) 0.82 calc(c * 0.36) h);
-    background-color: var(--success-tint);
-    color: oklch(from var(--success) 0.34 calc(c * 0.95) h);
+    border-color: var(--sys-color-success-border);
+    background-color: var(--sys-color-success-tint);
+    color: var(--sys-color-success-text);
   }
 
   .save-row {
@@ -953,17 +1103,13 @@
     letter-spacing: 0;
   }
 
-  .error-panel {
-    color: var(--bg-high-contrast);
-  }
-
   .skeleton {
-    border-radius: var(--border-radius);
+    border-radius: var(--sys-radius-control);
     background: linear-gradient(
       90deg,
-      var(--bg-light),
-      var(--bg-low-contrast),
-      var(--bg-light)
+      var(--sys-color-surface-raised),
+      var(--sys-color-surface-sunken),
+      var(--sys-color-surface-raised)
     );
     background-size: 200% 100%;
     animation: skeleton-shimmer 1.3s ease-out infinite;
@@ -1003,30 +1149,12 @@
       padding: var(--padding-3);
     }
 
-    .spot-hero {
-      grid-template-columns: minmax(18rem, 0.88fr) minmax(20rem, 1fr);
-    }
-
-    #photo-container {
-      min-height: 24rem;
-      aspect-ratio: auto;
-    }
-
-    .spot-summary {
-      padding: var(--padding-3);
-    }
-
     #spot-name {
-      font-size: 2.35rem;
+      font-size: 2rem;
     }
 
     #editable-fields-section {
       padding: var(--padding-3);
-    }
-
-    .rating-grid {
-      grid-template-columns: max-content max-content;
-      gap: var(--padding-2);
     }
   }
 

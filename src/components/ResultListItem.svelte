@@ -1,7 +1,9 @@
 <script lang="ts">
   import type { UserSpotRecord } from "$lib/core/domain/Spot/Spot";
-  import { Trash2, MapPin, Settings2 } from "@lucide/svelte";
+  import { Trash2, MapPin, Star, ChevronRight } from "@lucide/svelte";
   import CuisineIcon from "./CuisineIcon.svelte";
+  import { locationStore } from "$lib/adapters/primary/stores/location.store.svelte";
+  import { milesBetween, formatMiles } from "$lib/utils/distance";
 
   type ListItemProps = {
     item: UserSpotRecord;
@@ -17,6 +19,16 @@
   const toggleTools = () => {
     isToolsOpen = !isToolsOpen;
   };
+
+  const distanceLabel = $derived(
+    typeof item.lat === "number" && typeof item.lng === "number"
+      ? formatMiles(milesBetween(locationStore.center, { lat: item.lat, lng: item.lng }))
+      : null,
+  );
+
+  const subtitle = $derived(
+    [item.neighborhood, ...(item.place_types?.slice(-2) ?? [])].filter(Boolean).join(" · "),
+  );
 </script>
 
 <div class="list-item-container" id={item.id} data-open={isToolsOpen}>
@@ -25,15 +37,28 @@
     data-open={isToolsOpen}
     data-map-active={isMapActive}
   >
+    <a class="thumb" href={`/spot/${item.id}`} aria-hidden="true" tabindex="-1">
+      <CuisineIcon placeTypes={item.place_types} primaryType={item.primaryType} size={28} />
+    </a>
+
     <div class="list-item-content">
       <div class="spot-title-row">
-        <CuisineIcon placeTypes={item.place_types} primaryType={item.primaryType} size={20} />
-        <a href={`/spot/${item.id}`} aria-label={`Open ${item.name}`}>{item.name}</a>
+        <a href={`/spot/${item.id}`} class="spot-name" aria-label={`Open ${item.name}`}>{item.name}</a>
+      </div>
+      {#if subtitle}
+        <p class="spot-subtitle">{subtitle}</p>
+      {/if}
+      <div class="spot-meta-row">
+        {#if item.rating}
+          <span class="meta-rating"><Star size={11} /> {item.rating.toFixed(1)}</span>
+        {/if}
+        {#if distanceLabel}
+          <span class="meta-distance">{distanceLabel}</span>
+        {/if}
         {#if item.is_visited}
-          <strong class="visited-dot"></strong>
+          <span class="meta-visited"><span class="visited-dot"></span>Visited</span>
         {/if}
       </div>
-      <p>{item.address}</p>
     </div>
 
     <button
@@ -43,7 +68,7 @@
       aria-expanded={isToolsOpen}
       aria-label={isToolsOpen ? `Close actions for ${item.name}` : `Open actions for ${item.name}`}
     >
-      <Settings2 size={16} />
+      <ChevronRight size={16} />
     </button>
   </div>
 
@@ -69,65 +94,48 @@
 <style>
   .list-item-container {
     position: relative;
-    border: none;
-    border-radius: 0;
     overflow: hidden;
-    background-color: var(--bg-light);
-    border-bottom: 1px solid var(--bg-low-contrast);
+    background-color: var(--comp-list-item-bg);
+    border-bottom: 1px solid var(--comp-list-item-divider);
   }
 
   .list-item-wrapper {
-    display: flex;
+    display: grid;
+    grid-template-columns: 44px 1fr auto;
     position: relative;
-    flex-direction: row;
     align-items: center;
-    gap: var(--padding-2);
-    justify-content: space-between;
+    gap: 0.75rem;
     width: 100%;
-    padding: var(--padding-2);
+    padding: 0.75rem 1.125rem;
     z-index: 2;
-    transition:
-      background-color 0.18s ease-out;
-    background-color: var(--bg-color);
+    transition: background-color 0.18s ease-out;
+    background-color: var(--comp-list-item-bg);
     isolation: isolate;
   }
 
   .list-item-wrapper[data-open="true"] {
-    background-color: var(--bg-light);
+    background-color: var(--sys-color-surface-raised);
   }
 
   .list-item-wrapper[data-map-active="true"] {
-    background-color: var(--accent-color-tint);
+    background-color: var(--comp-list-item-bg-selected);
+    box-shadow: inset 3px 0 0 var(--comp-list-item-selected-edge);
   }
 
-  .list-item-wrapper button {
-    flex: 0 0 auto;
-    width: 2.75rem;
-    min-height: 2.75rem;
-    display: inline-flex;
+  .thumb {
+    display: flex;
     align-items: center;
     justify-content: center;
-    border: 1px solid transparent;
-    border-radius: var(--border-radius);
-    background-color: transparent;
-    cursor: pointer;
-    color: var(--bg-medium-contrast);
-    transition:
-      transform 0.22s cubic-bezier(0.25, 1, 0.5, 1),
-      border-color 0.18s ease-out,
-      background-color 0.18s ease-out,
-      color 0.18s ease-out;
-  }
-
-  .list-item-wrapper[data-open="true"] .tools-toggle {
-    transform: translateX(-6rem);
-    border-color: var(--accent-color);
-    background-color: var(--bg-light);
-    color: var(--bg-high-contrast);
+    width: 44px;
+    height: 44px;
+    /*border-radius: var(--comp-thumb-radius);
+    background-color: var(--comp-thumb-bg);
+    border: 1px solid var(--sys-color-border);*/
+    color: var(--sys-color-brand);
+    flex-shrink: 0;
   }
 
   .list-item-content {
-    flex: 1;
     min-width: 0;
   }
 
@@ -138,45 +146,86 @@
     min-width: 0;
   }
 
-  .spot-title-row a {
+  .spot-name {
     min-width: 0;
-    overflow-wrap: anywhere;
-    color: var(--bg-high-contrast);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: var(--comp-list-item-text);
     font-weight: 700;
+    font-size: 1rem;
     line-height: 1.25;
   }
 
-  .list-item-content p {
-    margin: 0.25rem 0 0;
-    color: var(--bg-medium-contrast);
-    font-size: 0.875rem;
-    line-height: 1.35;
-    overflow-wrap: anywhere;
+  .spot-subtitle {
+    margin: 0.125rem 0 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: var(--comp-list-item-text-sub);
+    font-size: 0.75rem;
+    line-height: 1.3;
+    text-transform: capitalize;
   }
 
-  /* .visited-check {
-    flex: 0 0 auto;
-    border: 1px solid var(--accent-color);
-    border-radius: 1rem;
-    color: var(--text-muted);
-    padding: 0.125rem 0.5rem;
+  .spot-meta-row {
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+    margin-top: 0.3125rem;
     font-size: 0.75rem;
-    font-weight: 500;
-    line-height: 1;
-  } */
+    font-variant-numeric: tabular-nums;
+  }
+
+  .meta-rating {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.1875rem;
+    color: var(--comp-list-item-star);
+  }
+
+  .meta-distance {
+    color: var(--comp-list-item-text-sub);
+  }
+
+  .meta-visited {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3125rem;
+    color: var(--sys-color-success-text);
+  }
 
   .visited-dot {
-    color: var(--success);
-    /* font-size: 1.25rem; */
-    /* font-weight: 800; */
-    /* line-height: 1; */
-    /* vertical-align: middle; */
-    background-color: var(--success);
-    border-radius: 100%;
-    width: 0.5rem;
-    height: 0.5rem;
-    /* font-weight: 500; */
-    /* line-height: 1; */
+    width: 0.375rem;
+    height: 0.375rem;
+    border-radius: 999px;
+    background-color: var(--sys-color-success);
+  }
+
+  .tools-toggle {
+    flex: 0 0 auto;
+    width: 2.25rem;
+    min-height: 2.25rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid transparent;
+    border-radius: var(--sys-radius-control);
+    background-color: transparent;
+    cursor: pointer;
+    color: var(--comp-list-item-chevron);
+    transition:
+      transform 0.22s cubic-bezier(0.25, 1, 0.5, 1),
+      border-color 0.18s ease-out,
+      background-color 0.18s ease-out,
+      color 0.18s ease-out;
+  }
+
+  .list-item-wrapper[data-open="true"] .tools-toggle {
+    transform: translateX(-6rem) rotate(90deg);
+    border-color: var(--sys-color-accent);
+    background-color: var(--sys-color-surface);
+    color: var(--sys-color-text);
   }
 
   .tool-buttons {
@@ -203,43 +252,43 @@
     height: 100%;
     width: 3rem;
     border: none;
-    color: var(--bg-light);
+    color: var(--sys-color-text-on-dark);
     display: inline-flex;
     align-items: center;
     justify-content: center;
   }
 
   .delete-button {
-    background-color: var(--error);
+    background-color: var(--comp-btn-danger-bg);
   }
 
   .map-button {
-    background-color: var(--success);
+    background-color: var(--sys-color-success);
   }
 
   .map-button[data-active="true"] {
-    background-color: var(--accent-color);
+    background-color: var(--sys-color-accent);
   }
 
   :is(button, a):focus-visible {
     outline: none;
-    box-shadow: 0 0 0 3px oklch(from var(--accent-color) l c h / 0.26);
+    box-shadow: var(--comp-focus-ring);
   }
 
   @media (hover: hover) {
     .list-item-wrapper:hover {
-      background-color: var(--bg-light);
+      background-color: var(--comp-list-item-bg-hover);
     }
 
-    .list-item-wrapper button:hover {
-      border-color: var(--bg-low-contrast);
-      color: var(--bg-high-contrast);
-      background-color: var(--bg-light);
+    .tools-toggle:hover {
+      border-color: var(--sys-color-border);
+      color: var(--sys-color-text);
+      background-color: var(--sys-color-surface);
     }
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .list-item-wrapper button,
+    .tools-toggle,
     .tool-buttons {
       transition: none;
     }

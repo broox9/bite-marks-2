@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Bite Marks — Theme B: Signal</title>
+<meta name="design_doc_mode" content="canvas">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#FBFBF9;--panel:#F3F3EF;--ink:#0D0F10;--ink2:#41464A;--ink3:#797F84;--line:#E1E3DE;--acid:#D3F94A;--acid-d:#9BBE18;--teal:#0E7C6B;--red:#D93B1E}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#E9EAE5;font-family:'Space Grotesk',system-ui,sans-serif;color:var(--ink)}
+a{color:var(--ink);text-decoration:none;border-bottom:2px solid var(--acid)}a:hover{background:var(--acid)}
+.lbl{position:absolute;font:500 12px/1 'JetBrains Mono';letter-spacing:.06em;text-transform:uppercase;color:#6E7378;white-space:nowrap}
+.fr{position:absolute;white-space:normal;background:var(--bg);overflow:hidden}
+.mob{border-radius:22px;border:1px solid var(--line);box-shadow:0 18px 40px rgba(0,0,0,.10)}
+.mono{font-family:'JetBrains Mono',monospace}
+.k{font:500 10px/1 'JetBrains Mono';letter-spacing:.1em;text-transform:uppercase;color:var(--ink3)}
+.ph{background:#E6E7E2;display:flex;align-items:center;justify-content:center;color:#9A9F9B;font:500 9px/1 'JetBrains Mono';letter-spacing:.12em;text-transform:uppercase;position:relative}
+.ph:after{content:"";position:absolute;inset:0;background:linear-gradient(135deg,transparent 49.6%,#D8DAD4 49.6% 50.4%,transparent 50.4%)}
+.card{background:#fff;border:1px solid var(--line)}
+.hard{border:1.5px solid var(--ink)}
+.btn{background:var(--ink);color:#fff;border:0;padding:13px 16px;font:600 13px/1 'Space Grotesk';cursor:pointer}
+.btn.acid{background:var(--acid);color:var(--ink)}
+.btn.ghost{background:transparent;color:var(--ink);border:1.5px solid var(--ink)}
+.kbd{font:500 10px/1 'JetBrains Mono';border:1px solid var(--line);background:var(--panel);padding:4px 6px;color:var(--ink2)}
+.chip{border:1px solid var(--line);background:#fff;padding:7px 11px;font:500 12px/1 'Space Grotesk';color:var(--ink2)}
+.chip.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+.seg{display:flex;border:1.5px solid var(--ink)}
+.seg div{padding:9px 13px;font:600 12px/1 'Space Grotesk';border-right:1.5px solid var(--ink)}
+.seg div:last-child{border-right:0}
+.seg .on{background:var(--acid)}
+.tr{display:grid;align-items:center;border-bottom:1px solid var(--line)}
+.map{background:linear-gradient(#EFF0EB,#EFF0EB);position:relative}
+.map:after{content:"";position:absolute;inset:0;background:repeating-linear-gradient(90deg,#E3E5DF 0 1px,transparent 1px 38px),repeating-linear-gradient(0deg,#E3E5DF 0 1px,transparent 1px 38px)}
+.pin{position:absolute;width:9px;height:9px;background:var(--ink);z-index:2}
+.pin.a{background:var(--acid);outline:1.5px solid var(--ink)}
+.nav{display:flex;gap:20px;font:600 13px/1 'Space Grotesk';color:var(--ink2)}
+.nav .on{color:var(--ink);border-bottom:2px solid var(--acid);padding-bottom:3px}
+</style>
+</head>
+<body>
+
+<div class="lbl" style="left:0;top:36px">Theme B — Signal · monochrome utility, acid accent, command-first</div>
+
+<!-- HOME DESKTOP -->
+<div class="lbl" style="left:0;top:74px;color:#3C4145">1 · “/” Home — desktop 1200</div>
+<div class="fr" style="left:0;top:98px;width:1200px;height:1180px">
+  <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 36px;border-bottom:1.5px solid var(--ink)">
+    <div style="display:flex;align-items:center;gap:9px"><div style="width:22px;height:22px;background:var(--ink)"></div><div style="font:700 17px/1 'Space Grotesk';letter-spacing:-.02em">BITE MARKS</div></div>
+    <div style="display:flex;align-items:center;gap:26px">
+      <div class="nav"><span class="on">Home</span><span>Spots</span><span>Tags</span><span>Nearby</span></div>
+      <div style="position:relative">
+        <div style="display:flex;align-items:center;gap:8px;border:1.5px solid var(--ink);padding:6px 10px"><div style="width:18px;height:18px;background:var(--acid)"></div><span class="mono" style="font-size:11px;font-weight:500">brandon</span><span style="font-size:9px">▾</span></div>
+        <div class="card hard" style="position:absolute;right:0;top:36px;width:200px;padding:0;z-index:5">
+          <div style="padding:11px 13px;font:600 13px/1 'Space Grotesk';border-bottom:1px solid var(--line)">Account settings</div>
+          <div style="padding:11px 13px;font:600 13px/1 'Space Grotesk';border-bottom:1px solid var(--line)">Default location</div>
+          <div style="padding:11px 13px;font:600 13px/1 'Space Grotesk';border-bottom:1px solid var(--line)">Export data (CSV)</div>
+          <div style="padding:11px 13px;font:600 13px/1 'Space Grotesk';color:var(--red);background:#FDF1EE">Log out →</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div style="padding:64px 36px 0;text-align:center;border-bottom:1px solid var(--line);padding-bottom:56px">
+    <div class="k">70 spots · 38 tasted · 32 to try · 4 cities</div>
+    <div style="font:700 44px/1.08 'Space Grotesk';letter-spacing:-.03em;margin:16px auto 0;max-width:640px">Where are we eating?</div>
+    <div style="max-width:660px;margin:26px auto 0;display:flex;align-items:center;gap:12px;border:1.5px solid var(--ink);background:#fff;padding:16px 18px;box-shadow:5px 5px 0 var(--acid)">
+      <span style="font-size:15px">⌕</span>
+      <span style="font:500 15px/1 'Space Grotesk';color:var(--ink3)">Search 70 spots, or a city, tag, or address</span>
+      <span style="margin-left:auto;display:flex;gap:5px"><i class="kbd">⌘</i><i class="kbd">K</i></span>
+    </div>
+    <div style="display:flex;gap:8px;justify-content:center;margin-top:16px"><span class="chip">Near me</span><span class="chip">To try</span><span class="chip">4.5+ rated</span><span class="chip">Added this month</span></div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;border-bottom:1px solid var(--line)">
+    <!-- DEFAULT LOCATION -->
+    <div style="padding:28px 36px;border-right:1px solid var(--line)">
+      <div style="display:flex;justify-content:space-between;align-items:center"><div class="k">Default location</div><span class="mono" style="font-size:10px;color:var(--acid-d);font-weight:700">● SET</span></div>
+      <div style="font:700 26px/1.1 'Space Grotesk';letter-spacing:-.02em;margin:10px 0 4px">Midtown, New York</div>
+      <div class="mono" style="font-size:11px;color:var(--ink3)">40.7549, −73.9840 · all distances measured from here</div>
+      <div class="seg" style="margin-top:16px;width:fit-content"><div class="on">Saved place</div><div>Type address</div><div>Use my location</div></div>
+      <div style="display:flex;gap:8px;margin-top:12px"><span class="chip on">Midtown</span><span class="chip">Jersey City</span><span class="chip">Bridgetown</span><span class="chip" style="border-style:dashed">+ Add</span></div>
+      <div class="map" style="height:104px;margin-top:16px;border:1px solid var(--line)"><div class="pin a" style="left:46%;top:44%"></div><div class="pin" style="left:62%;top:62%"></div><div class="pin" style="left:33%;top:56%"></div></div>
+      <div style="display:flex;gap:8px;margin-top:14px"><button class="btn acid">Save as default</button><button class="btn ghost">Reset</button></div>
+    </div>
+    <!-- INDEX -->
+    <div style="padding:28px 36px">
+      <div class="k" style="margin-bottom:14px">Index</div>
+      <div class="tr" style="grid-template-columns:1fr auto auto;gap:18px;padding:11px 0"><span style="font:600 14px/1 'Space Grotesk'">New York</span><span class="mono" style="font-size:11px;color:var(--ink3)">22 tasted</span><span class="mono" style="font-size:13px;font-weight:700">41</span></div>
+      <div class="tr" style="grid-template-columns:1fr auto auto;gap:18px;padding:11px 0"><span style="font:600 14px/1 'Space Grotesk'">Jersey City</span><span class="mono" style="font-size:11px;color:var(--ink3)">9 tasted</span><span class="mono" style="font-size:13px;font-weight:700">12</span></div>
+      <div class="tr" style="grid-template-columns:1fr auto auto;gap:18px;padding:11px 0"><span style="font:600 14px/1 'Space Grotesk'">Barbados</span><span class="mono" style="font-size:11px;color:var(--ink3)">5 tasted</span><span class="mono" style="font-size:13px;font-weight:700">6</span></div>
+      <div class="tr" style="grid-template-columns:1fr auto auto;gap:18px;padding:11px 0"><span style="font:600 14px/1 'Space Grotesk'">Tokyo</span><span class="mono" style="font-size:11px;color:var(--ink3)">2 tasted</span><span class="mono" style="font-size:13px;font-weight:700">3</span></div>
+      <div class="k" style="margin:24px 0 12px">Tags</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap"><span class="chip">steak 11</span><span class="chip">ramen 8</span><span class="chip">rooftop 6</span><span class="chip">bbq 5</span><span class="chip">omakase 4</span><span class="chip">caribbean 4</span></div>
+    </div>
+  </div>
+
+  <div style="padding:26px 36px 80px">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><div class="k">Recently added</div><a style="font:600 12px/1 'Space Grotesk'">All 70 spots</a></div>
+    <div class="tr" style="grid-template-columns:44px 1fr 130px 90px 70px 20px;gap:14px;padding:10px 0;border-top:1px solid var(--line)"><div class="ph" style="width:44px;height:44px"></div><div><div style="font:600 14px/1 'Space Grotesk'">Felina Steak Jersey City</div><div class="mono" style="font-size:10px;color:var(--ink3);margin-top:5px">2 Chapel Ave Unit 2</div></div><span class="mono" style="font-size:11px;color:var(--ink2)">Jersey City, NJ</span><span class="mono" style="font-size:11px;color:var(--acid-d);font-weight:700">● TASTED</span><span class="mono" style="font-size:12px;font-weight:700">4.5</span><span style="color:var(--ink3)">›</span></div>
+    <div class="tr" style="grid-template-columns:44px 1fr 130px 90px 70px 20px;gap:14px;padding:10px 0"><div class="ph" style="width:44px;height:44px"></div><div><div style="font:600 14px/1 'Space Grotesk'">Filé Gumbo Bar</div><div class="mono" style="font-size:10px;color:var(--ink3);margin-top:5px">376 Church St</div></div><span class="mono" style="font-size:11px;color:var(--ink2)">New York, NY</span><span class="mono" style="font-size:11px;color:var(--ink3);font-weight:700">○ TO TRY</span><span class="mono" style="font-size:12px;font-weight:700">—</span><span style="color:var(--ink3)">›</span></div>
+    <div class="tr" style="grid-template-columns:44px 1fr 130px 90px 70px 20px;gap:14px;padding:10px 0"><div class="ph" style="width:44px;height:44px"></div><div><div style="font:600 14px/1 'Space Grotesk'">The Nephew Supper Club</div><div class="mono" style="font-size:10px;color:var(--ink3);margin-top:5px">271 W 119th St</div></div><span class="mono" style="font-size:11px;color:var(--ink2)">New York, NY</span><span class="mono" style="font-size:11px;color:var(--ink3);font-weight:700">○ TO TRY</span><span class="mono" style="font-size:12px;font-weight:700">—</span><span style="color:var(--ink3)">›</span></div>
+    <div class="tr" style="grid-template-columns:44px 1fr 130px 90px 70px 20px;gap:14px;padding:10px 0;border-bottom:0"><div class="ph" style="width:44px;height:44px"></div><div><div style="font:600 14px/1 'Space Grotesk'">Razza</div><div class="mono" style="font-size:10px;color:var(--ink3);margin-top:5px">275 Grove St</div></div><span class="mono" style="font-size:11px;color:var(--ink2)">Jersey City, NJ</span><span class="mono" style="font-size:11px;color:var(--acid-d);font-weight:700">● TASTED</span><span class="mono" style="font-size:12px;font-weight:700">4.8</span><span style="color:var(--ink3)">›</span></div>
+  </div>
+
+  <div style="position:absolute;left:0;right:0;bottom:0;border-top:1.5px solid var(--ink);padding:13px 36px;display:flex;justify-content:space-between;background:var(--panel)">
+    <span class="mono" style="font-size:10px;color:var(--ink3)">BITE MARKS · v2.1 · LAST SYNC 09:41</span>
+    <span class="mono" style="font-size:10px;color:var(--ink3)">HELP · SHORTCUTS ⌘/ · PRIVACY</span>
+  </div>
+</div>
+
+<!-- DETAIL DESKTOP -->
+<div class="lbl" style="left:1260px;top:74px;color:#3C4145">2 · “/spots/:id” — desktop · sticky spec rail + photo grid</div>
+<div class="fr" style="left:1260px;top:98px;width:1200px;height:980px">
+  <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 36px;border-bottom:1.5px solid var(--ink)">
+    <div style="display:flex;align-items:center;gap:9px"><div style="width:20px;height:20px;background:var(--ink)"></div><div style="font:700 16px/1 'Space Grotesk'">BITE MARKS</div></div>
+    <div class="nav"><span>Home</span><span class="on">Spots</span><span>Tags</span><span>Nearby</span></div>
+  </div>
+  <div style="padding:16px 36px 14px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center">
+    <a style="font:600 12px/1 'Space Grotesk'">← Back to list</a>
+    <span class="mono" style="font-size:10px;color:var(--ink3)">SPOT 07 / 70 · ADDED 2024‑11‑03 · EDITED 2d AGO</span>
+  </div>
+
+  <div style="display:grid;grid-template-columns:392px 1fr;height:calc(100% - 106px)">
+    <!-- SPEC RAIL -->
+    <div style="padding:30px 30px 30px 36px;border-right:1.5px solid var(--ink);background:var(--panel)">
+      <div class="k">Steakhouse · Jersey City</div>
+      <div style="font:700 34px/1.06 'Space Grotesk';letter-spacing:-.03em;margin:10px 0 14px">Felina Steak Jersey City</div>
+      <div style="display:flex;gap:8px;margin-bottom:20px"><span class="chip" style="background:var(--acid);border-color:var(--acid);font-weight:600">✓ Tasted</span><span class="chip">★ 4.3 public</span></div>
+      <div class="tr" style="grid-template-columns:96px 1fr;padding:11px 0;border-top:1px solid #DCDED8"><span class="k">Address</span><span style="font:500 13px/1.4 'Space Grotesk'">2 Chapel Ave Unit 2<br>Jersey City, NJ 07305</span></div>
+      <div class="tr" style="grid-template-columns:96px 1fr;padding:11px 0"><span class="k">Distance</span><span class="mono" style="font-size:13px;font-weight:700">4.0 mi</span></div>
+      <div class="tr" style="grid-template-columns:96px 1fr;padding:11px 0"><span class="k">My rating</span><span style="display:flex;align-items:center;gap:8px"><span class="mono" style="font-size:20px;font-weight:700">4.5</span><span style="color:var(--ink);font-size:13px">★★★★<span style="color:#C9CCC6">★</span></span></span></div>
+      <div class="tr" style="grid-template-columns:96px 1fr;padding:11px 0"><span class="k">Tags</span><span style="display:flex;gap:6px;flex-wrap:wrap"><span class="chip" style="padding:5px 8px;font-size:11px">steak</span><span class="chip" style="padding:5px 8px;font-size:11px">view</span><span class="chip" style="padding:5px 8px;font-size:11px">date night</span></span></div>
+      <div class="tr" style="grid-template-columns:96px 1fr;padding:11px 0"><span class="k">Links</span><span style="display:flex;flex-direction:column;gap:6px"><a style="font:600 12px/1 'Space Grotesk'">Website ↗</a><a style="font:600 12px/1 'Space Grotesk'">Instagram ↗</a><a style="font:600 12px/1 'Space Grotesk'">Menu PDF ↗</a></span></div>
+      <div style="margin-top:20px" class="k">Notes</div>
+      <div class="card" style="padding:13px;margin-top:8px;font:500 13px/1.55 'Space Grotesk';color:var(--ink2)">Local, lowkey but dope. This one is in the cut but the view is great and it’s overall better than the one in south orange</div>
+      <div class="map" style="height:112px;margin-top:16px;border:1px solid var(--line)"><div class="pin a" style="left:48%;top:46%;width:12px;height:12px"></div><div style="position:absolute;right:8px;bottom:8px;background:#fff;border:1px solid var(--ink);padding:5px 9px;font:600 10px/1 'Space Grotesk'">Directions ↗</div></div>
+      <div style="display:flex;gap:8px;margin-top:16px"><button class="btn acid" style="flex:1">Save changes</button><button class="btn ghost">Delete</button></div>
+    </div>
+    <!-- PHOTO GRID -->
+    <div style="padding:24px 36px 24px 30px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><div class="k">10 photos</div><span class="mono" style="font-size:10px;color:var(--ink3)">CLICK TO ENLARGE · ← → TO STEP</span></div>
+      <div style="display:grid;grid-template-columns:2fr 1fr;grid-template-rows:236px 116px 116px 116px;gap:10px">
+        <div class="ph" style="grid-row:span 2">photo 01</div>
+        <div class="ph">02</div><div class="ph">03</div>
+        <div class="ph">04</div><div class="ph">05</div>
+        <div class="ph">06</div><div class="ph" style="background:var(--ink);color:var(--acid)">+4 more</div>
+      </div>
+      <div style="display:flex;gap:8px;margin-top:14px"><button class="btn ghost" style="padding:10px 14px">+ Add photos</button><button class="btn ghost" style="padding:10px 14px">Set cover</button></div>
+    </div>
+  </div>
+</div>
+
+<!-- MOBILE ROW -->
+<div class="lbl" style="left:0;top:1320px;color:#3C4145">3 · “/” Home — mobile</div>
+<div class="fr mob" style="left:0;top:1346px;width:390px;height:880px">
+  <div style="display:flex;align-items:center;justify-content:space-between;padding:22px 20px 14px;border-bottom:1.5px solid var(--ink)">
+    <div style="display:flex;align-items:center;gap:8px"><div style="width:18px;height:18px;background:var(--ink)"></div><div style="font:700 14px/1 'Space Grotesk'">BITE MARKS</div></div>
+    <div style="display:flex;align-items:center;gap:7px;border:1.5px solid var(--ink);padding:4px 8px"><div style="width:14px;height:14px;background:var(--acid)"></div><span class="mono" style="font-size:10px">brandon</span></div>
+  </div>
+  <div style="padding:26px 20px 22px;border-bottom:1px solid var(--line)">
+    <div class="k">70 spots · 38 tasted · 32 to try</div>
+    <div style="font:700 30px/1.08 'Space Grotesk';letter-spacing:-.03em;margin:12px 0 18px">Where are we eating?</div>
+    <div style="display:flex;align-items:center;gap:10px;border:1.5px solid var(--ink);background:#fff;padding:14px;box-shadow:4px 4px 0 var(--acid)"><span>⌕</span><span style="font:500 14px/1 'Space Grotesk';color:var(--ink3)">Search 70 spots</span></div>
+    <div style="display:flex;gap:7px;margin-top:12px;flex-wrap:wrap"><span class="chip">Near me</span><span class="chip">To try</span><span class="chip">4.5+</span></div>
+  </div>
+  <div style="padding:20px 20px;border-bottom:1px solid var(--line)">
+    <div style="display:flex;justify-content:space-between;align-items:center"><div class="k">Default location</div><span class="mono" style="font-size:10px;color:var(--acid-d);font-weight:700">● SET</span></div>
+    <div style="font:700 21px/1.1 'Space Grotesk';margin:9px 0 10px">Midtown, New York</div>
+    <div class="seg" style="width:100%"><div class="on" style="flex:1;text-align:center">Saved</div><div style="flex:1;text-align:center">Address</div><div style="flex:1;text-align:center">Locate</div></div>
+    <div style="display:flex;gap:7px;margin-top:10px;flex-wrap:wrap"><span class="chip on">Midtown</span><span class="chip">Jersey City</span><span class="chip" style="border-style:dashed">+ Add</span></div>
+    <button class="btn acid" style="width:100%;margin-top:12px">Save as default</button>
+  </div>
+  <div style="padding:18px 20px">
+    <div class="k" style="margin-bottom:8px">Recently added</div>
+    <div class="tr" style="grid-template-columns:40px 1fr auto;gap:12px;padding:10px 0"><div class="ph" style="width:40px;height:40px"></div><div><div style="font:600 13px/1 'Space Grotesk'">Felina Steak Jersey City</div><div class="mono" style="font-size:10px;color:var(--acid-d);margin-top:5px;font-weight:700">● TASTED 4.5</div></div><span style="color:var(--ink3)">›</span></div>
+    <div class="tr" style="grid-template-columns:40px 1fr auto;gap:12px;padding:10px 0"><div class="ph" style="width:40px;height:40px"></div><div><div style="font:600 13px/1 'Space Grotesk'">Filé Gumbo Bar</div><div class="mono" style="font-size:10px;color:var(--ink3);margin-top:5px;font-weight:700">○ TO TRY</div></div><span style="color:var(--ink3)">›</span></div>
+  </div>
+  <div style="position:absolute;left:0;right:0;bottom:0;background:#fff;border-top:1.5px solid var(--ink);display:grid;grid-template-columns:repeat(4,1fr);padding:9px 0 16px;text-align:center">
+    <div class="mono" style="font-size:9px;font-weight:700;line-height:1.7">◼<br>HOME</div>
+    <div class="mono" style="font-size:9px;font-weight:700;line-height:1.7;color:var(--ink3)">☰<br>SPOTS</div>
+    <div class="mono" style="font-size:9px;font-weight:700;line-height:1.7;color:var(--ink3)">◎<br>NEARBY</div>
+    <div class="mono" style="font-size:9px;font-weight:700;line-height:1.7;color:var(--ink3)">◐<br>ME</div>
+  </div>
+</div>
+
+<div class="lbl" style="left:440px;top:1320px;color:#3C4145">4 · “/spots/:id” — mobile · carousel + spec rows</div>
+<div class="fr mob" style="left:440px;top:1346px;width:390px;height:880px">
+  <div style="position:relative"><div class="ph" style="height:250px">photo 01 / 10</div>
+    <div style="position:absolute;left:16px;top:20px;width:32px;height:32px;background:#fff;border:1.5px solid var(--ink);display:flex;align-items:center;justify-content:center">←</div>
+    <div class="mono" style="position:absolute;right:16px;top:20px;background:var(--ink);color:var(--acid);padding:6px 9px;font-size:10px;font-weight:700">01/10</div>
+    <div style="position:absolute;left:0;right:0;bottom:12px;display:flex;gap:4px;justify-content:center"><i style="width:18px;height:4px;background:var(--acid)"></i><i style="width:6px;height:4px;background:rgba(255,255,255,.7)"></i><i style="width:6px;height:4px;background:rgba(255,255,255,.7)"></i><i style="width:6px;height:4px;background:rgba(255,255,255,.7)"></i></div>
+  </div>
+  <div style="padding:18px 20px 0">
+    <div class="k">Steakhouse · Jersey City</div>
+    <div style="font:700 26px/1.08 'Space Grotesk';letter-spacing:-.03em;margin:9px 0 12px">Felina Steak Jersey City</div>
+    <div style="display:flex;gap:7px"><span class="chip" style="background:var(--acid);border-color:var(--acid);font-weight:600">✓ Tasted</span><span class="chip">★ 4.3</span><span class="chip">4 mi</span></div>
+    <div class="tr" style="grid-template-columns:84px 1fr;padding:11px 0;margin-top:16px;border-top:1px solid var(--line)"><span class="k">Address</span><span style="font:500 12px/1.4 'Space Grotesk'">2 Chapel Ave Unit 2, Jersey City, NJ 07305</span></div>
+    <div class="tr" style="grid-template-columns:84px 1fr;padding:11px 0"><span class="k">My rating</span><span style="display:flex;align-items:center;gap:8px"><span class="mono" style="font-size:18px;font-weight:700">4.5</span><span style="font-size:12px">★★★★<span style="color:#C9CCC6">★</span></span></span></div>
+    <div class="tr" style="grid-template-columns:84px 1fr;padding:11px 0"><span class="k">Links</span><span style="display:flex;gap:12px"><a style="font:600 12px/1 'Space Grotesk'">Website ↗</a><a style="font:600 12px/1 'Space Grotesk'">Instagram ↗</a></span></div>
+    <div class="k" style="margin-top:16px">Notes</div>
+    <div class="card" style="padding:12px;margin-top:7px;font:500 12px/1.55 'Space Grotesk';color:var(--ink2)">Local, lowkey but dope. This one is in the cut but the view is great and it’s overall better than the one in south orange</div>
+    <div class="map" style="height:96px;margin-top:12px;border:1px solid var(--line)"><div class="pin a" style="left:48%;top:46%;width:12px;height:12px"></div><div style="position:absolute;right:8px;bottom:8px;background:#fff;border:1px solid var(--ink);padding:5px 9px;font:600 10px/1 'Space Grotesk'">Directions ↗</div></div>
+  </div>
+  <div style="position:absolute;left:0;right:0;bottom:0;padding:12px 20px 18px;background:#fff;border-top:1.5px solid var(--ink)"><button class="btn acid" style="width:100%">Save changes</button></div>
+</div>
+
+<div class="lbl" style="left:880px;top:1320px;color:#3C4145">5 · “/list” — search active (white sheet, ink border, kbd hints)</div>
+<div class="fr mob" style="left:880px;top:1346px;width:390px;height:880px">
+  <div style="opacity:.45">
+    <div class="map" style="height:200px"></div>
+    <div style="padding:12px 20px"><div class="tr" style="padding:12px 0"><span style="font:600 13px/1 'Space Grotesk'">Felina Steak Jersey City</span></div><div class="tr" style="padding:12px 0"><span style="font:600 13px/1 'Space Grotesk'">Filé Gumbo Bar</span></div></div>
+  </div>
+  <div style="position:absolute;inset:0;background:rgba(13,15,16,.30)"></div>
+  <div style="position:absolute;left:0;right:0;bottom:0;height:78%;background:#fff;border-top:2.5px solid var(--ink);padding:14px 20px 0">
+    <div style="width:40px;height:4px;background:var(--ink);margin:0 auto 16px"></div>
+    <div style="display:flex;align-items:center;gap:10px;border:1.5px solid var(--ink);padding:13px 14px;box-shadow:4px 4px 0 var(--acid)">
+      <span>⌕</span><span style="font:600 15px/1 'Space Grotesk'">fel</span><span style="width:2px;height:16px;background:var(--ink)"></span>
+      <span style="margin-left:auto;display:flex;gap:5px"><i class="kbd">ESC</i></span>
+    </div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin:20px 0 6px"><div class="k">Top matches</div><span class="mono" style="font-size:9px;color:var(--ink3)">2 OF 70</span></div>
+    <div class="tr" style="grid-template-columns:32px 1fr auto;gap:12px;padding:11px 0"><div style="width:32px;height:32px;background:var(--panel);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;font-size:11px">◉</div><div><div style="font:600 14px/1 'Space Grotesk'"><span style="background:var(--acid)">Fel</span>ina Steak Jersey City</div><div class="mono" style="font-size:10px;color:var(--ink3);margin-top:5px">JERSEY CITY · 4.0 MI · TASTED</div></div><span class="kbd">↵</span></div>
+    <div class="tr" style="grid-template-columns:32px 1fr auto;gap:12px;padding:11px 0"><div style="width:32px;height:32px;background:var(--panel);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;font-size:11px">◉</div><div><div style="font:600 14px/1 'Space Grotesk'"><span style="background:var(--acid)">Filé</span> Gumbo Bar</div><div class="mono" style="font-size:10px;color:var(--ink3);margin-top:5px">NEW YORK · 1.2 MI · TO TRY</div></div><span style="color:var(--ink3)">›</span></div>
+    <div class="k" style="margin:18px 0 8px">Filters</div>
+    <div style="display:flex;gap:7px;flex-wrap:wrap"><span class="chip on">Tasted</span><span class="chip">To try</span><span class="chip">&lt; 5 mi</span><span class="chip">4.5+</span><span class="chip">steak</span><span class="chip">ramen</span></div>
+    <div class="k" style="margin:18px 0 4px">Recent</div>
+    <div class="tr" style="padding:10px 0"><span class="mono" style="font-size:12px;color:var(--ink2)">↺ razza</span></div>
+    <div class="tr" style="padding:10px 0"><span class="mono" style="font-size:12px;color:var(--ink2)">↺ ramen, midtown</span></div>
+  </div>
+</div>
+
+<div class="lbl" style="left:1330px;top:1320px;color:#3C4145">Notes</div>
+<div class="fr card" style="left:1330px;top:1346px;width:430px;height:1090px;background:#fff">
+  <div style="padding:26px">
+    <div style="font:700 28px/1.1 'Space Grotesk';letter-spacing:-.03em">Signal</div>
+    <div style="font:500 13px/1.6 'Space Grotesk';color:var(--ink2);margin-top:12px">Monochrome utility. Hard 1.5&nbsp;px rules, offset acid shadows, mono for every number and status. Reads like a tool you use daily, not a lifestyle app.</div>
+    <div style="height:1px;background:var(--line);margin:20px 0"></div>
+    <div class="k">What it fixes</div>
+    <div style="font:500 13px/1.7 'Space Grotesk';color:var(--ink2);margin-top:10px">
+      <b>Home</b> leads with the thing you actually do — search — as a centered command bar with ⌘K. Below it a two‑up band: default‑location module (segmented control: saved place / type address / use my location, with saved chips and a live map) and a city + tag index. Then a real data table of recent adds.<br><br>
+      <b>Detail</b> inverts the old masthead: a sticky spec rail on the left holds name, address, rating, tags, links, notes and the mini‑map; the whole right side is the photo grid (click to enlarge, arrow keys to step). Mobile falls back to a swipe carousel with the same spec rows.<br><br>
+      <b>Search</b> sheet is white on a 2.5&nbsp;px ink edge with an acid offset shadow, mono result meta and keyboard chips.<br><br>
+      <b>Logout</b> lives in the header identity menu; footer is a one‑line status strip.
+    </div>
+    <div style="height:1px;background:var(--line);margin:20px 0"></div>
+    <div class="k">Palette</div>
+    <div style="display:flex;gap:8px;margin-top:10px">
+      <div style="flex:1;height:44px;background:var(--bg);border:1px solid var(--line)"></div>
+      <div style="flex:1;height:44px;background:var(--ink)"></div>
+      <div style="flex:1;height:44px;background:var(--acid)"></div>
+      <div style="flex:1;height:44px;background:var(--acid-d)"></div>
+      <div style="flex:1;height:44px;background:var(--red)"></div>
+    </div>
+    <div class="mono" style="font-size:10px;color:var(--ink3);margin-top:8px;line-height:1.6">#FBFBF9 · #0D0F10 · #D3F94A · #9BBE18 · #D93B1E<br>Space Grotesk + JetBrains Mono</div>
+    <div style="height:1px;background:var(--line);margin:20px 0"></div>
+    <div class="k">Watch out</div>
+    <div style="font:500 12px/1.6 'Space Grotesk';color:var(--ink2);margin-top:8px">Acid on white fails AA for text — it is used as a fill/highlight only. Status text uses the darker #9BBE18.</div>
+  </div>
+</div>
+
+</body>
+</html>
