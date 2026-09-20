@@ -25,7 +25,6 @@ import { locationStore as mapState } from "$lib/adapters/primary/stores/location
 type ResultHandler = (places: any[]) => void;
 
 let google: any = $state(null);
-let PlaceLib: any = $state(null);
 export const MAX_PLACE_PHOTOS = 15;
 const AREA_FIELDS = [
   "id",
@@ -46,16 +45,45 @@ const FIELDS = [
   "businessStatus",
 ];
 
+let readyPromise: Promise<any> | null = null;
+
+/**
+ * Resolves once the Maps JS API is genuinely usable.
+ *
+ * The Maps bootstrap sets `window.google.maps` synchronously but only attaches
+ * `importLibrary` when its follow-up scripts land, so a truthiness check on
+ * `google` can pass while the API is still half-built -- which is how Safari
+ * ended up calling `google.maps.importLibrary` before it existed. `app.html`
+ * hands us a promise settled by the API's own callback; everything here goes
+ * through it rather than touching the global directly.
+ */
+function whenGoogleReady(): Promise<any> {
+  if (google) return Promise.resolve(google);
+  const resolver = globalThis?.window?.resolveGoogleLoaded;
+  if (!resolver) {
+    return Promise.reject(new Error("Google Maps loader is unavailable"));
+  }
+  readyPromise ??= resolver().then((g: any) => {
+    google = g;
+    return g;
+  });
+  return readyPromise;
+}
+
+/** Loads the Places library. `importLibrary` caches, so repeat calls are cheap. */
+async function placesLibrary(): Promise<google.maps.PlacesLibrary> {
+  const g = await whenGoogleReady();
+  return (await g.maps.importLibrary("places")) as google.maps.PlacesLibrary;
+}
+
 if (globalThis?.window) {
-  window
-    .resolveGoogleLoaded?.()
-    ?.catch((e: Error) => {
-      throw e;
-    })
-    ?.then(async (g: any) => {
-      google = g;
-      const { Place } = await google.maps.importLibrary("places");
-      PlaceLib = Place;
+  // Warm the API up front so the first search is not paying for the load, but
+  // never let a failure here escape as an unhandled rejection -- callers that
+  // actually need Maps surface their own errors.
+  whenGoogleReady()
+    .then(() => placesLibrary())
+    .catch((e: unknown) => {
+      console.error("[bs] Failed to load Google Maps", e);
     });
 }
 
@@ -68,7 +96,7 @@ if (globalThis?.window) {
 export async function searchForPlaces(text: string, handleResults: ResultHandler) {
   console.log("[bs] searchForPlaces", text);
   if (!text || text.length < 3) return;
-  if (!google || !PlaceLib) return;
+  const { Place } = await placesLibrary();
   const request = {
     textQuery: text,
     fields: FIELDS,
@@ -83,7 +111,7 @@ export async function searchForPlaces(text: string, handleResults: ResultHandler
   };
 
   //@ts-ignore
-  const { places } = await PlaceLib.searchByText(request);
+  const { places } = await Place.searchByText(request);
 
   handleResults(places);
 }
@@ -97,8 +125,7 @@ export async function searchForPlaces(text: string, handleResults: ResultHandler
 export async function searchForAreas(text: string, handleResults: ResultHandler) {
   console.log("[bs] searchForAreas", text);
   if (!text || text.length < 3) return;
-  if (!google || !PlaceLib) return;
-  const { SearchByTextRankPreference } = await google.maps.importLibrary("places");
+  const { Place, SearchByTextRankPreference } = await placesLibrary();
   const request = {
     textQuery: text,
     fields: AREA_FIELDS,
@@ -111,7 +138,7 @@ export async function searchForAreas(text: string, handleResults: ResultHandler)
   };
 
   //@ts-ignore
-  const { places } = await PlaceLib.searchByText(request);
+  const { places } = await Place.searchByText(request);
 
   // let await google.maps.places.PlacesService.searchByText(placesService, request)
   handleResults(places);
@@ -124,11 +151,9 @@ export async function searchForAreas(text: string, handleResults: ResultHandler)
  * @param {string} value - The search box input value
  */
 export async function placeAutoComplete(value: string) : Promise<google.maps.places.Place[] | []> {
-  if (value.length < 3 || !google) return [];
+  if (value.length < 3) return [];
   console.log(mapState.name, mapState.center, mapState.radiusMeters)
-  // @ts-ignore
-  const { Place, AutocompleteSessionToken, AutocompleteSuggestion } =
-    (await (google as any).maps.importLibrary("places")) as google.maps.PlacesLibrary;
+  const { AutocompleteSessionToken, AutocompleteSuggestion } = await placesLibrary();
 
   // Add an initial request body.
   let request = {
@@ -179,11 +204,9 @@ export async function nearbySearch(e: Event) {
   const value = (e?.target as HTMLInputElement | null)?.value;
   console.log("[bs] nearbySearch value", value);
   if (!value || value.length < 3) return; // oops this is nearby the set center
-  if (!google) return;
   // let center = new google.maps.LatLng(52.369358, 4.889258);
   let center = mapState.center;
-  const { Place, SearchNearbyRankPreference } =
-    (await google.maps.importLibrary("places")) as google.maps.PlacesLibrary;
+  const { Place, SearchNearbyRankPreference } = await placesLibrary();
 
   const request = {
     // required parameters
@@ -219,8 +242,8 @@ export async function nearbySearch(e: Event) {
 
 
 export async function getLocationByAddress(address: string) {
-  if (!google) return;
-  const { Geocoder } = (await (google as any).maps.importLibrary("geocoding")) as any;
+  const g = await whenGoogleReady();
+  const { Geocoder } = (await g.maps.importLibrary("geocoding")) as any;
 
   const geocode = (new Geocoder()).geocode
   const request = {
@@ -250,20 +273,8 @@ export async function getPlacePhotoUrls(
   maxWidth?: number,
   maxPhotos: number = MAX_PLACE_PHOTOS,
 ): Promise<string[]> {
-  if (!google) {
-    // Wait for google to load if not ready yet
-    try {
-      await window.resolveGoogleLoaded?.();
-    } catch (e) {
-      console.error('[bs] Failed to load Google Maps', e);
-      return [];
-    }
-  }
-  
-  if (!google) return [];
-
   try {
-    const { Place } = await google.maps.importLibrary("places") as google.maps.PlacesLibrary;
+    const { Place } = await placesLibrary();
     
     // Create a Place instance with the place ID
     const place = new Place({ id: placeId });
