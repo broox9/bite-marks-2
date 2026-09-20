@@ -1,6 +1,6 @@
 import { v } from "convex/values";
 import { internalMutation } from "./_generated/server";
-import { components } from "./_generated/api";
+import { components, internal } from "./_generated/api";
 import { upsertPlaceDoc } from "./places";
 
 const placeInput = v.object({
@@ -215,6 +215,160 @@ export const verifyMigration = internalMutation({
       spotsMissingPlace,
       spotsByUser,
     };
+  },
+});
+
+/**
+ * Copy all spots and tags from one user to another (source is left unchanged).
+ * Accepts Better Auth user IDs (identity.subject / spots.userId).
+ */
+export const copyUserData = internalMutation({
+  args: {
+    sourceUserId: v.string(),
+    targetUserId: v.string(),
+  },
+  returns: v.object({
+    spotsInserted: v.number(),
+    spotsSkipped: v.number(),
+    tagsInserted: v.number(),
+    tagsSkipped: v.number(),
+  }),
+  handler: async (ctx, { sourceUserId, targetUserId }) => {
+    if (sourceUserId === targetUserId) {
+      throw new Error("Source and target user IDs must differ");
+    }
+
+    const sourceSpots = await ctx.db
+      .query("spots")
+      .withIndex("by_user", (q) => q.eq("userId", sourceUserId))
+      .collect();
+
+    const sourceTags = await ctx.db
+      .query("tags")
+      .withIndex("by_user", (q) => q.eq("userId", sourceUserId))
+      .collect();
+
+    const existingTargetSpots = await ctx.db
+      .query("spots")
+      .withIndex("by_user", (q) => q.eq("userId", targetUserId))
+      .collect();
+
+    const existingPlaceIds = new Set(existingTargetSpots.map((s) => s.placeId));
+
+    let spotsInserted = 0;
+    let spotsSkipped = 0;
+
+    for (const spot of sourceSpots) {
+      if (existingPlaceIds.has(spot.placeId)) {
+        spotsSkipped += 1;
+        continue;
+      }
+
+      const place = await ctx.db.get(spot.place);
+      if (!place) {
+        spotsSkipped += 1;
+        continue;
+      }
+
+      await ctx.db.insert("spots", {
+        userId: targetUserId,
+        place: spot.place,
+        placeId: spot.placeId,
+        name: spot.name,
+        personalRating: spot.personalRating,
+        personalNotes: spot.personalNotes,
+        isVisited: spot.isVisited,
+        socialLinks: [...spot.socialLinks],
+      });
+      spotsInserted += 1;
+      existingPlaceIds.add(spot.placeId);
+    }
+
+    const existingTargetTags = await ctx.db
+      .query("tags")
+      .withIndex("by_user", (q) => q.eq("userId", targetUserId))
+      .collect();
+
+    const existingTagNames = new Set(existingTargetTags.map((t) => t.tagName));
+
+    let tagsInserted = 0;
+    let tagsSkipped = 0;
+
+    for (const tag of sourceTags) {
+      if (existingTagNames.has(tag.tagName)) {
+        tagsSkipped += 1;
+        continue;
+      }
+      await ctx.db.insert("tags", {
+        userId: targetUserId,
+        tagName: tag.tagName,
+      });
+      tagsInserted += 1;
+      existingTagNames.add(tag.tagName);
+    }
+
+    return { spotsInserted, spotsSkipped, tagsInserted, tagsSkipped };
+  },
+});
+
+type CopyUserDataResult = {
+  spotsInserted: number;
+  spotsSkipped: number;
+  tagsInserted: number;
+  tagsSkipped: number;
+};
+
+/**
+ * Resolve Better Auth account _id values to user IDs, then copy user data.
+ */
+export const copyUserDataByAccount = internalMutation({
+  args: {
+    sourceAccountId: v.string(),
+    targetAccountId: v.string(),
+  },
+  returns: v.object({
+    sourceUserId: v.string(),
+    targetUserId: v.string(),
+    spotsInserted: v.number(),
+    spotsSkipped: v.number(),
+    tagsInserted: v.number(),
+    tagsSkipped: v.number(),
+  }),
+  handler: async (ctx, { sourceAccountId, targetAccountId }): Promise<
+    CopyUserDataResult & { sourceUserId: string; targetUserId: string }
+  > => {
+    const sourceAccount = await ctx.runQuery(components.betterAuth.adapter.findOne, {
+      model: "account",
+      where: [{ field: "_id", value: sourceAccountId }],
+    });
+    if (!sourceAccount) {
+      throw new Error(`No Better Auth account for id: ${sourceAccountId}`);
+    }
+
+    const targetAccount = await ctx.runQuery(components.betterAuth.adapter.findOne, {
+      model: "account",
+      where: [{ field: "_id", value: targetAccountId }],
+    });
+    if (!targetAccount) {
+      throw new Error(`No Better Auth account for id: ${targetAccountId}`);
+    }
+
+    const sourceUserId = String(
+      (sourceAccount as { userId?: string }).userId ?? ""
+    );
+    const targetUserId = String(
+      (targetAccount as { userId?: string }).userId ?? ""
+    );
+    if (!sourceUserId || !targetUserId) {
+      throw new Error("Could not resolve userId from account records");
+    }
+
+    const result = await ctx.runMutation(internal.migrations.copyUserData, {
+      sourceUserId,
+      targetUserId,
+    });
+
+    return { sourceUserId, targetUserId, ...result };
   },
 });
 

@@ -24,9 +24,15 @@ Thumbs.db
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 
+# VSCode
+.vscode
+
 # Sentry Config File
 .env.sentry-build-plugin
 
+.cursor
+.impeccable
+scripts/*
 
 # Claude
 .claude/worktrees/*

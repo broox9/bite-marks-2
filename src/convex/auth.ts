@@ -18,6 +18,9 @@ export const authComponent = createClient<DataModel, typeof authSchema>(componen
 export const createAuthOptions = (ctx: GenericCtx<DataModel>) => {
   const googleClientId = process.env.GOOGLE_CLIENT_ID;
   const googleClientSecret = process.env.GOOGLE_CLIENT_SECRET;
+  // #region agent log
+  fetch("http://127.0.0.1:7724/ingest/5ad7bcdf-f199-4e71-9ae6-e700736dd1c7",{method:"POST",headers:{"Content-Type":"application/json","X-Debug-Session-Id":"b32ac3"},body:JSON.stringify({sessionId:"b32ac3",runId:"initial",hypothesisId:"A,B,C",location:"src/convex/auth.ts:17",message:"Better Auth production OAuth configuration evaluated",data:{baseURL:siteUrl,googleProviderEnabled:Boolean(googleClientId&&googleClientSecret),googleClientIdSuffix:googleClientId?.slice(-12)??null,callbackURL:`${siteUrl}/api/auth/callback/google`},timestamp:Date.now()})}).catch(()=>{});
+  // #endregion
 
   return {
     baseURL: siteUrl,
