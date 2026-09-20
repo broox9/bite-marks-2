@@ -21,18 +21,81 @@
 				}
 			})();
 		</script>
-				<script>
+		<script>
+			/**
+			 * Dynamic Library Import bootstrap.
+			 * Uses `window.google` (property access) so Safari never throws
+			 * `ReferenceError: Can't find variable: google` before Maps JS loads.
+			 * The legacy `maps/api/js?...&libraries=places&callback=` loader also
+			 * leaves `google.maps.importLibrary` undefined on some WebKit builds.
+			 * This stub defines importLibrary immediately and queues requests.
+			 */
+			(function bootstrapGoogleMaps(options) {
+				var googleNs = window.google || (window.google = {});
+				var maps = googleNs.maps || (googleNs.maps = {});
+				if (typeof maps.importLibrary === "function") {
+					return;
+				}
 
-					window.resolveGoogleLoaded = () => {
-						if (!google) {
-							console.error('[bs] GOOGLE LOAD ERROR')
-							return Promise.reject('Error loading google') // nothing catching this yet
+				var pendingLibraries = [];
+				var loadPromise;
+
+				function toParamName(key) {
+					return key.replace(/[A-Z]/g, function (ch) {
+						return "_" + ch.toLowerCase();
+					});
+				}
+
+				function loadApi() {
+					if (loadPromise) return loadPromise;
+					loadPromise = new Promise(function (resolve, reject) {
+						var script = document.createElement("script");
+						var params = new URLSearchParams();
+						var key;
+						for (key in options) {
+							if (Object.prototype.hasOwnProperty.call(options, key)) {
+								params.set(toParamName(key), options[key]);
+							}
 						}
-						console.log('[bs] GOOGLE READY', true)
-						return Promise.resolve(google)
+						params.set("libraries", pendingLibraries.join(","));
+						params.set("callback", "google.maps.__ib__");
+						script.src = "https://maps.googleapis.com/maps/api/js?" + params.toString();
+						script.async = true;
+						script.nonce = document.querySelector("script[nonce]")?.nonce || "";
+						script.onerror = function () {
+							reject(new Error("The Google Maps JavaScript API could not load."));
+						};
+						maps.__ib__ = resolve;
+						document.head.appendChild(script);
+					});
+					return loadPromise;
+				}
+
+				maps.importLibrary = function importLibrary(name) {
+					if (name && pendingLibraries.indexOf(name) === -1) {
+						pendingLibraries.push(name);
 					}
-				</script>
-		<script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDkL_zZu457B4XEsAkbVDXr8hsYsebDnOs&libraries=places&loading=async&callback=resolveGoogleLoaded"></script>
+					var args = arguments;
+					return loadApi().then(function () {
+						return maps.importLibrary.apply(maps, args);
+					});
+				};
+
+				window.resolveGoogleLoaded = function resolveGoogleLoaded() {
+					return maps.importLibrary("core").then(function () {
+						return window.google;
+					});
+				};
+
+				// Start fetching Places immediately; search UI needs it on first keystroke.
+				maps.importLibrary("places").catch(function () {
+					// Preload failure is surfaced by later importLibrary callers.
+				});
+			})({
+				key: "AIzaSyDkL_zZu457B4XEsAkbVDXr8hsYsebDnOs",
+				v: "weekly"
+			});
+		</script>
 		%sveltekit.head%
 	</head>
 	<body data-sveltekit-preload-data="hover">
