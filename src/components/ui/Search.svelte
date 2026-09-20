@@ -1,24 +1,21 @@
 <script lang="ts">
-  import Input from './Input.svelte';
-  import { Search, Clock } from '@lucide/svelte';
-  // import { Component } from 'svelte'
+  import { Search } from '@lucide/svelte';
+  import type { Component } from 'svelte';
 
   interface Props extends Omit<Record<string, unknown>, 'class' | 'type'> {
     class?: string
     value?: string
     'data-size'?: 'sm' | 'md' | 'lg'
     'data-variant'?: string
+    Icon?: Component<{ size?: number; class?: string }>
   }
 
-  let { icon, Icon,...rest }: Props = $props()
+  let { Icon = Search, ...rest }: Props = $props()
 </script>
 
 <div class="search-bar-row">
   <label class="search-pill">
     <Icon size={15} class="search-icon"/>
-    <!-- {#if icon}
-      {@render icon()}
-    {/if} -->
     <input type="search" {...rest} />
   </label>
   <button type="button" class="cancel-btn" onclick={() => 0}>Cancel</button>

@@ -41,6 +41,12 @@
   --comp-btn-danger-border:       var(--sys-color-error);
   --comp-btn-danger-text:         var(--sys-color-text-on-dark);
 
+  /* OAuth provider button on authentication screens. */
+  --comp-btn-oauth-bg:            var(--sys-color-surface);
+  --comp-btn-oauth-bg-hover:      var(--sys-color-surface-raised);
+  --comp-btn-oauth-border:        var(--sys-color-border);
+  --comp-btn-oauth-text:          var(--sys-color-text);
+
   /* ─── Pill Tabs / Segmented Control ──────────────────────────────────────
    * Independent pill buttons — "All 70", "Visited 38", "To try 32".
    * ──────────────────────────────────────────────────────────────────────── */
@@ -96,8 +102,10 @@
   /* ─── List Item ──────────────────────────────────────────────────────────
    * Clean chevron row: name · subtitle · star · distance · ›
    * ──────────────────────────────────────────────────────────────────────── */
-  --comp-list-item-bg:             var(--sys-color-surface);
+  --comp-list-item-bg:             var(--sys-color-page);
   --comp-list-item-bg-hover:       var(--sys-color-surface-raised);
+  --comp-list-item-bg-selected:    var(--sys-color-accent-tint);
+  --comp-list-item-selected-edge:  var(--sys-color-accent);
   --comp-list-item-divider:        var(--sys-color-border);
   --comp-list-item-text:           var(--sys-color-text);
   --comp-list-item-text-sub:       var(--sys-color-text-muted);
@@ -107,11 +115,12 @@
   /* ─── Map Markers ────────────────────────────────────────────────────────
    * Pill-shaped labels with name visible. Color encodes visited state.
    * ──────────────────────────────────────────────────────────────────────── */
+  --comp-marker-default-bg:        var(--sys-color-surface);
+  --comp-marker-default-text:      var(--sys-color-text);
   --comp-marker-visited-bg:        var(--sys-color-success);
-  --comp-marker-to-try-bg:         var(--sys-color-brand);
-  --comp-marker-selected-bg:       var(--sys-color-text);
-  --comp-marker-text:              var(--sys-color-text-on-dark);
-  --comp-marker-border:            var(--sys-color-surface); /* white ring  */
+  --comp-marker-selected-bg:       var(--sys-color-brand);
+  --comp-marker-accent-text:       var(--sys-color-text-on-dark);
+  --comp-marker-border:            var(--sys-color-border);
   --comp-marker-shadow:            var(--ref-shadow-sm);
   --comp-marker-radius:            var(--sys-radius-pill);
 
@@ -153,7 +162,7 @@
    * Slides up from bottom. Contains search input, top matches, filters.
    * ──────────────────────────────────────────────────────────────────────── */
   --comp-drawer-bg:                var(--sys-color-surface);
-  --comp-drawer-radius:            var(--sys-radius-control); /* top corners  */
+  --comp-drawer-radius:            var(--sys-radius-3xl); /* top corners  */
   --comp-drawer-shadow:            var(--sys-shadow-overlay);
   --comp-drawer-backdrop:          var(--sys-overlay-bg);
   --comp-drawer-input-bg:          var(--sys-color-surface-sunken);
@@ -170,6 +179,11 @@
   --comp-header-menu-text:         var(--sys-color-text);
   --comp-header-menu-bg-hover:     var(--sys-color-surface-raised);
 
+  /* ─── Mobile navigation drawer ────────────────────────────────────────── */
+  --comp-menu-bg:                  var(--sys-color-surface);
+  --comp-menu-border:              var(--sys-color-border);
+  --comp-menu-scrim:               var(--sys-overlay-bg);
+
   /* ─── Detail — Eyebrow ───────────────────────────────────────────────────
    * "STEAKHOUSE · JERSEY CITY, NJ" above the spot name.
    * ──────────────────────────────────────────────────────────────────────── */
@@ -185,6 +199,18 @@
   --comp-section-label-size:       0.6875rem;
   --comp-section-label-weight:     700;
   --comp-section-label-spacing:    0.06em;
+
+  /* ─── Detail — Cards (hero, mini-map, personal details, notes) ──────────
+   * Shared surface for the overlapping hero card + the stacked detail cards.
+   * ──────────────────────────────────────────────────────────────────────── */
+  --comp-card-bg:                  var(--sys-color-surface);
+  --comp-card-border:              var(--sys-color-border);
+  --comp-card-radius:              var(--sys-radius-2xl);
+  --comp-card-shadow:              var(--sys-shadow-card);
+
+  /* ─── Spot card thumbnail ─────────────────────────────────────────────── */
+  --comp-thumb-radius:             var(--sys-radius-xl);
+  --comp-thumb-bg:                 var(--sys-color-surface-sunken);
 
   /* ─── Detail — Link Grid Cards ───────────────────────────────────────────
    * Two-column grid of link cards: WEBSITE / felinajc.com
@@ -224,4 +250,11 @@
   --comp-textarea-placeholder: var(--sys-color-text-muted);
   --comp-textarea-radius:      var(--sys-radius-control);
 
+}
+
+:root[data-theme='night'] {
+  /* Map selection is amber in the night palette. */
+  --comp-list-item-bg-selected:    var(--sys-color-brand-tint);
+  --comp-list-item-selected-edge:  var(--sys-color-brand);
+  --comp-btn-oauth-bg:             var(--sys-color-surface-sunken);
 }

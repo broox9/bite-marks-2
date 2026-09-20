@@ -1,10 +1,9 @@
 <script lang="ts">
-  const { children, title='', cssClass = '' } = $props()
-  const classList = `card p-4 rounded-xl ${cssClass}`
+  const { children, cssClass = '' } = $props()
 </script>
 
 
-<div class={classList}>
+<div class="card p-4 rounded-xl {cssClass}">
   <div class="card-body">
     {@render children()}
   </div>

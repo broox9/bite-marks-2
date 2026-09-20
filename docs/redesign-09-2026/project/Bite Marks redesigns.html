@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Bite Marks — redesign explorations</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=DM+Serif+Display:ital@0;1&family=Inter+Tight:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    html, body { margin: 0; padding: 0; height: 100%; background: #f0eee9; font-family: 'Plus Jakarta Sans', system-ui, sans-serif; }
+    #root { height: 100vh; }
+    .ab-card { box-shadow: 0 8px 28px rgba(20, 15, 10, 0.10), 0 2px 6px rgba(20, 15, 10, 0.06); border-radius: 14px; overflow: hidden; background: #fff; }
+  </style>
+  <script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+  <script type="text/babel" src="design-canvas.jsx"></script>
+  <script type="text/babel" src="shared.jsx"></script>
+  <script type="text/babel" src="variants/r1-refined.jsx"></script>
+  <script type="text/babel" src="variants/d2-dark.jsx"></script>
+</head>
+<body>
+  <div id="root"></div>
+  <script type="text/babel" data-presets="env,react">
+    // Wrapper to give every artboard a card shadow + clip overflow.
+    function Frame({ children }) {
+      return <div className="ab-card" style={{ width: '100%', height: '100%' }}>{children}</div>;
+    }
+
+    function App() {
+      const phoneW = 540, phoneH = 1080;
+      const mobileW = 420, mobileH = 900; // true mobile-web viewport for R1
+      const wideW = 880, wideH = 940;
+      return (
+        <DesignCanvas>
+          <DCSection
+            id="refined"
+            title="Refinements"
+            subtitle="Same Bite Marks DNA — tightened spacing, hierarchy, color use."
+          >
+            <DCArtboard id="r1-list" label="R1 · Listings · mobile" width={mobileW} height={mobileH}>
+              <Frame><R1Listings /></Frame>
+            </DCArtboard>
+            <DCArtboard id="r1-list-exp" label="R1 · Listings · list expanded" width={mobileW} height={mobileH}>
+              <Frame><R1Listings expanded openCard={-1} /></Frame>
+            </DCArtboard>
+            <DCArtboard id="r1-search" label="R1 · Search drawer" width={mobileW} height={mobileH}>
+              <Frame><R1ListingsSearch /></Frame>
+            </DCArtboard>
+            <DCArtboard id="r1-detail" label="R1 · Detail · mobile" width={mobileW} height={mobileH}>
+              <Frame><R1Detail /></Frame>
+            </DCArtboard>
+            <DCArtboard id="r1-settings" label="R1 · Settings & location" width={mobileW} height={mobileH}>
+              <Frame><R1Settings /></Frame>
+            </DCArtboard>
+
+          </DCSection>
+
+          <DCSection
+            id="r1-night"
+            title="R1 · After-hours"
+            subtitle="Same R1 layout, D2's dark palette and type (DM Serif Display, Inter Tight, IBM Plex Mono)."
+          >
+            <DCArtboard id="r1n-list" label="R1 Night · Listings" width={mobileW} height={mobileH}>
+              <Frame><R1Theme theme={r1Dark}><R1Listings /></R1Theme></Frame>
+            </DCArtboard>
+            <DCArtboard id="r1n-list-exp" label="R1 Night · Listings · list expanded" width={mobileW} height={mobileH}>
+              <Frame><R1Theme theme={r1Dark}><R1Listings expanded openCard={-1} /></R1Theme></Frame>
+            </DCArtboard>
+            <DCArtboard id="r1n-search" label="R1 Night · Search drawer" width={mobileW} height={mobileH}>
+              <Frame><R1Theme theme={r1Dark}><R1ListingsSearch /></R1Theme></Frame>
+            </DCArtboard>
+            <DCArtboard id="r1n-detail" label="R1 Night · Detail" width={mobileW} height={mobileH}>
+              <Frame><R1Theme theme={r1Dark}><R1Detail /></R1Theme></Frame>
+            </DCArtboard>
+            <DCArtboard id="r1n-settings" label="R1 Night · Settings & location" width={mobileW} height={mobileH}>
+              <Frame><R1Theme theme={r1Dark}><R1Settings /></R1Theme></Frame>
+            </DCArtboard>
+          </DCSection>
+
+          <DCSection
+            id="distinct"
+            title="D2 reference"
+            subtitle="Source palette and type for R1 After-hours."
+          >
+            <DCArtboard id="d2-list" label="D2 · After-Hours · Listings" width={phoneW} height={phoneH}>
+              <Frame><D2Listings /></Frame>
+            </DCArtboard>
+            <DCArtboard id="d2-detail" label="D2 · After-Hours · Detail" width={phoneW} height={phoneH}>
+              <Frame><D2Detail /></Frame>
+            </DCArtboard>
+            <DCPostIt x={-260} y={120} width={230}>
+              <b>How to use this.</b> Drag to pan, scroll to zoom, click the ⤢ corner of any artboard to view it full-bleed. Drop comments anywhere.
+            </DCPostIt>
+          </DCSection>
+        </DesignCanvas>
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+  </script>
+</body>
+</html>

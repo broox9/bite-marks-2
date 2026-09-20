@@ -1,114 +1,79 @@
-export const GOOGLE_MAPS_LOAD_TIMEOUT_MS = 20_000;
+export type GoogleMapsImportLibrary = (
+  library: string,
+  ...rest: unknown[]
+) => Promise<unknown>;
 
-export type GoogleMapsLike = {
-	maps?: {
-		importLibrary?: (name: string) => Promise<unknown>;
-	};
+export type GoogleMapsRoot = {
+  google?: {
+    maps?: {
+      importLibrary?: GoogleMapsImportLibrary;
+    };
+  };
 };
 
-export type GoogleMapsLoaderHost = {
-	google?: unknown;
-	resolveGoogleLoaded?: () => Promise<GoogleMapsLike>;
-	__googleMapsLoadFailed?: (reason?: unknown) => Promise<GoogleMapsLike>;
-	__googleMapsLoaderInstalled?: boolean;
-};
-
-type TimerId = ReturnType<typeof setTimeout> | number;
-
-type InstallOptions = {
-	timeoutMs?: number;
-	setTimer?: (handler: () => void, timeout: number) => TimerId;
-	clearTimer?: (id: TimerId) => void;
-};
-
-function toError(reason: unknown): Error {
-	if (reason instanceof Error) return reason;
-	return new Error("Google Maps failed to load");
+export class GoogleMapsLoadError extends Error {
+  override name = "GoogleMapsLoadError";
 }
 
-/**
- * Read `host.google` via property access so a missing Maps script never
- * throws `ReferenceError: Can't find variable: google` (Safari) /
- * `google is not defined` (Chromium).
- */
-export function readGoogleMapsGlobal(
-	host: GoogleMapsLoaderHost | null | undefined,
-): GoogleMapsLike | undefined {
-	if (!host) return undefined;
-	const value = host.google;
-	if (!value || typeof value !== "object") return undefined;
-	return value as GoogleMapsLike;
+const DEFAULT_TIMEOUT_MS = 15_000;
+const DEFAULT_POLL_MS = 50;
+
+export function getMapsImportLibrary(
+  root: GoogleMapsRoot = globalThis as GoogleMapsRoot,
+): GoogleMapsImportLibrary | undefined {
+  const maps = root.google?.maps;
+  const importLibrary = maps?.importLibrary;
+  if (typeof importLibrary !== "function") return undefined;
+  return importLibrary.bind(maps);
 }
 
-/**
- * Shared waiter for the Maps JS bootstrap.
- *
- * `resolveGoogleLoaded` may be invoked by:
- * - our app code before the async Maps script finishes
- * - the Maps `callback=` once the script is actually ready
- *
- * Early callers receive the same pending promise instead of rejecting.
- */
-export function installGoogleMapsLoader(
-	host: GoogleMapsLoaderHost,
-	options: InstallOptions = {},
-): () => Promise<GoogleMapsLike> {
-	if (host.__googleMapsLoaderInstalled && typeof host.resolveGoogleLoaded === "function") {
-		return host.resolveGoogleLoaded;
-	}
+export async function importMapsLibrary<T = unknown>(
+  library: string,
+  root: GoogleMapsRoot = globalThis as GoogleMapsRoot,
+): Promise<T> {
+  const importLibrary = getMapsImportLibrary(root);
+  if (!importLibrary) {
+    throw new GoogleMapsLoadError(
+      `Google Maps importLibrary is unavailable (library=${library})`,
+    );
+  }
+  return (await importLibrary(library)) as T;
+}
 
-	const timeoutMs = options.timeoutMs ?? GOOGLE_MAPS_LOAD_TIMEOUT_MS;
-	const setTimer = options.setTimer ?? setTimeout;
-	const clearTimer = options.clearTimer ?? clearTimeout;
+export async function waitForGoogleMaps(
+  options: {
+    timeoutMs?: number;
+    pollMs?: number;
+    root?: GoogleMapsRoot;
+  } = {},
+): Promise<NonNullable<GoogleMapsRoot["google"]>> {
+  const {
+    timeoutMs = DEFAULT_TIMEOUT_MS,
+    pollMs = DEFAULT_POLL_MS,
+    root = globalThis as GoogleMapsRoot,
+  } = options;
+  const startedAt = Date.now();
 
-	let settled = false;
-	let resolveReady!: (value: GoogleMapsLike) => void;
-	let rejectReady!: (reason: Error) => void;
-	const ready = new Promise<GoogleMapsLike>((resolve, reject) => {
-		resolveReady = resolve;
-		rejectReady = reject;
-	});
-	// The Maps script can fail (ad blocker / network) before any waiter attaches.
-	ready.catch(() => {});
+  while (Date.now() - startedAt <= timeoutMs) {
+    const importLibrary = getMapsImportLibrary(root);
+    if (importLibrary) {
+      await importLibrary("core");
+      if (!root.google) {
+        throw new GoogleMapsLoadError(
+          "Google Maps loaded without a google namespace",
+        );
+      }
+      return root.google;
+    }
 
-	let timeoutId: TimerId | undefined;
+    await delay(pollMs);
+  }
 
-	const settleResolve = (value: GoogleMapsLike) => {
-		if (settled) return;
-		settled = true;
-		if (timeoutId !== undefined) clearTimer(timeoutId);
-		resolveReady(value);
-	};
+  throw new GoogleMapsLoadError("Google Maps failed to become ready");
+}
 
-	const settleReject = (reason: unknown) => {
-		if (settled) return;
-		settled = true;
-		if (timeoutId !== undefined) clearTimer(timeoutId);
-		rejectReady(toError(reason));
-	};
-
-	const resolveGoogleLoaded = () => {
-		const maps = readGoogleMapsGlobal(host);
-		if (maps) settleResolve(maps);
-		return ready;
-	};
-
-	host.resolveGoogleLoaded = resolveGoogleLoaded;
-	host.__googleMapsLoadFailed = (reason?: unknown) => {
-		settleReject(reason);
-		return ready;
-	};
-	host.__googleMapsLoaderInstalled = true;
-
-	timeoutId = setTimer(() => {
-		const maps = readGoogleMapsGlobal(host);
-		if (maps) {
-			settleResolve(maps);
-			return;
-		}
-		settleReject(new Error("Google Maps load timed out"));
-	}, timeoutMs);
-
-	resolveGoogleLoaded();
-	return resolveGoogleLoaded;
+function delay(ms: number): Promise<void> {
+  return new Promise((resolve) => {
+    setTimeout(resolve, ms);
+  });
 }

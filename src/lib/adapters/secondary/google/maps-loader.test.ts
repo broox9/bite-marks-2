@@ -1,131 +1,181 @@
 import { readFileSync } from "node:fs";
-import path from "node:path";
+import { resolve } from "node:path";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import {
-	GOOGLE_MAPS_LOAD_TIMEOUT_MS,
-	installGoogleMapsLoader,
-	readGoogleMapsGlobal,
-	type GoogleMapsLike,
-	type GoogleMapsLoaderHost,
+  GoogleMapsLoadError,
+  getMapsImportLibrary,
+  importMapsLibrary,
+  waitForGoogleMaps,
+  type GoogleMapsRoot,
 } from "./maps-loader";
 
-describe("readGoogleMapsGlobal", () => {
-	it("returns undefined without throwing when google is missing", () => {
-		expect(readGoogleMapsGlobal(undefined)).toBeUndefined();
-		expect(readGoogleMapsGlobal(null)).toBeUndefined();
-		expect(readGoogleMapsGlobal({})).toBeUndefined();
-		expect(readGoogleMapsGlobal({ google: undefined })).toBeUndefined();
-	});
+describe("getMapsImportLibrary", () => {
+  it("returns undefined when the Maps namespace is missing", () => {
+    expect(getMapsImportLibrary({})).toBeUndefined();
+    expect(getMapsImportLibrary({ google: {} })).toBeUndefined();
+    expect(getMapsImportLibrary({ google: { maps: {} } })).toBeUndefined();
+  });
 
-	it("returns the Maps global when present", () => {
-		const google = { maps: {} };
-		expect(readGoogleMapsGlobal({ google })).toBe(google);
-	});
+  it("returns undefined when importLibrary exists but is not a function", () => {
+    const root = {
+      google: { maps: { importLibrary: "places" as unknown as undefined } },
+    } as GoogleMapsRoot;
+
+    expect(getMapsImportLibrary(root)).toBeUndefined();
+  });
+
+  it("returns a bound importLibrary when the dynamic loader is present", async () => {
+    const importLibrary = vi.fn(async function (
+      this: { marker: string },
+      library: string,
+    ) {
+      return { library, marker: this.marker };
+    });
+    const root: GoogleMapsRoot = {
+      google: { maps: { importLibrary, marker: "maps" } as any },
+    };
+
+    const bound = getMapsImportLibrary(root);
+    await expect(bound?.("places")).resolves.toEqual({
+      library: "places",
+      marker: "maps",
+    });
+  });
 });
 
-describe("installGoogleMapsLoader", () => {
-	afterEach(() => {
-		vi.useRealTimers();
-	});
+describe("importMapsLibrary", () => {
+  it("throws a controlled error instead of TypeError when importLibrary is missing", async () => {
+    const root: GoogleMapsRoot = { google: { maps: {} } };
 
-	it("does not throw when called before the Maps script defines google", () => {
-		const host: GoogleMapsLoaderHost = {};
-		expect(() => installGoogleMapsLoader(host, { timeoutMs: 50_000 })).not.toThrow();
-		expect(() => host.resolveGoogleLoaded?.()).not.toThrow();
-	});
+    // Legacy Maps stub: `google.maps` exists, but importLibrary was never attached.
+    // This is the BITE-MARKS-2-2C production failure mode (Safari / WebKit).
+    expect(typeof root.google?.maps?.importLibrary).not.toBe("function");
+    expect(() => {
+      const maps = root.google!.maps as { importLibrary?: (library: string) => unknown };
+      maps.importLibrary!("places");
+    }).toThrow(TypeError);
 
-	it("lets early callers wait until the Maps callback provides google", async () => {
-		const host: GoogleMapsLoaderHost = {};
-		installGoogleMapsLoader(host, { timeoutMs: 50_000 });
+    await expect(importMapsLibrary("places", root)).rejects.toBeInstanceOf(
+      GoogleMapsLoadError,
+    );
+    await expect(importMapsLibrary("places", root)).rejects.not.toBeInstanceOf(
+      TypeError,
+    );
+    await expect(importMapsLibrary("places", root)).rejects.toThrow(
+      /importLibrary is unavailable/,
+    );
+  });
 
-		const pending = host.resolveGoogleLoaded?.();
-		expect(pending).toBeInstanceOf(Promise);
+  it("does not call a non-function importLibrary property", async () => {
+    const root = {
+      google: {
+        maps: {
+          importLibrary: undefined,
+        },
+      },
+    };
 
-		const google: GoogleMapsLike = { maps: {} };
-		host.google = google;
-		host.resolveGoogleLoaded?.();
+    await expect(importMapsLibrary("places", root)).rejects.toBeInstanceOf(
+      GoogleMapsLoadError,
+    );
+  });
 
-		await expect(pending).resolves.toBe(google);
-	});
+  it("loads the requested library when importLibrary is available", async () => {
+    const places = { Place: class {} };
+    const importLibrary = vi.fn(async (library: string) => {
+      if (library === "places") return places;
+      return {};
+    });
+    const root: GoogleMapsRoot = { google: { maps: { importLibrary } } };
 
-	it("resolves immediately when Maps is already on the host", async () => {
-		const google: GoogleMapsLike = { maps: {} };
-		const host: GoogleMapsLoaderHost = { google };
-		installGoogleMapsLoader(host, { timeoutMs: 50_000 });
-		await expect(host.resolveGoogleLoaded?.()).resolves.toBe(google);
-	});
-
-	it("rejects on script onerror without a ReferenceError", async () => {
-		const host: GoogleMapsLoaderHost = {};
-		installGoogleMapsLoader(host, { timeoutMs: 50_000 });
-		const pending = host.resolveGoogleLoaded?.();
-
-		host.__googleMapsLoadFailed?.(new Error("Google Maps script failed to load"));
-
-		await expect(pending).rejects.toThrow("Google Maps script failed to load");
-	});
-
-	it("times out if Maps never arrives", async () => {
-		vi.useFakeTimers();
-		const host: GoogleMapsLoaderHost = {};
-		installGoogleMapsLoader(host, { timeoutMs: GOOGLE_MAPS_LOAD_TIMEOUT_MS });
-		const pending = host.resolveGoogleLoaded?.();
-
-		await vi.advanceTimersByTimeAsync(GOOGLE_MAPS_LOAD_TIMEOUT_MS);
-
-		await expect(pending).rejects.toThrow("Google Maps load timed out");
-	});
-
-	it("is idempotent and keeps the original waiter", async () => {
-		const host: GoogleMapsLoaderHost = {};
-		const first = installGoogleMapsLoader(host, { timeoutMs: 50_000 });
-		const second = installGoogleMapsLoader(host, { timeoutMs: 50_000 });
-		expect(second).toBe(first);
-
-		const google: GoogleMapsLike = { maps: {} };
-		host.google = google;
-		first();
-		await expect(host.resolveGoogleLoaded?.()).resolves.toBe(google);
-	});
+    await expect(importMapsLibrary("places", root)).resolves.toBe(places);
+    expect(importLibrary).toHaveBeenCalledWith("places");
+  });
 });
 
-describe("app.html Google Maps bootstrap", () => {
-	const appHtml = readFileSync(path.resolve("./src/app.html"), "utf8");
-	const bootstrap = appHtml.match(/<script>\s*([\s\S]*?)\s*<\/script>/)?.[1] ?? "";
+describe("app.html Maps bootstrap", () => {
+  const html = readFileSync(resolve(process.cwd(), "src/app.html"), "utf8");
+  const bootstrap =
+    [...html.matchAll(/<script>([\s\S]*?)<\/script>/g)]
+      .map((match) => match[1])
+      .find((script) => script.includes("bootstrapGoogleMaps")) ?? "";
 
-	it("does not read an undeclared google identifier", () => {
-		expect(bootstrap).toContain("window.google");
-		expect(bootstrap).toContain("__googleMapsLoadFailed");
-		expect(bootstrap).not.toMatch(/\bif\s*\(\s*!google\s*\)/);
-		expect(bootstrap).not.toMatch(/Promise\.resolve\(\s*google\s*\)/);
-	});
+  it("does not use the legacy libraries= + callback= script loader", () => {
+    expect(html).not.toMatch(
+      /maps\/api\/js\?[^"']*libraries=places[^"']*callback=resolveGoogleLoaded/,
+    );
+  });
 
-	it("does not throw when evaluated before Maps defines google", async () => {
-		const windowObj: {
-			google?: unknown;
-			resolveGoogleLoaded?: () => Promise<unknown>;
-			__googleMapsLoadFailed?: (reason?: unknown) => Promise<unknown>;
-		} = {};
-		const fn = new Function(
-			"window",
-			"Promise",
-			"Error",
-			"setTimeout",
-			"clearTimeout",
-			"console",
-			bootstrap,
-		);
-		expect(() =>
-			fn(windowObj, Promise, Error, () => 1, () => {}, console),
-		).not.toThrow();
+  it("defines importLibrary immediately so Safari does not see an undefined function", () => {
+    expect(html).toContain("maps.importLibrary = function importLibrary");
+    expect(html).toContain('maps.importLibrary("core")');
+  });
 
-		const pending = windowObj.resolveGoogleLoaded?.();
-		expect(pending).toBeInstanceOf(Promise);
+  it("never reads an undeclared google identifier (BITE-MARKS-2-2B)", () => {
+    expect(bootstrap).toContain("window.google");
+    expect(bootstrap).not.toMatch(/\bif\s*\(\s*!google\s*\)/);
+    expect(bootstrap).not.toMatch(/Promise\.resolve\(\s*google\s*\)/);
+  });
 
-		const maps = { maps: {} };
-		windowObj.google = maps;
-		windowObj.resolveGoogleLoaded?.();
-		await expect(pending).resolves.toBe(maps);
-	});
+  it("does not throw when evaluated before Maps JS defines google", () => {
+    const windowObj: {
+      google?: { maps?: { importLibrary?: (...args: unknown[]) => unknown } };
+      resolveGoogleLoaded?: () => Promise<unknown>;
+    } = {};
+    const documentStub = {
+      querySelector: () => null,
+      createElement: () => ({
+        async: false,
+        nonce: "",
+        src: "",
+        onerror: null as ((err: Error) => void) | null,
+      }),
+      head: { appendChild: () => {} },
+    };
+    const fn = new Function(
+      "window",
+      "document",
+      "URLSearchParams",
+      "Promise",
+      "Error",
+      bootstrap,
+    );
+
+    expect(() =>
+      fn(windowObj, documentStub, URLSearchParams, Promise, Error),
+    ).not.toThrow();
+    expect(typeof windowObj.resolveGoogleLoaded).toBe("function");
+    expect(typeof windowObj.google?.maps?.importLibrary).toBe("function");
+    expect(() => windowObj.resolveGoogleLoaded?.()).not.toThrow();
+  });
+});
+
+describe("waitForGoogleMaps", () => {
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  it("resolves after importLibrary appears on a previously incomplete maps stub", async () => {
+    const root: GoogleMapsRoot = { google: { maps: {} } };
+    const importLibrary = vi.fn(async (library: string) => {
+      return { library };
+    });
+
+    const ready = waitForGoogleMaps({ root, timeoutMs: 200, pollMs: 10 });
+    setTimeout(() => {
+      root.google!.maps!.importLibrary = importLibrary;
+    }, 20);
+
+    await expect(ready).resolves.toBe(root.google);
+    expect(importLibrary).toHaveBeenCalledWith("core");
+  });
+
+  it("rejects with GoogleMapsLoadError when importLibrary never becomes a function", async () => {
+    const root: GoogleMapsRoot = { google: { maps: {} } };
+
+    await expect(
+      waitForGoogleMaps({ root, timeoutMs: 30, pollMs: 5 }),
+    ).rejects.toBeInstanceOf(GoogleMapsLoadError);
+  });
 });

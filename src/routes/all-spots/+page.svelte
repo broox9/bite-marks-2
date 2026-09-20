@@ -70,16 +70,16 @@
 	.spots-page {
 		--page-max-width: 80rem;
 		--page-padding: 1rem;
-		--card-border: #e5e7eb;
-		--card-surface: #ffffff;
-		--text-strong: #111827;
-		--text-muted: #4b5563;
-		--rating-bg: #fef3c7;
-		--rating-text: #92400e;
-		--price-bg: #f3f4f6;
-		--price-text: #1f2937;
-		--link: #2563eb;
-		--link-hover: #3b82f6;
+		--card-border: var(--sys-color-border);
+		--card-surface: var(--sys-color-surface);
+		--text-strong: var(--sys-color-text);
+		--text-muted: var(--sys-color-text-muted);
+		--rating-bg: var(--sys-color-warning-tint);
+		--rating-text: var(--sys-color-warning-text);
+		--price-bg: var(--sys-color-surface-sunken);
+		--price-text: var(--sys-color-text-secondary);
+		--link: var(--sys-color-brand);
+		--link-hover: var(--sys-color-brand-hover);
 
 		max-width: var(--page-max-width);
 		margin: 0 auto;
@@ -89,8 +89,10 @@
 	h1 {
 		margin: 0 0 1.5rem;
 		color: var(--text-strong);
+		font-family: var(--sys-font-display);
 		font-size: 1.875rem;
-		font-weight: 700;
+		font-weight: var(--sys-display-weight);
+		letter-spacing: var(--sys-display-tracking);
 		line-height: 1.2;
 	}
 
@@ -113,7 +115,7 @@
 		border: 1px solid var(--card-border);
 		border-radius: 0.5rem;
 		background: var(--card-surface);
-		box-shadow: 0 1px 2px rgb(0 0 0 / 0.05);
+		box-shadow: var(--ref-shadow-sm);
 	}
 
 	.spot-header {

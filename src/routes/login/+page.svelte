@@ -175,13 +175,13 @@
 
   .toggle-mode {
     font-size: 0.9rem;
-    color: var(--color-muted, #666);
+    color: var(--sys-color-text-muted);
   }
 
   .toggle-mode button {
     border: none;
     background: none;
-    color: var(--cta-dark-super, #2563eb);
+    color: var(--comp-btn-link-text);
     text-decoration: underline;
     cursor: pointer;
     font: inherit;
@@ -189,7 +189,7 @@
   }
 
   .oauth-error {
-    color: var(--color-danger, #b42318);
+    color: var(--sys-color-error-text);
     font-size: 0.9rem;
     margin: 0;
     max-width: var(--field-width);
@@ -202,7 +202,7 @@
     gap: 0.75rem;
     max-width: var(--field-width);
     margin: 1rem auto 0.75rem;
-    color: var(--color-muted, #666);
+    color: var(--sys-color-text-muted);
     font-size: 0.85rem;
   }
 
@@ -211,7 +211,7 @@
     content: "";
     flex: 1;
     height: 1px;
-    background: var(--color-border, #ccc);
+    background: var(--sys-color-border);
   }
 
   .oauth-action {
@@ -226,18 +226,24 @@
     box-sizing: border-box;
     width: 100%;
     padding: 0.65rem 1rem;
-    border: 1px solid var(--color-border, #ccc);
-    border-radius: 0.375rem;
+    border: 1px solid var(--comp-btn-oauth-border);
+    border-radius: var(--comp-btn-primary-radius);
     text-decoration: none;
     font-weight: 600;
-    color: inherit;
-    background: var(--color-surface, #fff);
+    color: var(--comp-btn-oauth-text);
+    background: var(--comp-btn-oauth-bg);
     font: inherit;
     cursor: pointer;
   }
 
   .google-signin:hover:not(:disabled) {
-    filter: brightness(0.97);
+    background: var(--comp-btn-oauth-bg-hover);
+    border-color: var(--sys-color-border-strong);
+  }
+
+  .google-signin:focus-visible {
+    outline: none;
+    box-shadow: var(--comp-focus-ring);
   }
 
   .google-signin:disabled {
