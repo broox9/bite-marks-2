@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Bite Marks — Theme D: Night Market</title>
+<meta name="design_doc_mode" content="canvas">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#131110;--panel:#1D1A18;--panel2:#262220;--line:#332E2A;--ink:#F6F1EA;--ink2:#B7AEA4;--ink3:#847B72;--amber:#F0A93B;--amber-d:#C9862A;--mint:#5FD3A0;--rose:#F0705A}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#0B0A09;font-family:'DM Sans',system-ui,sans-serif;color:var(--ink)}
+a{color:var(--amber);text-decoration:none}a:hover{color:#FFC066}
+.lbl{position:absolute;font:500 12px/1 'DM Sans';letter-spacing:.14em;text-transform:uppercase;color:#6D6660;white-space:nowrap}
+.fr{position:absolute;white-space:normal;background:var(--bg);overflow:hidden}
+.mob{border-radius:26px;border:1px solid var(--line);box-shadow:0 20px 44px rgba(0,0,0,.5)}
+.dis{font-family:'Sora',sans-serif;font-weight:600;letter-spacing:-.03em}
+.eb{font:700 10px/1 'DM Sans';letter-spacing:.16em;text-transform:uppercase;color:var(--ink3)}
+.ph{background:linear-gradient(150deg,#2C2724,#1C1917);display:flex;align-items:center;justify-content:center;color:#6A625B;font:700 9px/1 'DM Sans';letter-spacing:.16em;text-transform:uppercase}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:14px}
+.btn{background:var(--amber);color:#1A1512;border:0;border-radius:10px;padding:13px 18px;font:700 13px/1 'DM Sans';cursor:pointer}
+.btn.g{background:transparent;color:var(--ink);border:1px solid var(--line)}
+.btn.m{background:var(--mint);color:#0E2B1F}
+.chip{border:1px solid var(--line);background:var(--panel2);border-radius:999px;padding:7px 12px;font:500 12px/1 'DM Sans';color:var(--ink2)}
+.chip.on{background:var(--amber);border-color:var(--amber);color:#1A1512;font-weight:700}
+.nav{display:flex;gap:24px;font:500 13px/1 'DM Sans';color:var(--ink2)}
+.nav .on{color:var(--amber)}
+.row{display:grid;align-items:center;border-bottom:1px solid var(--line)}
+.map{background:#191614;position:relative;overflow:hidden}
+.map:after{content:"";position:absolute;inset:0;background:repeating-linear-gradient(90deg,#221E1B 0 1px,transparent 1px 44px),repeating-linear-gradient(0deg,#221E1B 0 1px,transparent 1px 42px)}
+.map .glow{position:absolute;border-radius:999px;filter:blur(26px);opacity:.5}
+.pin{position:absolute;width:10px;height:10px;border-radius:999px;z-index:2;box-shadow:0 0 0 3px rgba(19,17,16,.8)}
+.stat b{font-family:'Sora',sans-serif;font-weight:600;font-size:34px;line-height:1;display:block;letter-spacing:-.03em}
+</style>
+</head>
+<body>
+
+<div class="lbl" style="left:0;top:36px">Theme D — Night Market · dark, amber + mint, glowing map hero</div>
+
+<!-- HOME DESKTOP -->
+<div class="lbl" style="left:0;top:74px;color:#8A827A">1 · “/” Home — desktop 1200</div>
+<div class="fr" style="left:0;top:98px;width:1200px;height:1090px">
+  <div style="display:flex;align-items:center;justify-content:space-between;padding:18px 40px;border-bottom:1px solid var(--line)">
+    <div style="display:flex;align-items:center;gap:10px"><div style="width:24px;height:24px;border-radius:8px;background:var(--amber)"></div><div class="dis" style="font-size:18px">Bite Marks</div></div>
+    <div style="display:flex;align-items:center;gap:26px">
+      <div class="nav"><span class="on">Home</span><span>Spots</span><span>Tags</span><span>Nearby</span></div>
+      <div style="position:relative">
+        <div style="display:flex;align-items:center;gap:8px;background:var(--panel2);border:1px solid var(--line);border-radius:999px;padding:5px 11px 5px 5px"><div style="width:24px;height:24px;border-radius:999px;background:var(--mint);color:#0E2B1F;font:700 10px/24px 'DM Sans';text-align:center">BR</div><span style="font:500 12px/1 'DM Sans'">Brandon</span><span style="font-size:9px;color:var(--ink3)">▾</span></div>
+        <div class="card" style="position:absolute;right:0;top:40px;width:206px;padding:6px;background:var(--panel2);box-shadow:0 18px 40px rgba(0,0,0,.6);z-index:5">
+          <div style="padding:10px 12px;font:500 13px/1 'DM Sans';border-radius:8px">Account</div>
+          <div style="padding:10px 12px;font:500 13px/1 'DM Sans'">Default location</div>
+          <div style="padding:10px 12px;font:500 13px/1 'DM Sans'">Appearance</div>
+          <div style="height:1px;background:var(--line);margin:5px 8px"></div>
+          <div style="padding:10px 12px;font:700 13px/1 'DM Sans';color:var(--rose)">Log out</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAP HERO -->
+  <div style="position:relative;margin:26px 40px 0;border-radius:18px;overflow:hidden;border:1px solid var(--line)">
+    <div class="map" style="height:352px">
+      <div class="glow" style="left:34%;top:34%;width:200px;height:200px;background:var(--amber)"></div>
+      <div class="glow" style="left:60%;top:52%;width:170px;height:170px;background:var(--mint)"></div>
+      <div class="pin" style="left:44%;top:42%;background:var(--amber);width:15px;height:15px"></div>
+      <div class="pin" style="left:58%;top:56%;background:var(--mint)"></div><div class="pin" style="left:31%;top:60%;background:var(--mint)"></div>
+      <div class="pin" style="left:69%;top:33%;background:var(--mint)"></div><div class="pin" style="left:52%;top:70%;background:var(--ink3)"></div>
+      <div class="pin" style="left:76%;top:63%;background:var(--ink3)"></div>
+    </div>
+    <div style="position:absolute;left:0;right:0;top:0;padding:26px 30px;background:linear-gradient(rgba(19,17,16,.9),transparent)">
+      <div class="eb">Your map · August 2026</div>
+      <div class="dis" style="font-size:38px;line-height:1.06;margin-top:12px;max-width:520px">70 spots marked.<br>38 of them tasted.</div>
+    </div>
+    <div style="position:absolute;left:30px;bottom:26px;display:flex;gap:10px">
+      <div style="background:rgba(19,17,16,.82);border:1px solid var(--line);border-radius:999px;padding:9px 14px;font:700 12px/1 'DM Sans'"><span style="color:var(--mint)">●</span> 38 tasted</div>
+      <div style="background:rgba(19,17,16,.82);border:1px solid var(--line);border-radius:999px;padding:9px 14px;font:700 12px/1 'DM Sans'"><span style="color:var(--ink3)">●</span> 32 to try</div>
+      <div style="background:rgba(19,17,16,.82);border:1px solid var(--line);border-radius:999px;padding:9px 14px;font:700 12px/1 'DM Sans'"><span style="color:var(--amber)">◎</span> Midtown, New York</div>
+    </div>
+    <div style="position:absolute;right:30px;bottom:26px;display:flex;gap:10px">
+      <button class="btn g" style="background:rgba(19,17,16,.82)">Open full map</button>
+      <button class="btn">＋ Add a spot</button>
+    </div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:1fr 400px;gap:26px;padding:26px 40px 80px">
+    <!-- RAIL -->
+    <div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px"><div class="dis" style="font-size:19px">Pick up where you left off</div><a style="font:700 12px/1 'DM Sans'">All 70 spots →</a></div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px">
+        <div class="card" style="overflow:hidden"><div class="ph" style="height:112px">photo</div><div style="padding:14px"><div class="eb">Steakhouse · Jersey City</div><div class="dis" style="font-size:16px;margin-top:7px">Felina Steak</div><div style="font:700 11px/1 'DM Sans';color:var(--mint);margin-top:9px">● Tasted · 4.5</div></div></div>
+        <div class="card" style="overflow:hidden"><div class="ph" style="height:112px">photo</div><div style="padding:14px"><div class="eb">Pizza · Jersey City</div><div class="dis" style="font-size:16px;margin-top:7px">Razza</div><div style="font:700 11px/1 'DM Sans';color:var(--mint);margin-top:9px">● Tasted · 4.8</div></div></div>
+        <div class="card" style="overflow:hidden"><div class="ph" style="height:112px">photo</div><div style="padding:14px"><div class="eb">Supper club · Harlem</div><div class="dis" style="font-size:16px;margin-top:7px">The Nephew</div><div style="font:700 11px/1 'DM Sans';color:var(--ink3);margin-top:9px">○ To try</div></div></div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:18px">
+        <div class="card" style="padding:16px"><div class="eb">New York</div><div class="stat" style="margin-top:8px"><b>41</b></div></div>
+        <div class="card" style="padding:16px"><div class="eb">Jersey City</div><div class="stat" style="margin-top:8px"><b>12</b></div></div>
+        <div class="card" style="padding:16px"><div class="eb">Barbados</div><div class="stat" style="margin-top:8px"><b>6</b></div></div>
+        <div class="card" style="padding:16px"><div class="eb">Tokyo</div><div class="stat" style="margin-top:8px"><b>3</b></div></div>
+      </div>
+    </div>
+    <!-- DEFAULT LOCATION -->
+    <div class="card" style="padding:20px">
+      <div style="display:flex;justify-content:space-between;align-items:center"><div class="eb">Default location</div><span style="font:700 10px/1 'DM Sans';color:var(--mint);letter-spacing:.1em">● SET</span></div>
+      <div class="dis" style="font-size:23px;margin:10px 0 6px">Midtown, New York</div>
+      <div style="font:400 12px/1.5 'DM Sans';color:var(--ink3)">Every distance, the nearby tab and the map’s opening view start here.</div>
+      <div style="display:flex;align-items:center;gap:10px;background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:12px 13px;margin-top:16px">
+        <span style="color:var(--amber)">◎</span><span style="font:500 13px/1 'DM Sans';color:var(--ink3)">City, neighbourhood or address</span>
+      </div>
+      <button class="btn g" style="width:100%;margin-top:9px;font-weight:500">Use my current location</button>
+      <div class="eb" style="margin:18px 0 9px">Saved places</div>
+      <div style="display:flex;gap:7px;flex-wrap:wrap"><span class="chip on">Midtown</span><span class="chip">Jersey City</span><span class="chip">Bridgetown</span><span class="chip" style="border-style:dashed;color:var(--ink3)">+ Add</span></div>
+      <div class="map" style="height:118px;border-radius:10px;margin-top:16px;border:1px solid var(--line)"><div class="glow" style="left:36%;top:30%;width:120px;height:120px;background:var(--amber)"></div><div class="pin" style="left:46%;top:44%;background:var(--amber);width:13px;height:13px"></div><div class="pin" style="left:64%;top:60%;background:var(--mint)"></div></div>
+      <button class="btn" style="width:100%;margin-top:16px">Save as default</button>
+    </div>
+  </div>
+
+  <div style="position:absolute;left:0;right:0;bottom:0;border-top:1px solid var(--line);padding:15px 40px;display:flex;justify-content:space-between;align-items:center;background:var(--panel)">
+    <div style="font:400 11px/1 'DM Sans';color:var(--ink3)">Bite Marks · synced 09:41</div>
+    <div style="display:flex;gap:20px;font:500 11px/1 'DM Sans';color:var(--ink2)"><span>Help</span><span>Export</span><span>Privacy</span></div>
+  </div>
+</div>
+
+<!-- DETAIL DESKTOP -->
+<div class="lbl" style="left:1260px;top:74px;color:#8A827A">2 · “/spots/:id” — desktop · deck carousel + panels</div>
+<div class="fr" style="left:1260px;top:98px;width:1200px;height:980px">
+  <div style="display:flex;align-items:center;justify-content:space-between;padding:18px 40px;border-bottom:1px solid var(--line)">
+    <div style="display:flex;align-items:center;gap:10px"><div style="width:22px;height:22px;border-radius:7px;background:var(--amber)"></div><div class="dis" style="font-size:17px">Bite Marks</div></div>
+    <div class="nav"><span>Home</span><span class="on">Spots</span><span>Tags</span><span>Nearby</span></div>
+  </div>
+  <div style="padding:20px 40px 0"><a style="font:700 12px/1 'DM Sans'">← Back to list</a></div>
+
+  <div style="display:grid;grid-template-columns:1fr 402px;gap:28px;padding:16px 40px 0">
+    <!-- DECK CAROUSEL -->
+    <div>
+      <div style="position:relative;height:404px">
+        <div class="ph" style="position:absolute;left:26px;right:26px;top:16px;height:372px;border-radius:16px;opacity:.35"></div>
+        <div class="ph" style="position:absolute;left:13px;right:13px;top:8px;height:386px;border-radius:16px;opacity:.6"></div>
+        <div class="ph" style="position:absolute;left:0;right:0;top:0;height:400px;border-radius:16px;font-size:10px">photo 01 of 10</div>
+        <div style="position:absolute;right:16px;top:16px;background:rgba(19,17,16,.8);border:1px solid var(--line);border-radius:999px;padding:7px 12px;font:700 11px/1 'DM Sans'">01 / 10</div>
+        <div style="position:absolute;left:16px;bottom:22px;display:flex;gap:8px">
+          <div style="width:36px;height:36px;border-radius:999px;background:rgba(19,17,16,.82);border:1px solid var(--line);display:flex;align-items:center;justify-content:center">‹</div>
+          <div style="width:36px;height:36px;border-radius:999px;background:rgba(19,17,16,.82);border:1px solid var(--line);display:flex;align-items:center;justify-content:center">›</div>
+        </div>
+        <div style="position:absolute;right:16px;bottom:22px;display:flex;gap:5px;align-items:center"><i style="width:22px;height:3px;border-radius:2px;background:var(--amber)"></i><i style="width:7px;height:3px;border-radius:2px;background:var(--line)"></i><i style="width:7px;height:3px;border-radius:2px;background:var(--line)"></i><i style="width:7px;height:3px;border-radius:2px;background:var(--line)"></i></div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:20px">
+        <div class="card" style="padding:16px"><div class="eb">My notes</div><div style="font:400 14px/1.6 'DM Sans';color:var(--ink2);margin-top:9px">Local, lowkey but dope. This one is in the cut but the view is great and it’s overall better than the one in south orange</div></div>
+        <div class="card" style="padding:16px">
+          <div style="display:flex;justify-content:space-between;align-items:center"><div class="eb">Links</div><span style="font:700 11px/1 'DM Sans';color:var(--amber)">+ Add</span></div>
+          <div class="row" style="grid-template-columns:1fr auto;padding:11px 0;margin-top:4px"><span style="font:500 13px/1 'DM Sans'">Website</span><span style="color:var(--ink3);font-size:11px">↗</span></div>
+          <div class="row" style="grid-template-columns:1fr auto;padding:11px 0"><span style="font:500 13px/1 'DM Sans'">Instagram</span><span style="color:var(--ink3);font-size:11px">↗</span></div>
+          <div class="row" style="grid-template-columns:1fr auto;padding:11px 0;border:0"><span style="font:500 13px/1 'DM Sans'">Menu (PDF)</span><span style="color:var(--ink3);font-size:11px">↗</span></div>
+        </div>
+      </div>
+    </div>
+    <!-- PANELS -->
+    <div>
+      <div class="eb">Steakhouse · Jersey City, NJ</div>
+      <div class="dis" style="font-size:37px;line-height:1.06;margin:12px 0 12px">Felina Steak Jersey City</div>
+      <div style="font:400 13px/1.5 'DM Sans';color:var(--ink2)">2 Chapel Ave Unit 2<br>Jersey City, NJ 07305</div>
+      <div style="display:flex;gap:7px;margin-top:14px;flex-wrap:wrap"><span class="chip" style="background:rgba(95,211,160,.14);border-color:rgba(95,211,160,.35);color:var(--mint);font-weight:700">✓ Tasted</span><span class="chip">★ 4.3 public</span><span class="chip">4 mi</span></div>
+      <div class="card" style="padding:18px;margin-top:18px">
+        <div class="eb">My rating</div>
+        <div style="display:flex;align-items:flex-end;gap:12px;margin-top:8px"><div class="dis" style="font-size:46px;line-height:.9;color:var(--amber)">4.5</div><div style="padding-bottom:8px"><div style="color:var(--amber);font-size:16px;letter-spacing:2px">★★★★<span style="color:var(--line)">★</span></div><div style="font:400 11px/1 'DM Sans';color:var(--ink3);margin-top:6px">edited 2 days ago</div></div></div>
+      </div>
+      <div class="card" style="padding:0;margin-top:14px;overflow:hidden">
+        <div class="map" style="height:158px"><div class="glow" style="left:38%;top:30%;width:130px;height:130px;background:var(--amber)"></div><div class="pin" style="left:48%;top:46%;background:var(--amber);width:14px;height:14px"></div><div style="position:absolute;right:12px;bottom:12px;background:var(--amber);border-radius:999px;padding:7px 12px;font:700 11px/1 'DM Sans';color:#1A1512;z-index:3">Directions ↗</div></div>
+        <div style="padding:14px 16px;display:flex;justify-content:space-between"><span style="font:400 12px/1 'DM Sans';color:var(--ink3)">From Midtown, New York</span><span style="font:700 12px/1 'DM Sans'">4.0 mi</span></div>
+      </div>
+      <div style="display:flex;gap:9px;margin-top:18px"><button class="btn" style="flex:1">Save changes</button><button class="btn g">Delete</button></div>
+    </div>
+  </div>
+</div>
+
+<!-- MOBILE -->
+<div class="lbl" style="left:0;top:1220px;color:#8A827A">3 · “/” Home — mobile</div>
+<div class="fr mob" style="left:0;top:1246px;width:390px;height:880px">
+  <div style="display:flex;align-items:center;justify-content:space-between;padding:22px 20px 12px">
+    <div style="display:flex;align-items:center;gap:9px"><div style="width:20px;height:20px;border-radius:7px;background:var(--amber)"></div><div class="dis" style="font-size:16px">Bite Marks</div></div>
+    <div style="width:28px;height:28px;border-radius:999px;background:var(--mint);color:#0E2B1F;font:700 10px/28px 'DM Sans';text-align:center">BR</div>
+  </div>
+  <div style="position:relative;margin:8px 16px 0;border-radius:16px;overflow:hidden;border:1px solid var(--line)">
+    <div class="map" style="height:250px">
+      <div class="glow" style="left:30%;top:32%;width:150px;height:150px;background:var(--amber)"></div>
+      <div class="glow" style="left:58%;top:56%;width:130px;height:130px;background:var(--mint)"></div>
+      <div class="pin" style="left:44%;top:42%;background:var(--amber);width:14px;height:14px"></div>
+      <div class="pin" style="left:60%;top:58%;background:var(--mint)"></div><div class="pin" style="left:30%;top:62%;background:var(--mint)"></div><div class="pin" style="left:72%;top:34%;background:var(--ink3)"></div>
+    </div>
+    <div style="position:absolute;left:0;right:0;top:0;padding:18px;background:linear-gradient(rgba(19,17,16,.92),transparent)">
+      <div class="eb">Your map</div>
+      <div class="dis" style="font-size:26px;line-height:1.08;margin-top:9px">70 marked.<br>38 tasted.</div>
+    </div>
+    <div style="position:absolute;left:14px;right:14px;bottom:14px;display:flex;gap:7px">
+      <div style="background:rgba(19,17,16,.85);border:1px solid var(--line);border-radius:999px;padding:8px 11px;font:700 11px/1 'DM Sans'"><span style="color:var(--amber)">◎</span> Midtown</div>
+      <div style="background:rgba(19,17,16,.85);border:1px solid var(--line);border-radius:999px;padding:8px 11px;font:700 11px/1 'DM Sans'"><span style="color:var(--mint)">●</span> 38</div>
+      <div style="margin-left:auto;background:var(--amber);border-radius:999px;padding:8px 12px;font:700 11px/1 'DM Sans';color:#1A1512">＋ Add</div>
+    </div>
+  </div>
+  <div class="card" style="margin:14px 16px 0;padding:16px">
+    <div style="display:flex;justify-content:space-between;align-items:center"><div class="eb">Default location</div><span style="font:700 10px/1 'DM Sans';color:var(--mint)">● SET</span></div>
+    <div class="dis" style="font-size:20px;margin:9px 0 12px">Midtown, New York</div>
+    <div style="display:flex;align-items:center;gap:9px;background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:11px 12px"><span style="color:var(--amber)">◎</span><span style="font:500 12px/1 'DM Sans';color:var(--ink3)">City or address</span></div>
+    <div style="display:flex;gap:7px;margin-top:10px;flex-wrap:wrap"><span class="chip on">Midtown</span><span class="chip">Jersey City</span><span class="chip">Use my location</span></div>
+    <button class="btn" style="width:100%;margin-top:13px">Save as default</button>
+  </div>
+  <div style="padding:18px 16px 0">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><div class="dis" style="font-size:16px">Pick up where you left off</div><a style="font:700 11px/1 'DM Sans'">All 70 →</a></div>
+    <div style="display:flex;gap:12px"><div class="ph" style="width:64px;height:64px;border-radius:12px"></div><div><div class="eb">Steakhouse · Jersey City</div><div class="dis" style="font-size:15px;margin-top:6px">Felina Steak Jersey City</div><div style="font:700 11px/1 'DM Sans';color:var(--mint);margin-top:7px">● Tasted · 4.5</div></div></div>
+  </div>
+  <div style="position:absolute;left:0;right:0;bottom:0;background:var(--panel);border-top:1px solid var(--line);display:grid;grid-template-columns:repeat(4,1fr);padding:10px 0 18px;text-align:center;color:var(--ink3)">
+    <div style="font:700 10px/1.7 'DM Sans';color:var(--amber)">◆<br>Home</div>
+    <div style="font:700 10px/1.7 'DM Sans'">☰<br>Spots</div>
+    <div style="font:700 10px/1.7 'DM Sans'">◎<br>Nearby</div>
+    <div style="font:700 10px/1.7 'DM Sans'">◐<br>Me</div>
+  </div>
+</div>
+
+<div class="lbl" style="left:440px;top:1220px;color:#8A827A">4 · “/spots/:id” — mobile · deck carousel</div>
+<div class="fr mob" style="left:440px;top:1246px;width:390px;height:880px">
+  <div style="padding:16px 16px 0;position:relative">
+    <div style="position:relative;height:272px">
+      <div class="ph" style="position:absolute;left:20px;right:20px;top:12px;height:250px;border-radius:14px;opacity:.35"></div>
+      <div class="ph" style="position:absolute;left:10px;right:10px;top:6px;height:258px;border-radius:14px;opacity:.6"></div>
+      <div class="ph" style="position:absolute;left:0;right:0;top:0;height:266px;border-radius:14px">photo 01 of 10</div>
+      <div style="position:absolute;left:12px;top:12px;width:32px;height:32px;border-radius:999px;background:rgba(19,17,16,.82);border:1px solid var(--line);display:flex;align-items:center;justify-content:center">←</div>
+      <div style="position:absolute;right:12px;top:12px;background:rgba(19,17,16,.82);border:1px solid var(--line);border-radius:999px;padding:6px 11px;font:700 10px/1 'DM Sans'">01 / 10</div>
+      <div style="position:absolute;left:0;right:0;bottom:14px;display:flex;gap:5px;justify-content:center"><i style="width:18px;height:3px;border-radius:2px;background:var(--amber)"></i><i style="width:6px;height:3px;border-radius:2px;background:rgba(255,255,255,.35)"></i><i style="width:6px;height:3px;border-radius:2px;background:rgba(255,255,255,.35)"></i><i style="width:6px;height:3px;border-radius:2px;background:rgba(255,255,255,.35)"></i></div>
+    </div>
+  </div>
+  <div style="padding:12px 20px 100px">
+    <div class="eb">Steakhouse · Jersey City</div>
+    <div class="dis" style="font-size:27px;line-height:1.07;margin:9px 0 10px">Felina Steak Jersey City</div>
+    <div style="font:400 12px/1.5 'DM Sans';color:var(--ink2)">2 Chapel Ave Unit 2, Jersey City, NJ 07305</div>
+    <div style="display:flex;gap:7px;margin-top:12px;flex-wrap:wrap"><span class="chip" style="background:rgba(95,211,160,.14);border-color:rgba(95,211,160,.35);color:var(--mint);font-weight:700">✓ Tasted</span><span class="chip">★ 4.3</span><span class="chip">4 mi</span></div>
+    <div class="card" style="padding:14px;margin-top:14px;display:flex;align-items:center;justify-content:space-between">
+      <div><div class="eb">My rating</div><div class="dis" style="font-size:30px;color:var(--amber);margin-top:6px">4.5</div></div>
+      <div style="color:var(--amber);font-size:15px;letter-spacing:2px">★★★★<span style="color:var(--line)">★</span></div>
+    </div>
+    <div class="card" style="padding:14px;margin-top:12px"><div class="eb">My notes</div><div style="font:400 13px/1.6 'DM Sans';color:var(--ink2);margin-top:8px">Local, lowkey but dope. This one is in the cut but the view is great and it’s overall better than the one in south orange</div></div>
+    <div class="card" style="padding:0;margin-top:12px;overflow:hidden"><div class="map" style="height:96px"><div class="glow" style="left:38%;top:28%;width:110px;height:110px;background:var(--amber)"></div><div class="pin" style="left:48%;top:46%;background:var(--amber);width:13px;height:13px"></div><div style="position:absolute;right:10px;bottom:10px;background:var(--amber);border-radius:999px;padding:6px 10px;font:700 10px/1 'DM Sans';color:#1A1512;z-index:3">Directions ↗</div></div></div>
+  </div>
+  <div style="position:absolute;left:0;right:0;bottom:0;padding:12px 20px 18px;background:var(--panel);border-top:1px solid var(--line)"><button class="btn" style="width:100%">Save changes</button></div>
+</div>
+
+<div class="lbl" style="left:880px;top:1220px;color:#8A827A">5 · “/list” — search active (panel sheet, mint caret)</div>
+<div class="fr mob" style="left:880px;top:1246px;width:390px;height:880px">
+  <div style="opacity:.4">
+    <div class="map" style="height:206px"><div class="glow" style="left:34%;top:32%;width:140px;height:140px;background:var(--amber)"></div></div>
+    <div style="padding:12px 20px"><div class="row" style="padding:13px 0"><span style="font:500 13px/1 'DM Sans'">Felina Steak Jersey City</span></div><div class="row" style="padding:13px 0"><span style="font:500 13px/1 'DM Sans'">Filé Gumbo Bar</span></div></div>
+  </div>
+  <div style="position:absolute;inset:0;background:rgba(5,4,4,.6)"></div>
+  <div style="position:absolute;left:0;right:0;bottom:0;height:78%;background:var(--panel);border-radius:22px 22px 0 0;border-top:1px solid #4A423B;box-shadow:0 -20px 50px rgba(0,0,0,.7);padding:14px 20px 0">
+    <div style="width:40px;height:4px;border-radius:999px;background:var(--line);margin:0 auto 15px"></div>
+    <div style="display:flex;align-items:center;gap:10px;background:var(--panel2);border:1px solid #4A423B;border-radius:12px;padding:13px 14px">
+      <span style="color:var(--amber)">⌕</span><span style="font:700 15px/1 'DM Sans'">fel</span><span style="width:2px;height:16px;background:var(--mint)"></span>
+      <span style="margin-left:auto;font:700 12px/1 'DM Sans';color:var(--amber)">Cancel</span>
+    </div>
+    <div class="eb" style="margin:20px 0 4px">Top matches</div>
+    <div class="row" style="grid-template-columns:36px 1fr auto;gap:12px;padding:12px 0"><div style="width:36px;height:36px;border-radius:10px;background:var(--panel2);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;color:var(--amber)">◉</div><div><div style="font:500 14px/1 'DM Sans'"><span style="background:rgba(240,169,59,.22);color:var(--amber)">Fel</span>ina Steak Jersey City</div><div style="font:400 11px/1 'DM Sans';color:var(--ink3);margin-top:5px">Jersey City · 4 mi · <span style="color:var(--mint)">Tasted 4.5</span></div></div><span style="color:var(--ink3)">›</span></div>
+    <div class="row" style="grid-template-columns:36px 1fr auto;gap:12px;padding:12px 0"><div style="width:36px;height:36px;border-radius:10px;background:var(--panel2);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;color:var(--amber)">◉</div><div><div style="font:500 14px/1 'DM Sans'"><span style="background:rgba(240,169,59,.22);color:var(--amber)">Filé</span> Gumbo Bar</div><div style="font:400 11px/1 'DM Sans';color:var(--ink3);margin-top:5px">New York · 1.2 mi · To try</div></div><span style="color:var(--ink3)">›</span></div>
+    <div class="eb" style="margin:18px 0 9px">Quick filters</div>
+    <div style="display:flex;gap:7px;flex-wrap:wrap"><span class="chip on">Tasted</span><span class="chip">To try</span><span class="chip">Under 5 mi</span><span class="chip">4.5+</span><span class="chip">steak</span></div>
+    <div class="eb" style="margin:18px 0 4px">Recent</div>
+    <div class="row" style="padding:11px 0"><span style="font:400 13px/1 'DM Sans';color:var(--ink2)">↺ Razza</span></div>
+    <div class="row" style="padding:11px 0"><span style="font:400 13px/1 'DM Sans';color:var(--ink2)">↺ ramen, midtown</span></div>
+  </div>
+</div>
+
+<div class="lbl" style="left:1330px;top:1220px;color:#8A827A">Notes + account sheet</div>
+<div class="fr card" style="left:1330px;top:1246px;width:430px;height:1090px;border-radius:0">
+  <div style="padding:26px">
+    <div class="dis" style="font-size:28px">Night Market</div>
+    <div style="font:400 13px/1.65 'DM Sans';color:var(--ink2);margin-top:12px">Dark ground, amber for action and rating, mint for “tasted”. The map glows, so it can carry the home screen on its own.</div>
+    <div style="height:1px;background:var(--line);margin:20px 0"></div>
+    <div class="eb">What it fixes</div>
+    <div style="font:400 13px/1.7 'DM Sans';color:var(--ink2);margin-top:10px">
+      <b>Home</b> is a map card, not empty space: 352&nbsp;px of glowing map with the headline over the top gradient, legend chips and Add/Open actions at the bottom. Under it, three recent cards, four city tiles, and the default‑location module as a full sidebar panel.<br><br>
+      <b>Detail</b> uses a stacked deck carousel (two peeking cards behind the current photo) so the photo count is legible before you swipe; metadata sits in dark panels on the right, mini‑map included.<br><br>
+      <b>Search</b> sheet is #1D1A18 with a lifted top border, amber query highlight and a mint caret. No gray.<br><br>
+      <b>Logout</b> is in the header identity menu on desktop and in the “Me” account sheet on mobile (below); footer is a one‑line sync strip.
+    </div>
+    <div style="height:1px;background:var(--line);margin:20px 0"></div>
+    <div class="eb">Mobile account sheet — where logout lives</div>
+    <div style="background:var(--panel2);border:1px solid var(--line);border-radius:14px;padding:6px;margin-top:12px">
+      <div style="display:flex;align-items:center;gap:11px;padding:12px"><div style="width:34px;height:34px;border-radius:999px;background:var(--mint);color:#0E2B1F;font:700 12px/34px 'DM Sans';text-align:center">BR</div><div><div style="font:700 13px/1 'DM Sans'">Brandon</div><div style="font:400 11px/1 'DM Sans';color:var(--ink3);margin-top:5px">brandon@example.com</div></div></div>
+      <div class="row" style="grid-template-columns:1fr auto;padding:12px;border-color:#332E2A"><span style="font:500 13px/1 'DM Sans'">Default location</span><span style="font:400 12px/1 'DM Sans';color:var(--ink3)">Midtown ›</span></div>
+      <div class="row" style="grid-template-columns:1fr auto;padding:12px"><span style="font:500 13px/1 'DM Sans'">Appearance</span><span style="font:400 12px/1 'DM Sans';color:var(--ink3)">Dark ›</span></div>
+      <div class="row" style="grid-template-columns:1fr auto;padding:12px"><span style="font:500 13px/1 'DM Sans'">Export your list</span><span style="color:var(--ink3)">›</span></div>
+      <div style="padding:13px 12px;font:700 13px/1 'DM Sans';color:var(--rose)">Log out</div>
+    </div>
+    <div style="height:1px;background:var(--line);margin:20px 0"></div>
+    <div class="eb">Palette</div>
+    <div style="display:flex;gap:8px;margin-top:10px">
+      <div style="flex:1;height:44px;border-radius:8px;background:var(--bg);border:1px solid var(--line)"></div>
+      <div style="flex:1;height:44px;border-radius:8px;background:var(--panel2)"></div>
+      <div style="flex:1;height:44px;border-radius:8px;background:var(--amber)"></div>
+      <div style="flex:1;height:44px;border-radius:8px;background:var(--mint)"></div>
+      <div style="flex:1;height:44px;border-radius:8px;background:var(--rose)"></div>
+    </div>
+    <div style="font:400 11px/1.6 'DM Sans';color:var(--ink3);margin-top:8px">#131110 · #262220 · #F0A93B · #5FD3A0 · #F0705A<br>Sora + DM Sans</div>
+  </div>
+</div>
+
+</body>
+</html>

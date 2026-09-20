@@ -1,0 +1,75 @@
+/* map-markers.css
+ * Shared mapbox marker styling (R1 pin: label pill + pointer triangle).
+ * Global so it works regardless of which route mounts the map — component
+ * <style> blocks are per-route bundles and wouldn't reach markers created
+ * on another page. See DESIGN.md §6.5.
+ */
+
+.r1-pin {
+  --r1-pin-fill: var(--comp-marker-default-bg);
+
+  position: relative;
+  transform: translateY(-4px);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  background-color: var(--r1-pin-fill);
+  color: var(--comp-marker-default-text);
+  border: 2px solid var(--comp-marker-border);
+  border-radius: var(--comp-marker-radius);
+  padding: 0.25rem 0.5rem;
+  font-family: var(--sys-font-sans);
+  font-size: 0.6875rem;
+  font-weight: 700;
+  box-shadow: var(--comp-marker-shadow);
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.r1-pin::after {
+  position: absolute;
+  top: calc(100% - 1px);
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-top: 0.35rem solid var(--r1-pin-fill);
+  border-right: 0.3rem solid transparent;
+  border-left: 0.3rem solid transparent;
+  content: '';
+  transform: translateX(-50%);
+}
+
+.r1-pin[data-state="visited"] {
+  --r1-pin-fill: var(--comp-marker-visited-bg);
+
+  color: var(--comp-marker-accent-text);
+  border-color: var(--sys-color-success-text);
+}
+
+.r1-pin[data-state="active"] {
+  --r1-pin-fill: var(--comp-marker-selected-bg);
+
+  border-color: var(--comp-marker-selected-bg);
+  color: var(--comp-marker-accent-text);
+  box-shadow: var(--ref-shadow-md);
+  z-index: 1;
+}
+
+/* At low zoom, dozens of label pills overlap illegibly — collapse to plain
+ * dots until the map is zoomed in enough to give each pill room. */
+#map-container[data-pin-scale="dot"] .r1-pin:not([data-state="active"]) {
+  padding: 0;
+  width: 0.625rem;
+  height: 0.625rem;
+  min-width: 0;
+  border-width: 1.5px;
+  border-radius: 999px;
+}
+
+#map-container[data-pin-scale="dot"] .r1-pin:not([data-state="active"])::after {
+  display: none;
+}
+
+#map-container[data-pin-scale="dot"] .r1-pin:not([data-state="active"]) .r1-pin-label {
+  display: none;
+}

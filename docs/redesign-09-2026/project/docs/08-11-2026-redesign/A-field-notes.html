@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Bite Marks — Theme A: Field Notes</title>
+<meta name="design_doc_mode" content="canvas">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--paper:#F6F1E4;--card:#FFFDF7;--ink:#191510;--ink2:#5B5445;--ink3:#8A8270;--line:#DCD3BC;--line2:#EBE4D2;--tomato:#C6462B;--olive:#55703F;--gold:#B98A2E}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#E4DFD2;font-family:'Manrope',system-ui,sans-serif;color:var(--ink)}
+a{color:var(--tomato);text-decoration:none}a:hover{color:#9E3520}
+.lbl{position:absolute;font:600 12px/1 'Manrope';letter-spacing:.14em;text-transform:uppercase;color:#7E7767;white-space:nowrap}
+.fr{position:absolute;white-space:normal;background:var(--paper);overflow:hidden}
+.mob{border-radius:26px;border:1px solid var(--line);box-shadow:0 18px 40px rgba(0,0,0,.10)}
+.ser{font-family:'Instrument Serif',Georgia,serif;font-weight:400;letter-spacing:-.01em}
+.eb{font:700 10px/1 'Manrope';letter-spacing:.16em;text-transform:uppercase;color:var(--ink3)}
+.ph{background:repeating-linear-gradient(135deg,#E9E1CB 0 10px,#E3DAC2 10px 20px);display:flex;align-items:center;justify-content:center;color:#8B8168;font:600 9px/1 'Manrope';letter-spacing:.14em;text-transform:uppercase}
+.card{background:var(--card);border:1px solid var(--line);border-radius:4px}
+.rule{height:1px;background:var(--line2)}
+.tab{display:flex;gap:6px}
+.pill{border:1px solid var(--line);border-radius:999px;padding:6px 11px;font:600 12px/1 'Manrope';color:var(--ink2);background:var(--card)}
+.pill.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+.btn{background:var(--tomato);color:#fff;border:0;border-radius:3px;padding:12px 16px;font:700 13px/1 'Manrope';cursor:pointer}
+.btn.ghost{background:transparent;color:var(--ink);border:1px solid var(--ink)}
+.stat b{font-family:'Instrument Serif',serif;font-weight:400;font-size:40px;line-height:1;display:block}
+.stat span{font:600 11px/1 'Manrope';letter-spacing:.12em;text-transform:uppercase;color:var(--ink3)}
+.nav{display:flex;gap:22px;font:600 13px/1 'Manrope';color:var(--ink2)}
+.nav .on{color:var(--tomato)}
+.rowitem{display:grid;grid-template-columns:56px 1fr auto;gap:12px;align-items:center;padding:12px 0;border-bottom:1px solid var(--line2)}
+.dot{width:7px;height:7px;border-radius:999px;background:var(--olive);display:inline-block}
+.mapstrip{background:
+ radial-gradient(circle at 30% 40%,#DCE6CE 0 34px,transparent 35px),
+ radial-gradient(circle at 74% 66%,#CFE0DC 0 46px,transparent 47px),
+ linear-gradient(#EFE7D3,#EFE7D3);position:relative}
+.mapstrip:after{content:"";position:absolute;inset:0;background:
+ repeating-linear-gradient(90deg,rgba(255,255,255,.75) 0 1px,transparent 1px 46px),
+ repeating-linear-gradient(0deg,rgba(255,255,255,.75) 0 1px,transparent 1px 44px)}
+.pin{position:absolute;width:11px;height:11px;border-radius:999px;border:2px solid #FFFDF7;z-index:2}
+</style>
+</head>
+<body>
+
+<div class="lbl" style="left:0;top:36px">Theme A — Field Notes · paper, ledger rules, serif display</div>
+
+<!-- ================= HOME DESKTOP ================= -->
+<div class="lbl" style="left:0;top:74px;color:#4A443A">1 · “/” Home — desktop 1200</div>
+<div class="fr" style="left:0;top:98px;width:1200px;height:1090px">
+  <div style="display:flex;align-items:center;justify-content:space-between;padding:20px 40px;border-bottom:1px solid var(--line)">
+    <div style="display:flex;align-items:center;gap:10px"><div style="width:26px;height:26px;border-radius:999px;background:var(--tomato)"></div><div class="ser" style="font-size:25px">Bite Marks</div></div>
+    <div style="display:flex;align-items:center;gap:28px">
+      <div class="nav"><span class="on">Home</span><span>Spots</span><span>Tags</span><span>Nearby</span></div>
+      <div style="position:relative">
+        <div style="display:flex;align-items:center;gap:8px;border:1px solid var(--line);border-radius:999px;padding:5px 11px 5px 5px;background:var(--card)"><div style="width:24px;height:24px;border-radius:999px;background:var(--olive);color:#fff;font:700 10px/24px 'Manrope';text-align:center">BR</div><span style="font:600 12px/1 'Manrope'">Brandon</span><span style="color:var(--ink3);font-size:10px">▾</span></div>
+        <div class="card" style="position:absolute;right:0;top:40px;width:196px;padding:6px;box-shadow:0 12px 28px rgba(0,0,0,.12)">
+          <div style="padding:9px 11px;font:600 13px/1 'Manrope'">Account</div>
+          <div style="padding:9px 11px;font:600 13px/1 'Manrope'">Default location</div>
+          <div style="padding:9px 11px;font:600 13px/1 'Manrope'">Export spots</div>
+          <div class="rule" style="margin:5px 0"></div>
+          <div style="padding:9px 11px;font:700 13px/1 'Manrope';color:var(--tomato)">Log out</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:1fr 400px;gap:40px;padding:44px 40px 36px">
+    <div>
+      <div class="eb">Your map so far</div>
+      <div class="ser" style="font-size:62px;line-height:1.02;margin:14px 0 0;max-width:600px">Seventy spots marked. Thirty‑eight tasted, thirty‑two still waiting.</div>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:0;margin-top:34px;border-top:1px solid var(--line)">
+        <div class="stat" style="padding:18px 18px 18px 0;border-right:1px solid var(--line2)"><b>70</b><span style="margin-top:8px">Marked</span></div>
+        <div class="stat" style="padding:18px;border-right:1px solid var(--line2)"><b style="color:var(--olive)">38</b><span style="margin-top:8px">Tasted</span></div>
+        <div class="stat" style="padding:18px;border-right:1px solid var(--line2)"><b style="color:var(--tomato)">32</b><span style="margin-top:8px">To try</span></div>
+        <div class="stat" style="padding:18px"><b>4.3</b><span style="margin-top:8px">Avg rating</span></div>
+      </div>
+    </div>
+
+    <!-- DEFAULT LOCATION MODULE -->
+    <div class="card" style="padding:0;overflow:hidden">
+      <div class="mapstrip" style="height:132px">
+        <div class="pin" style="left:38%;top:44%;background:var(--tomato)"></div>
+        <div class="pin" style="left:62%;top:58%;background:var(--olive)"></div>
+        <div class="pin" style="left:52%;top:30%;background:var(--olive)"></div>
+      </div>
+      <div style="padding:18px">
+        <div class="eb">Default location</div>
+        <div class="ser" style="font-size:27px;margin:8px 0 2px">Midtown, New York</div>
+        <div style="font:500 12px/1.4 'Manrope';color:var(--ink3)">Distances and “nearby” are measured from here.</div>
+        <div style="margin-top:16px;display:flex;align-items:center;gap:8px;border:1px solid var(--line);border-radius:3px;padding:11px 12px;background:var(--paper)">
+          <span style="color:var(--tomato);font-size:13px">◎</span>
+          <span style="font:600 13px/1 'Manrope';color:var(--ink2)">Search an address or city</span>
+        </div>
+        <div class="tab" style="margin-top:10px;flex-wrap:wrap"><span class="pill on">Midtown</span><span class="pill">Jersey City</span><span class="pill">Use my location</span></div>
+        <div style="display:flex;gap:8px;margin-top:16px"><button class="btn" style="flex:1">Save as default</button><button class="btn ghost">Clear</button></div>
+      </div>
+    </div>
+  </div>
+
+  <div style="padding:0 40px">
+    <div class="rule"></div>
+    <div style="display:flex;align-items:baseline;justify-content:space-between;margin:26px 0 16px"><div class="ser" style="font-size:29px">Jump back in</div><a style="font:700 12px/1 'Manrope'">All 70 spots →</a></div>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:18px">
+      <div class="card" style="overflow:hidden"><div class="ph" style="height:118px">photo</div><div style="padding:13px"><div style="font:700 14px/1.2 'Manrope'">Felina Steak</div><div style="font:500 11px/1 'Manrope';color:var(--ink3);margin-top:6px">Jersey City · 4 mi</div><div style="margin-top:9px;font:600 11px/1 'Manrope';color:var(--olive)"><span class="dot"></span> Tasted · 4.5</div></div></div>
+      <div class="card" style="overflow:hidden"><div class="ph" style="height:118px">photo</div><div style="padding:13px"><div style="font:700 14px/1.2 'Manrope'">Razza</div><div style="font:500 11px/1 'Manrope';color:var(--ink3);margin-top:6px">Jersey City · 5 mi</div><div style="margin-top:9px;font:600 11px/1 'Manrope';color:var(--olive)"><span class="dot"></span> Tasted · 4.8</div></div></div>
+      <div class="card" style="overflow:hidden"><div class="ph" style="height:118px">photo</div><div style="padding:13px"><div style="font:700 14px/1.2 'Manrope'">Jamba Honare</div><div style="font:500 11px/1 'Manrope';color:var(--ink3);margin-top:6px">Tokyo · 6,741 mi</div><div style="margin-top:9px;font:600 11px/1 'Manrope';color:var(--tomato)">◇ To try</div></div></div>
+      <div class="card" style="overflow:hidden"><div class="ph" style="height:118px">photo</div><div style="padding:13px"><div style="font:700 14px/1.2 'Manrope'">The Nephew Supper Club</div><div style="font:500 11px/1 'Manrope';color:var(--ink3);margin-top:6px">New York · 2 mi</div><div style="margin-top:9px;font:600 11px/1 'Manrope';color:var(--tomato)">◇ To try</div></div></div>
+    </div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:1fr 400px;gap:40px;padding:36px 40px 80px">
+    <div>
+      <div class="ser" style="font-size:29px;margin-bottom:6px">By city</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:0 32px">
+        <div><div class="rowitem" style="grid-template-columns:1fr auto"><span style="font:600 13px/1 'Manrope'">New York</span><span style="font:600 13px/1 'Manrope';color:var(--ink3)">41</span></div><div class="rowitem" style="grid-template-columns:1fr auto"><span style="font:600 13px/1 'Manrope'">Jersey City</span><span style="font:600 13px/1 'Manrope';color:var(--ink3)">12</span></div></div>
+        <div><div class="rowitem" style="grid-template-columns:1fr auto"><span style="font:600 13px/1 'Manrope'">Barbados</span><span style="font:600 13px/1 'Manrope';color:var(--ink3)">6</span></div><div class="rowitem" style="grid-template-columns:1fr auto"><span style="font:600 13px/1 'Manrope'">Tokyo</span><span style="font:600 13px/1 'Manrope';color:var(--ink3)">3</span></div></div>
+      </div>
+    </div>
+    <div class="card" style="padding:18px;background:#FBF6E9">
+      <div class="eb">Add a spot</div>
+      <div class="ser" style="font-size:24px;margin:8px 0 10px">Paste a link, we’ll fill the rest</div>
+      <div style="border:1px dashed var(--line);border-radius:3px;padding:12px;font:500 12px/1 'Manrope';color:var(--ink3);background:var(--card)">instagram.com/p/… · maps.app.goo.gl/…</div>
+    </div>
+  </div>
+
+  <div style="position:absolute;left:0;right:0;bottom:0;border-top:1px solid var(--line);padding:16px 40px;display:flex;justify-content:space-between;align-items:center;background:var(--card)">
+    <div style="font:500 11px/1 'Manrope';color:var(--ink3)">Bite Marks — a private restaurant ledger</div>
+    <div style="display:flex;gap:20px;font:600 11px/1 'Manrope';color:var(--ink2)"><span>Help</span><span>Export</span><span>Privacy</span></div>
+  </div>
+</div>
+
+<!-- ================= DETAIL DESKTOP ================= -->
+<div class="lbl" style="left:1260px;top:74px;color:#4A443A">2 · “/spots/:id” — desktop · filmstrip carousel + ledger rail</div>
+<div class="fr" style="left:1260px;top:98px;width:1200px;height:980px">
+  <div style="display:flex;align-items:center;justify-content:space-between;padding:18px 40px;border-bottom:1px solid var(--line)">
+    <div style="display:flex;align-items:center;gap:10px"><div style="width:22px;height:22px;border-radius:999px;background:var(--tomato)"></div><div class="ser" style="font-size:21px">Bite Marks</div></div>
+    <div class="nav"><span>Home</span><span class="on">Spots</span><span>Tags</span><span>Nearby</span></div>
+  </div>
+  <div style="padding:22px 40px 0"><a style="font:700 12px/1 'Manrope'">← Back to list</a></div>
+
+  <div style="display:grid;grid-template-columns:1fr 392px;gap:32px;padding:18px 40px 0">
+    <!-- CAROUSEL -->
+    <div>
+      <div style="position:relative"><div class="ph" style="height:440px;border-radius:4px">photo 3 of 10</div>
+        <div style="position:absolute;left:14px;top:14px;background:rgba(25,21,16,.72);color:#fff;border-radius:999px;padding:6px 11px;font:700 10px/1 'Manrope';letter-spacing:.1em">03 / 10</div>
+        <div style="position:absolute;left:14px;bottom:14px;display:flex;gap:8px">
+          <div style="width:34px;height:34px;border-radius:999px;background:var(--card);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;font-size:13px">‹</div>
+          <div style="width:34px;height:34px;border-radius:999px;background:var(--card);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;font-size:13px">›</div>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:8px;margin-top:8px">
+        <div class="ph" style="height:62px;border-radius:3px"></div><div class="ph" style="height:62px;border-radius:3px"></div>
+        <div class="ph" style="height:62px;border-radius:3px;outline:2px solid var(--tomato);outline-offset:1px"></div>
+        <div class="ph" style="height:62px;border-radius:3px"></div><div class="ph" style="height:62px;border-radius:3px"></div><div class="ph" style="height:62px;border-radius:3px"></div>
+        <div class="ph" style="height:62px;border-radius:3px;background:var(--ink);color:#EDE6D5">+4</div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:26px">
+        <div class="card" style="padding:16px"><div class="eb">My notes</div><div style="font:500 14px/1.55 'Manrope';color:var(--ink2);margin-top:9px">Local, lowkey but dope. This one is in the cut but the view is great and it’s overall better than the one in south orange</div></div>
+        <div class="card" style="padding:16px"><div style="display:flex;justify-content:space-between;align-items:center"><div class="eb">Links</div><span style="font:700 11px/1 'Manrope';color:var(--tomato)">+ Add</span></div>
+          <div class="rowitem" style="grid-template-columns:1fr auto;padding:10px 0"><span style="font:600 13px/1 'Manrope'">Website</span><span style="color:var(--ink3);font-size:11px">↗</span></div>
+          <div class="rowitem" style="grid-template-columns:1fr auto;padding:10px 0"><span style="font:600 13px/1 'Manrope'">Instagram</span><span style="color:var(--ink3);font-size:11px">↗</span></div>
+          <div class="rowitem" style="grid-template-columns:1fr auto;padding:10px 0;border:0"><span style="font:600 13px/1 'Manrope'">Menu (PDF)</span><span style="color:var(--ink3);font-size:11px">↗</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- LEDGER RAIL -->
+    <div>
+      <div class="eb">Steakhouse · Jersey City</div>
+      <div class="ser" style="font-size:46px;line-height:1.03;margin:10px 0 12px">Felina Steak Jersey City</div>
+      <div style="font:500 13px/1.5 'Manrope';color:var(--ink2)">2 Chapel Ave Unit 2<br>Jersey City, NJ 07305</div>
+      <div class="tab" style="margin-top:14px;flex-wrap:wrap"><span class="pill" style="background:#FBEFD7;border-color:#EBDCB8">★ 4.3 public</span><span class="pill" style="background:#E5EEDB;border-color:#CFDFC0;color:var(--olive)">✓ Tasted</span><span class="pill">4 mi away</span></div>
+      <div class="rule" style="margin:22px 0"></div>
+      <div class="eb">My rating</div>
+      <div style="display:flex;align-items:flex-end;gap:10px;margin-top:8px"><div class="ser" style="font-size:52px;line-height:.9">4.5</div><div style="font:600 12px/1 'Manrope';color:var(--ink3);padding-bottom:8px">/ 5 · edited 2d ago</div></div>
+      <div style="display:flex;gap:5px;margin-top:12px;color:var(--gold);font-size:19px">★★★★<span style="color:var(--line)">★</span></div>
+      <div class="rule" style="margin:22px 0"></div>
+      <div class="eb">Where it sits</div>
+      <div class="mapstrip" style="height:150px;border-radius:4px;margin-top:9px;position:relative;border:1px solid var(--line)">
+        <div class="pin" style="left:48%;top:46%;background:var(--tomato);width:14px;height:14px"></div>
+        <div style="position:absolute;right:10px;bottom:10px;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:6px 11px;font:700 11px/1 'Manrope';color:var(--tomato)">Directions ↗</div>
+      </div>
+      <div style="display:flex;gap:8px;margin-top:22px"><button class="btn" style="flex:1">Save changes</button><button class="btn ghost">Delete</button></div>
+    </div>
+  </div>
+</div>
+
+<!-- ================= MOBILE ROW ================= -->
+<div class="lbl" style="left:0;top:1230px;color:#4A443A">3 · “/” Home — mobile</div>
+<div class="fr mob" style="left:0;top:1256px;width:390px;height:880px">
+  <div style="display:flex;align-items:center;justify-content:space-between;padding:24px 20px 14px">
+    <div style="display:flex;align-items:center;gap:8px"><div style="width:20px;height:20px;border-radius:999px;background:var(--tomato)"></div><div class="ser" style="font-size:20px">Bite Marks</div></div>
+    <div style="width:30px;height:30px;border-radius:999px;background:var(--olive);color:#fff;font:700 10px/30px 'Manrope';text-align:center">BR</div>
+  </div>
+  <div style="padding:6px 20px 0">
+    <div class="eb">Your map so far</div>
+    <div class="ser" style="font-size:34px;line-height:1.06;margin-top:10px">70 spots marked.<br>38 tasted.</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;margin-top:20px;border-top:1px solid var(--line)">
+      <div class="stat" style="padding:14px 0"><b style="font-size:28px">70</b><span style="margin-top:6px;font-size:10px">Marked</span></div>
+      <div class="stat" style="padding:14px 0"><b style="font-size:28px;color:var(--olive)">38</b><span style="margin-top:6px;font-size:10px">Tasted</span></div>
+      <div class="stat" style="padding:14px 0"><b style="font-size:28px;color:var(--tomato)">32</b><span style="margin-top:6px;font-size:10px">To try</span></div>
+    </div>
+  </div>
+  <div class="card" style="margin:8px 20px 0;overflow:hidden">
+    <div class="mapstrip" style="height:96px"><div class="pin" style="left:44%;top:44%;background:var(--tomato)"></div><div class="pin" style="left:66%;top:60%;background:var(--olive)"></div></div>
+    <div style="padding:14px">
+      <div class="eb">Default location</div>
+      <div class="ser" style="font-size:23px;margin:6px 0 10px">Midtown, New York</div>
+      <div class="tab" style="flex-wrap:wrap"><span class="pill on">Midtown</span><span class="pill">Jersey City</span><span class="pill">Use my location</span></div>
+      <button class="btn" style="width:100%;margin-top:12px">Save as default</button>
+    </div>
+  </div>
+  <div style="padding:20px 20px 0">
+    <div style="display:flex;justify-content:space-between;align-items:baseline"><div class="ser" style="font-size:23px">Jump back in</div><a style="font:700 11px/1 'Manrope'">All 70 →</a></div>
+    <div class="rowitem"><div class="ph" style="width:56px;height:56px;border-radius:3px"></div><div><div style="font:700 14px/1.2 'Manrope'">Felina Steak</div><div style="font:500 11px/1 'Manrope';color:var(--ink3);margin-top:5px">Jersey City · 4 mi</div><div style="font:600 11px/1 'Manrope';color:var(--olive);margin-top:6px"><span class="dot"></span> Tasted · 4.5</div></div><span style="color:var(--ink3)">›</span></div>
+    <div class="rowitem"><div class="ph" style="width:56px;height:56px;border-radius:3px"></div><div><div style="font:700 14px/1.2 'Manrope'">Razza</div><div style="font:500 11px/1 'Manrope';color:var(--ink3);margin-top:5px">Jersey City · 5 mi</div><div style="font:600 11px/1 'Manrope';color:var(--olive);margin-top:6px"><span class="dot"></span> Tasted · 4.8</div></div><span style="color:var(--ink3)">›</span></div>
+  </div>
+  <div style="position:absolute;left:0;right:0;bottom:0;background:var(--card);border-top:1px solid var(--line);display:grid;grid-template-columns:repeat(4,1fr);padding:10px 0 18px;text-align:center">
+    <div style="font:700 10px/1.6 'Manrope';color:var(--tomato)">◆<br>Home</div>
+    <div style="font:700 10px/1.6 'Manrope';color:var(--ink3)">☰<br>Spots</div>
+    <div style="font:700 10px/1.6 'Manrope';color:var(--ink3)">◎<br>Nearby</div>
+    <div style="font:700 10px/1.6 'Manrope';color:var(--ink3)">◐<br>Me</div>
+  </div>
+</div>
+
+<div class="lbl" style="left:440px;top:1230px;color:#4A443A">4 · “/spots/:id” — mobile · swipe carousel</div>
+<div class="fr mob" style="left:440px;top:1256px;width:390px;height:880px">
+  <div style="position:relative"><div class="ph" style="height:268px">photo 3 of 10</div>
+    <div style="position:absolute;left:16px;top:22px;width:34px;height:34px;border-radius:999px;background:var(--card);display:flex;align-items:center;justify-content:center">←</div>
+    <div style="position:absolute;right:16px;top:22px;background:rgba(25,21,16,.7);color:#fff;border-radius:999px;padding:6px 10px;font:700 10px/1 'Manrope'">03 / 10</div>
+    <div style="position:absolute;left:0;right:0;bottom:14px;display:flex;gap:5px;justify-content:center">
+      <i style="width:5px;height:5px;border-radius:999px;background:rgba(255,255,255,.55)"></i><i style="width:5px;height:5px;border-radius:999px;background:rgba(255,255,255,.55)"></i><i style="width:16px;height:5px;border-radius:999px;background:#fff"></i><i style="width:5px;height:5px;border-radius:999px;background:rgba(255,255,255,.55)"></i><i style="width:5px;height:5px;border-radius:999px;background:rgba(255,255,255,.55)"></i>
+    </div>
+  </div>
+  <div style="padding:20px 20px 0">
+    <div class="eb">Steakhouse · Jersey City</div>
+    <div class="ser" style="font-size:33px;line-height:1.04;margin:8px 0 10px">Felina Steak Jersey City</div>
+    <div style="font:500 12px/1.5 'Manrope';color:var(--ink2)">2 Chapel Ave Unit 2, Jersey City, NJ 07305</div>
+    <div class="tab" style="margin-top:12px;flex-wrap:wrap"><span class="pill" style="background:#FBEFD7;border-color:#EBDCB8">★ 4.3</span><span class="pill" style="background:#E5EEDB;border-color:#CFDFC0;color:var(--olive)">✓ Tasted</span><span class="pill">4 mi</span></div>
+    <div class="rule" style="margin:18px 0"></div>
+    <div style="display:flex;gap:14px;align-items:flex-end"><div><div class="eb">My rating</div><div class="ser" style="font-size:40px;line-height:1;margin-top:4px">4.5</div></div><div style="display:flex;gap:4px;color:var(--gold);font-size:16px;padding-bottom:8px">★★★★<span style="color:var(--line)">★</span></div></div>
+    <div class="card" style="padding:14px;margin-top:16px"><div class="eb">My notes</div><div style="font:500 13px/1.55 'Manrope';color:var(--ink2);margin-top:8px">Local, lowkey but dope. This one is in the cut but the view is great and it’s overall better than the one in south orange</div></div>
+    <div class="mapstrip" style="height:110px;border-radius:4px;margin-top:14px;border:1px solid var(--line)"><div class="pin" style="left:48%;top:44%;background:var(--tomato);width:14px;height:14px"></div><div style="position:absolute;right:10px;bottom:10px;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:6px 10px;font:700 10px/1 'Manrope';color:var(--tomato)">Directions ↗</div></div>
+  </div>
+  <div style="position:absolute;left:0;right:0;bottom:0;padding:12px 20px 20px;background:var(--card);border-top:1px solid var(--line)"><button class="btn" style="width:100%">Save changes</button></div>
+</div>
+
+<div class="lbl" style="left:880px;top:1230px;color:#4A443A">5 · “/list” — search active (cream sheet, ink field)</div>
+<div class="fr mob" style="left:880px;top:1256px;width:390px;height:880px">
+  <div style="filter:blur(1.5px);opacity:.5">
+    <div class="mapstrip" style="height:210px"></div>
+    <div style="padding:14px 20px"><div class="rowitem" style="grid-template-columns:1fr"><span style="font:700 14px/1 'Manrope'">Felina Steak Jersey City</span></div><div class="rowitem" style="grid-template-columns:1fr"><span style="font:700 14px/1 'Manrope'">Filé Gumbo Bar</span></div></div>
+  </div>
+  <div style="position:absolute;inset:0;background:rgba(25,21,16,.34)"></div>
+  <div style="position:absolute;left:0;right:0;bottom:0;height:76%;background:var(--paper);border-radius:20px 20px 0 0;border-top:3px solid var(--ink);box-shadow:0 -16px 40px rgba(0,0,0,.22);padding:14px 20px 0">
+    <div style="width:38px;height:4px;border-radius:999px;background:var(--line);margin:0 auto 14px"></div>
+    <div style="display:flex;align-items:center;gap:10px;background:var(--card);border:1.5px solid var(--ink);border-radius:3px;padding:13px 14px">
+      <span style="color:var(--tomato)">⌕</span><span style="font:700 15px/1 'Manrope'">fel</span><span style="width:1.5px;height:16px;background:var(--tomato)"></span>
+      <span style="margin-left:auto;font:700 12px/1 'Manrope';color:var(--tomato)">Cancel</span>
+    </div>
+    <div class="eb" style="margin:20px 0 4px">Top matches</div>
+    <div class="rowitem" style="grid-template-columns:34px 1fr auto"><div style="width:34px;height:34px;border-radius:3px;background:#F0E8D4;display:flex;align-items:center;justify-content:center;color:var(--tomato)">◉</div><div><div style="font:700 14px/1 'Manrope'"><span style="background:#F7DCCF;color:#9E3520">Fel</span>ina Steak Jersey City</div><div style="font:500 11px/1 'Manrope';color:var(--ink3);margin-top:5px">Jersey City, NJ · 4 mi</div></div><span style="color:var(--ink3)">›</span></div>
+    <div class="rowitem" style="grid-template-columns:34px 1fr auto"><div style="width:34px;height:34px;border-radius:3px;background:#F0E8D4;display:flex;align-items:center;justify-content:center;color:var(--tomato)">◉</div><div><div style="font:700 14px/1 'Manrope'"><span style="background:#F7DCCF;color:#9E3520">Filé</span> Gumbo Bar</div><div style="font:500 11px/1 'Manrope';color:var(--ink3);margin-top:5px">New York, NY · 1 mi</div></div><span style="color:var(--ink3)">›</span></div>
+    <div class="eb" style="margin:18px 0 8px">Quick filters</div>
+    <div class="tab" style="flex-wrap:wrap"><span class="pill on">Tasted</span><span class="pill">To try</span><span class="pill">Under 5 mi</span><span class="pill">4.5+</span><span class="pill">Steak</span></div>
+    <div class="eb" style="margin:18px 0 4px">Recent</div>
+    <div class="rowitem" style="grid-template-columns:1fr auto;padding:10px 0"><span style="font:600 13px/1 'Manrope';color:var(--ink2)">↺ Razza</span></div>
+    <div class="rowitem" style="grid-template-columns:1fr auto;padding:10px 0"><span style="font:600 13px/1 'Manrope';color:var(--ink2)">↺ ramen, midtown</span></div>
+  </div>
+</div>
+
+<div class="lbl" style="left:1330px;top:1230px;color:#4A443A">Notes</div>
+<div class="fr" style="left:1330px;top:1256px;width:430px;height:1090px;background:var(--card);border:1px solid var(--line);border-radius:4px">
+  <div style="padding:26px">
+    <div class="ser" style="font-size:30px;line-height:1.1">Field Notes</div>
+    <div style="font:500 13px/1.6 'Manrope';color:var(--ink2);margin-top:12px">Paper ground, hairline ledger rules, a serif display voice. Tomato replaces the pure orange; olive replaces the mint green so “tasted” reads calmer.</div>
+    <div class="rule" style="margin:20px 0"></div>
+    <div class="eb">What it fixes</div>
+    <div style="font:500 13px/1.7 'Manrope';color:var(--ink2);margin-top:10px">
+      <b>Home</b> becomes a ledger: one large statement of the collection, four stats on a rule, default‑location card with live map strip, then recent spots and a by‑city index. Space is used by type, not boxes.<br><br>
+      <b>Detail</b> splits into filmstrip carousel (7 visible thumbs + overflow) and a right ledger rail carrying every field the old blank masthead wasted.<br><br>
+      <b>Search</b> sheet is cream with a 1.5&nbsp;px ink border and tomato caret — no gray.<br><br>
+      <b>Logout</b> moves into the header account menu (shown open). Footer becomes a colophon; mobile uses a 4‑tab bar with “Me”.
+    </div>
+    <div class="rule" style="margin:20px 0"></div>
+    <div class="eb">Palette</div>
+    <div style="display:flex;gap:8px;margin-top:10px">
+      <div style="flex:1;height:44px;border-radius:3px;background:var(--paper);border:1px solid var(--line)"></div>
+      <div style="flex:1;height:44px;border-radius:3px;background:var(--ink)"></div>
+      <div style="flex:1;height:44px;border-radius:3px;background:var(--tomato)"></div>
+      <div style="flex:1;height:44px;border-radius:3px;background:var(--olive)"></div>
+      <div style="flex:1;height:44px;border-radius:3px;background:var(--gold)"></div>
+    </div>
+    <div style="font:500 11px/1.5 'Manrope';color:var(--ink3);margin-top:8px">#F6F1E4 · #191510 · #C6462B · #55703F · #B98A2E<br>Instrument Serif + Manrope</div>
+  </div>
+</div>
+
+</body>
+</html>

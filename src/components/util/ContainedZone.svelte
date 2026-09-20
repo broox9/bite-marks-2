@@ -1,10 +1,8 @@
 <script lang="ts">
   let { cssClasses = "", children } = $props();
-
-  const classList = `${cssClasses}`;
 </script>
 
-<div class="contained-zone">
+<div class="contained-zone {cssClasses}">
   {@render children()}
 </div>
 

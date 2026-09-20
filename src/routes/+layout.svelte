@@ -1,22 +1,25 @@
 <script lang="ts">
-  // import { Hamburger } from "@lucide/svelte";
   import "../styles/app.css";
   import DotLogo from '$lib/assets/bite-marks-dot.svg'
-  // import BookmarkLogo from '../components/BookmarkLogo.svelte'
+  import { Menu } from '@lucide/svelte';
+  import { onMount } from 'svelte';
 
   import type { LayoutProps } from "./$types";
-  import { goto } from "$app/navigation";
   import { PUBLIC_CONVEX_URL } from "$env/static/public";
   import { createSvelteAuthClient } from "@mmailaender/convex-better-auth-svelte/svelte";
   import { authClient } from "$lib/auth-client";
-
-  import { locationStore } from "$lib/adapters/primary/stores/location.store.svelte";
+  import {
+    applyThemePreference,
+    readThemePreference,
+    THEME_CHANGE_EVENT,
+    type ThemePreference,
+  } from '$lib/theme';
 
   import ContainedZone from "../components/util/ContainedZone.svelte";
   import MainNavLinks from "../components/MainNavLinks.svelte";
+  import BottomNav from '../components/BottomNav.svelte';
 
   let { data, children }: LayoutProps = $props();
-  let currentPlace = $derived(locationStore);
 
   createSvelteAuthClient({
     authClient,
@@ -24,44 +27,57 @@
     getServerState: () => data.authState,
   });
 
-  const logout = async () => {
-    await authClient.signOut();
-    goto("/login");
-  };
+  onMount(() => {
+    const colorScheme = window.matchMedia('(prefers-color-scheme: dark)');
+    const syncTheme = () => applyThemePreference(readThemePreference(localStorage));
+    const handleThemeChange = (event: Event) => {
+      applyThemePreference((event as CustomEvent<ThemePreference>).detail);
+    };
+
+    syncTheme();
+    colorScheme.addEventListener('change', syncTheme);
+    window.addEventListener('storage', syncTheme);
+    window.addEventListener(THEME_CHANGE_EVENT, handleThemeChange);
+
+    return () => {
+      colorScheme.removeEventListener('change', syncTheme);
+      window.removeEventListener('storage', syncTheme);
+      window.removeEventListener(THEME_CHANGE_EVENT, handleThemeChange);
+    };
+  });
 </script>
 
 <svelte:head>
   <title>Bite Marks</title>
   <link rel="icon" href={DotLogo} />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=IBM+Plex+Mono:wght@400;500;600&family=Inter+Tight:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap"
+    rel="stylesheet"
+  />
   <link
     href="https://api.mapbox.com/mapbox-gl-js/v3.19.0/mapbox-gl.css"
     rel="stylesheet"
   />
 </svelte:head>
 
-<div id="body-container">
+<div id="body-container" class:has-bottom-nav={!!data.user}>
   <header id="page-header">
     <ContainedZone>
       <div class="main-header">
         <strong>
 
           <a href="/">
-            <!-- <img src="/new-bite-marks-logo.png" alt="Bite Marks" width="32" height="48" /> -->
-            <img src={DotLogo} alt="Bite Marks" height="28" />
-            <!-- <BookmarkLogo heightProp={24} /> -->
-            <!-- <Hamburger size={24} /> -->
-            Bite Marks
+            <img src={DotLogo} alt="" height="24" />
+            <span>Bite Marks</span>
           </a>
         </strong>
 
-        <MainNavLinks ariaLabel="Main navigation" />
-      </div>
-      <!-- <button onclick={logout}>Logout</button> -->
-
-      <div class="sub-header">
-        <small>
-          <a href="/">{currentPlace.name || "???"} ({currentPlace.radiusMiles} miles)</a>
-        </small>
+        <MainNavLinks ariaLabel="Main navigation" class="desktop-nav" />
+        <a class="mobile-menu" href="/settings" aria-label="Open settings">
+          <Menu size={18} />
+        </a>
       </div>
     </ContainedZone>
   </header>
@@ -70,16 +86,9 @@
     {@render children()}
   </section>
 
-  <section id="bottom-sheet">Bottom Sheet here</section>
-
-  <footer>
-    <a class="footer-link" href="/">Home</a>
-    {#if data.user}
-      <button class="footer-link footer-link--button" onclick={logout} type="button"
-        >Logout</button
-      >
-    {/if}
-  </footer>
+  {#if data.user}
+    <BottomNav />
+  {/if}
 </div>
 
 <style>
@@ -91,76 +100,53 @@
     display: grid;
     grid-template:
       "header"
-      "content"
-      "footer";
-    grid-template-rows: auto 1fr auto;
-    min-height: 100vh;
-    /*overflow: hidden;*/
-    background-color: var(--bg-color);
+      "content";
+    grid-template-rows: auto 1fr;
+    min-height: 100svh;
+    padding-bottom: 0;
+    background-color: var(--sys-color-page);
+  }
+
+  #body-container.has-bottom-nav {
+    padding-bottom: calc(var(--comp-nav-height) + env(safe-area-inset-bottom));
   }
 
   #page-header {
     grid-area: header;
-    /* background: var(--bg-light); */
-    padding: 0.25rem;
-  }
-
-  #page-header .sub-header {
-    /*background-color: oklch(from var(--bg-low-contrast) l c h / 0.5);*/
-    /*background-color: var(--bg-light);*/
-    /*border: 1px solid var(--bg-low-contrast);*/
-    padding: 0.5rem 0 0 0.5rem;
-    /*text-align: center;*/
-    border-radius: var(--border-radius);
-    font-style: italic;
-    font-weight:300;
-    letter-spacing: 0.05ch;
-
-    & a {
-      color: var(--cta-dark-super);
-    }
+    border-bottom: 1px solid var(--sys-color-border);
+    background: var(--sys-color-page);
+    padding: 0.45rem 0;
   }
 
   .main-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 0 0.25rem;
+    min-height: 2.75rem;
+    padding: 0 1.125rem;
   }
 
   .main-header strong a {
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    font-size: 1.5rem;
-    color: var(--text-color);
+    font-family: var(--sys-font-display);
+    font-size: var(--sys-brand-size);
+    font-weight: var(--sys-brand-weight);
+    letter-spacing: var(--sys-display-tracking);
+    color: var(--comp-header-brand-text);
   }
 
-  footer {
-    grid-area: footer;
-    width: 100%;
-    margin-top: 3.5rem;
-    background-color: var(--bg-light);
-    padding: 0.5rem;
-    display: flex;
-    justify-content: flex-start;
+  .mobile-menu {
+    width: 2.125rem;
+    height: 2.125rem;
+    display: inline-flex;
     align-items: center;
-    gap: 1rem;
-    flex-wrap: wrap;
-  }
-
-  .footer-link {
-    color: var(--bg-medium-contrast);
-    text-decoration: none;
-  }
-
-  .footer-link--button {
-    margin: 0;
-    padding: 0;
-    border: none;
-    background: none;
-    font: inherit;
-    cursor: pointer;
+    justify-content: center;
+    border: 1px solid var(--comp-header-menu-border);
+    border-radius: var(--sys-radius-control);
+    background: var(--sys-color-surface-sunken);
+    color: var(--comp-header-menu-text);
   }
 
   #page-content {
@@ -169,25 +155,21 @@
     min-height: 0; /* Allow grid item to shrink below content size */
   }
 
-  #bottom-sheet {
-    /* grid-area: content; */
+  :global(.desktop-nav) {
     display: none;
-    bottom: -100px;
-    width: 100%;
-    z-index: -4;
-    height: minmax(200px, 50svh);
-    place-self: end;
-
-    .open {
-      display: fixed;
-      bottom: 0;
-      z-index: 10;
-    }
   }
 
   @media (min-width: 768px) {
-    #bottom-sheet {
+    #body-container {
+      padding-bottom: 0;
+    }
+
+    .mobile-menu {
       display: none;
+    }
+
+    :global(.desktop-nav) {
+      display: block;
     }
   }
 </style>

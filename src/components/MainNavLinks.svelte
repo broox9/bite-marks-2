@@ -11,7 +11,7 @@
   <ul>
     <li><a href="/list">Spots</a></li>
     <li><a href="/">Search</a></li>
-    <!-- <li><a href="/tags">Tags</a></li> -->
+    <li><a href="/settings">Settings</a></li>
   </ul>
 </nav>
 
@@ -25,6 +25,12 @@
   }
 
   .main-nav-links ul li a {
-    color: var(--accent-color);
+    color: var(--sys-color-text-muted);
+    font-size: 0.8125rem;
+    font-weight: 700;
+  }
+
+  .main-nav-links ul li a:hover {
+    color: var(--sys-color-brand);
   }
 </style>

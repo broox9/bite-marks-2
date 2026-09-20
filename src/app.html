@@ -4,6 +4,23 @@
 		<meta charset="utf-8" />
 		<!--<link rel="icon" href="%sveltekit.assets%/favicon.png" />-->
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<script>
+			(() => {
+				try {
+					const stored = localStorage.getItem('bite-marks-theme');
+					const preference = stored === 'light' || stored === 'night' || stored === 'system'
+						? stored
+						: 'system';
+					const theme = preference === 'system'
+						? (matchMedia('(prefers-color-scheme: dark)').matches ? 'night' : 'light')
+						: preference;
+					document.documentElement.dataset.theme = theme;
+					document.documentElement.style.colorScheme = theme === 'night' ? 'dark' : 'light';
+				} catch {
+					document.documentElement.dataset.theme = 'light';
+				}
+			})();
+		</script>
 				<script>
 
 					window.resolveGoogleLoaded = () => {
@@ -15,7 +32,7 @@
 						return Promise.resolve(google)
 					}
 				</script>
-		<script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDkL_zZu457B4XEsAkbVDXr8hsYsebDnOs&libraries=places&callback=resolveGoogleLoaded"></script>
+		<script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDkL_zZu457B4XEsAkbVDXr8hsYsebDnOs&libraries=places&loading=async&callback=resolveGoogleLoaded"></script>
 		%sveltekit.head%
 	</head>
 	<body data-sveltekit-preload-data="hover">
