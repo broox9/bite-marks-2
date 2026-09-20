@@ -21,18 +21,55 @@
 				}
 			})();
 		</script>
-				<script>
-
-					window.resolveGoogleLoaded = () => {
-						if (!google) {
-							console.error('[bs] GOOGLE LOAD ERROR')
-							return Promise.reject('Error loading google') // nothing catching this yet
+		<script>
+			(() => {
+				// The Maps bootstrap defines `window.google.maps` SYNCHRONOUSLY, but only as a
+				// stub -- `importLibrary` and friends arrive with the follow-up scripts it
+				// appends (main.js et al). So `google` being truthy proves nothing. We hand
+				// callers a promise that is settled by the API's own callback instead, and
+				// only after `importLibrary` is actually there.
+				const ready = new Promise((resolve, reject) => {
+					const settle = () => {
+						const g = window.google;
+						if (g && g.maps && typeof g.maps.importLibrary === 'function') {
+							console.log('[bs] GOOGLE READY', true);
+							resolve(g);
+							return true;
 						}
-						console.log('[bs] GOOGLE READY', true)
-						return Promise.resolve(google)
-					}
-				</script>
-		<script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDkL_zZu457B4XEsAkbVDXr8hsYsebDnOs&libraries=places&loading=async&callback=resolveGoogleLoaded"></script>
+						return false;
+					};
+
+					window.__biteMarksGoogleLoaded = () => {
+						if (settle()) return;
+						console.error('[bs] GOOGLE LOAD ERROR: callback fired without importLibrary');
+						reject(new Error('Google Maps loaded without importLibrary'));
+					};
+
+					window.__biteMarksGoogleFailed = () => {
+						console.error('[bs] GOOGLE LOAD ERROR: script failed to load');
+						reject(new Error('Google Maps JS API failed to load'));
+					};
+
+					// Safety net for the cases the callback never covers: blocked by an
+					// extension, offline, or a key/referrer rejection.
+					setTimeout(() => {
+						if (settle()) return;
+						reject(new Error('Google Maps JS API timed out'));
+					}, 15000);
+				});
+
+				// Keep the shared promise from surfacing as an unhandled rejection; each
+				// caller still sees the rejection through resolveGoogleLoaded().
+				ready.catch(() => {});
+
+				window.resolveGoogleLoaded = () => ready;
+			})();
+		</script>
+		<script
+			async
+			src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDkL_zZu457B4XEsAkbVDXr8hsYsebDnOs&libraries=places&loading=async&callback=__biteMarksGoogleLoaded"
+			onerror="__biteMarksGoogleFailed()"
+		></script>
 		%sveltekit.head%
 	</head>
 	<body data-sveltekit-preload-data="hover">
