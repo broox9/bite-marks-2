@@ -32,6 +32,7 @@
   const spotRows = $derived(
     (spotsQuery.current?.rows ?? []) as UserSpotRecord[],
   );
+  const savedPlaceIds = $derived(new Set(spotRows.map((spot) => spot.place_id)));
   const visitedCount = $derived(spotRows.filter((s) => s.is_visited).length);
   const unvisitedCount = $derived(spotRows.length - visitedCount);
   const filteredSpotRows = $derived(
@@ -355,8 +356,8 @@
       </button>
     </div>
 
-    <PlaceSearchTool selectResultAction={selectResultFn} />
-    <Dialog shouldModalBeOpen={!!selectedResultObj} onClose={resultClearAction}>
+    <PlaceSearchTool selectResultAction={selectResultFn} {savedPlaceIds} />
+    <Dialog title="Add a spot" shouldModalBeOpen={!!selectedResultObj} onClose={resultClearAction}>
       {#if selectedResultObj}
         <ResultCard
           place={selectedResultObj}

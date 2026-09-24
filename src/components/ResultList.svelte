@@ -1,8 +1,13 @@
 <script lang="ts">
   import type { ResultPlaceRecord } from "$lib/core/domain/Place/Place";
-  import { MapPin, ChevronRight } from '@lucide/svelte';
+  import { MapPin, ChevronRight, Check } from '@lucide/svelte';
 
-  const { items, onSelect, query = '' } : { items: ResultPlaceRecord[], onSelect: any, query?: string } = $props()
+  const { items, onSelect, query = '', savedPlaceIds = new Set<string>() } : {
+    items: ResultPlaceRecord[];
+    onSelect: (item: ResultPlaceRecord) => void;
+    query?: string;
+    savedPlaceIds?: ReadonlySet<string>;
+  } = $props()
 
   function highlight(name: string, q: string): { text: string; match: boolean }[] {
     if (!q) return [{ text: name, match: false }];
@@ -42,7 +47,12 @@
               {#if part.match}<mark class="match">{part.text}</mark>{:else}{part.text}{/if}
             {/each}
           </span>
-          <span class="result-sub">{item.neighborhood}</span>
+          <span class="result-details">
+            {#if item.neighborhood}<span class="result-sub">{item.neighborhood}</span>{/if}
+            {#if savedPlaceIds.has(item.place_id)}
+              <span class="saved-badge"><Check size={12} strokeWidth={2.5} aria-hidden="true" /> Saved</span>
+            {/if}
+          </span>
         </span>
         <ChevronRight size={16} class="result-chevron" />
       </li>
@@ -131,6 +141,27 @@
     font-size: 0.8125rem;
     color: var(--comp-list-item-text-sub);
     line-height: 1.3;
+  }
+
+  .result-details {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.375rem 0.625rem;
+  }
+
+  .saved-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.2rem;
+    padding: 0.125rem 0.4375rem;
+    border-radius: var(--sys-radius-pill);
+    background-color: var(--sys-color-brand-tint);
+    color: var(--sys-color-brand);
+    font-size: 0.6875rem;
+    font-weight: 700;
+    line-height: 1.2;
+    white-space: nowrap;
   }
 
   :global(.result-chevron) {

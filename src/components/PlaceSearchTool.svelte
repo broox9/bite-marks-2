@@ -10,8 +10,9 @@
   let resultList = $state<ResultPlaceRecord[] | []>([])
   let selectedResult = $state<ResultPlaceRecord | null>(null)
 
-  let { selectResultAction }: {
+  let { selectResultAction, savedPlaceIds = new Set<string>() }: {
     selectResultAction: (selectedPlace: ResultPlaceRecord) => void;
+    savedPlaceIds?: ReadonlySet<string>;
   } = $props()
 
   const resultHandler = (results: ResultPlaceRecord[]) => {
@@ -60,7 +61,7 @@
   </div>
 
   {#if resultList.length > 0}
-    <ResultList items={resultList} onSelect={selectResult} query={currentSearchValue} />
+    <ResultList items={resultList} onSelect={selectResult} query={currentSearchValue} {savedPlaceIds} />
   {:else}
     <!-- <div class="drawer-section">
       <p class="section-label">Quick Filters</p>
