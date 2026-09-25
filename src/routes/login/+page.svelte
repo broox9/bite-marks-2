@@ -8,7 +8,9 @@
   let password = $state("");
   let errorMessage = $state("");
   let pending = $state(false);
-  let mode = $state<"login" | "register">("login");
+  let mode = $state<"login" | "register">(
+    page.url.searchParams.get("mode") === "register" ? "register" : "login",
+  );
 
   const oauthErrorMessage = $derived.by(() => {
     const code = page.url.searchParams.get("oauth");
@@ -128,7 +130,7 @@
         onclick={handleGoogle}
         disabled={pending}
       >
-        Continue with Google
+        {mode === "login" ? "Continue with Google" : "Sign up with Google"}
       </button>
     </div>
   </form>
