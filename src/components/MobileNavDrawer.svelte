@@ -12,6 +12,7 @@
     Search,
     Settings,
     Tags,
+    UserPlus,
     X,
   } from '@lucide/svelte';
   import { tick } from 'svelte';
@@ -205,6 +206,12 @@
                 <a href="/login" onclick={() => closeMenu()}>
                   <LogIn size={20} strokeWidth={2} />
                   <span>Log in</span>
+                </a>
+              </li>
+              <li>
+                <a href="/login?mode=register" onclick={() => closeMenu()}>
+                  <UserPlus size={20} strokeWidth={2} />
+                  <span>Sign up</span>
                 </a>
               </li>
             {/if}
