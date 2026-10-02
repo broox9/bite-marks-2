@@ -7,8 +7,6 @@
   import { PUBLIC_CONVEX_URL } from "$env/static/public";
   import { createSvelteAuthClient } from "@mmailaender/convex-better-auth-svelte/svelte";
   import { authClient } from "$lib/auth-client";
-  import { getSearchPreferences } from '$lib/adapters/primary/remote-handlers/search-preferences.remote';
-  import { locationStore } from '$lib/adapters/primary/stores/location.store.svelte';
   import {
     applyThemePreference,
     readThemePreference,
@@ -19,6 +17,7 @@
   import ContainedZone from "../components/util/ContainedZone.svelte";
   import MainNavLinks from "../components/MainNavLinks.svelte";
   import MobileNavDrawer from '../components/MobileNavDrawer.svelte';
+  import SearchPreferencesHydrator from '../components/SearchPreferencesHydrator.svelte';
 
   let { data, children }: LayoutProps = $props();
 
@@ -26,16 +25,6 @@
     authClient,
     convexUrl: PUBLIC_CONVEX_URL,
     getServerState: () => data.authState,
-  });
-
-  const searchPreferencesQuery = data.user ? getSearchPreferences({}) : null;
-  let hydratedPreference = $state<unknown>(null);
-
-  $effect(() => {
-    const preference = searchPreferencesQuery?.current;
-    if (!preference || preference === hydratedPreference) return;
-    hydratedPreference = preference;
-    locationStore.apply(preference);
   });
 
   onMount(() => {
@@ -74,6 +63,9 @@
 </svelte:head>
 
 <div id="body-container">
+  {#if data.user}
+    <SearchPreferencesHydrator />
+  {/if}
   <header id="page-header">
     <ContainedZone>
       <div class="main-header">

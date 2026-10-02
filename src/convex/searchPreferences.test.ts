@@ -34,11 +34,12 @@ describe("search preferences", () => {
     });
 
     expect(updated._id).toBe(created._id);
-    expect(await user.query(api.searchPreferences.getMine, {})).toMatchObject({
+    const result = await user.query(api.searchPreferences.getMine, {});
+    expect(result).toMatchObject({
       locationName: "Downtown Brooklyn",
       radiusMeters: 16093.44,
-      type: undefined,
     });
+    expect(result?.type).toBeUndefined();
   });
 
   it("isolates preferences by authenticated user", async () => {
