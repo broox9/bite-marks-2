@@ -40,4 +40,17 @@ export default defineSchema({
     userId: v.string(),
     tagName: v.string(),
   }).index("by_user", ["userId"]),
+
+  // A user's default location and radius for place searches.
+  searchPreferences: defineTable({
+    userId: v.string(),
+    locationName: v.string(),
+    center: v.object({
+      lat: v.number(),
+      lng: v.number(),
+    }),
+    radiusMeters: v.number(),
+    // A user-defined label such as "Home" or "Work".
+    type: v.optional(v.string()),
+  }).index("by_user", ["userId"]),
 });

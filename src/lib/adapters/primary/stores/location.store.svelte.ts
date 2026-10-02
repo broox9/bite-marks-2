@@ -4,6 +4,7 @@ const degreesPerMileMultiplier = 1.0145
 let center = $state({ lat: 40.7484, lng: -73.9857 })
 let name = $state('Midtown, New York')
 let radiusMiles = $state(29) 
+let type = $state('')
 // move this to the setter or getter function
 let radiusMeters = $derived(radiusMiles * 1609.34 ) // 1610 meters per mile 56500 ~= 35 miles
 
@@ -35,6 +36,23 @@ export const locationStore = {
   },
   set radiusMiles(newRadius) {
     radiusMiles = newRadius
+  },
+  get type() {
+    return type
+  },
+  set type(newType: string) {
+    type = newType
+  },
+  apply(preference: {
+    locationName: string;
+    center: { lat: number; lng: number };
+    radiusMiles: number;
+    type?: string;
+  }) {
+    name = preference.locationName
+    center = preference.center
+    radiusMiles = preference.radiusMiles
+    type = preference.type ?? ''
   },
 
   set radiusMeters (newRadius) {

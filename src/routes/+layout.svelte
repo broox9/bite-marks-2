@@ -17,6 +17,7 @@
   import ContainedZone from "../components/util/ContainedZone.svelte";
   import MainNavLinks from "../components/MainNavLinks.svelte";
   import MobileNavDrawer from '../components/MobileNavDrawer.svelte';
+  import SearchPreferencesHydrator from '../components/SearchPreferencesHydrator.svelte';
 
   let { data, children }: LayoutProps = $props();
 
@@ -62,6 +63,9 @@
 </svelte:head>
 
 <div id="body-container">
+  {#if data.user}
+    <SearchPreferencesHydrator />
+  {/if}
   <header id="page-header">
     <ContainedZone>
       <div class="main-header">

@@ -129,6 +129,12 @@
     updateSpotsInView();
   });
 
+  $effect(() => {
+    const center = locationStore.center;
+    if (!mapReady || !map) return;
+    map.setCenter([center.lng, center.lat]);
+  });
+
   function selectResultFn(selectedResult: ResultPlaceRecord) {
     selectedResultObj = selectedResult;
   }
