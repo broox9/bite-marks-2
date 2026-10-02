@@ -1,10 +1,11 @@
 <script lang="ts">
-  import { MapPin, LocateFixed, LogOut, Monitor, Moon, Search, Sun } from '@lucide/svelte';
+  import { Check, MapPin, LocateFixed, LogOut, Monitor, Moon, Save, Search, Sun } from '@lucide/svelte';
   import { page } from '$app/state';
   import { goto } from '$app/navigation';
   import { onMount } from 'svelte';
   import { authClient } from '$lib/auth-client';
   import { locationStore } from '$lib/adapters/primary/stores/location.store.svelte';
+  import { saveSearchPreferences } from '$lib/adapters/primary/remote-handlers/search-preferences.remote';
   import { searchForAreas } from '$lib/adapters/secondary/google/google.svelte';
   import { transformResultToPlace } from '$lib/adapters/secondary/appwrite/dtos/placesToRecord';
   import type { ResultPlaceRecord } from '$lib/core/domain/Place/Place';
@@ -21,6 +22,9 @@
   let locationResults = $state<ResultPlaceRecord[]>([]);
   let isLocating = $state(false);
   let locateError = $state<string | null>(null);
+  let isSavingLocation = $state(false);
+  let saveError = $state<string | null>(null);
+  let savedLocation = $state(false);
   let themePreference = $state<ThemePreference>('system');
 
   onMount(() => {
@@ -52,6 +56,7 @@
         : `${name}, ${neighborhood}`
       : address;
     locationStore.center = { lat, lng };
+    savedLocation = false;
     locationInput = '';
     locationResults = [];
   }
@@ -67,6 +72,7 @@
       (pos) => {
         locationStore.center = { lat: pos.coords.latitude, lng: pos.coords.longitude };
         locationStore.name = 'Current location';
+        savedLocation = false;
         isLocating = false;
       },
       () => {
@@ -74,6 +80,26 @@
         isLocating = false;
       },
     );
+  }
+
+  async function saveLocationDefaults() {
+    isSavingLocation = true;
+    saveError = null;
+    savedLocation = false;
+    try {
+      const preference = await saveSearchPreferences({
+        locationName: locationStore.name,
+        center: { ...locationStore.center },
+        radiusMiles: Number(locationStore.radiusMiles),
+        type: locationStore.type.trim() || undefined,
+      });
+      if (preference) locationStore.apply(preference);
+      savedLocation = true;
+    } catch (error) {
+      saveError = error instanceof Error ? error.message : 'Could not save search defaults.';
+    } finally {
+      isSavingLocation = false;
+    }
   }
 
   async function logout() {
@@ -115,6 +141,17 @@
     {#if locationResults.length}
       <ResultList items={locationResults} onSelect={selectAreaResult} query={locationInput} />
     {/if}
+
+    <label class="text-field">
+      <span>Label <small>Optional</small></span>
+      <input
+        type="text"
+        maxlength="40"
+        placeholder="Home, Work, Weekend…"
+        bind:value={locationStore.type}
+        oninput={() => (savedLocation = false)}
+      />
+    </label>
   </section>
 
   <section class="settings-card" aria-labelledby="radius-heading">
@@ -129,16 +166,31 @@
       type="range"
       class="radius-slider"
       min="1"
-      max="50"
+      max="30"
       step="1"
       bind:value={locationStore.radiusMiles}
+      oninput={() => (savedLocation = false)}
       aria-label="Search radius in miles"
     />
     <div class="radius-scale">
       <span>1 mi</span>
-      <span>25</span>
-      <span>50 mi</span>
+      <span>15</span>
+      <span>30 mi</span>
     </div>
+
+    <button
+      type="button"
+      class="save-defaults-btn"
+      onclick={saveLocationDefaults}
+      disabled={isSavingLocation}
+    >
+      {#if savedLocation}
+        <Check size={16} /> Saved
+      {:else}
+        <Save size={16} /> {isSavingLocation ? 'Saving…' : 'Save search defaults'}
+      {/if}
+    </button>
+    {#if saveError}<p class="field-error" role="alert">{saveError}</p>{/if}
   </section>
 
   <section class="settings-card" aria-labelledby="appearance-heading">
@@ -354,6 +406,37 @@
     font-size: 0.8125rem;
   }
 
+  .text-field {
+    display: grid;
+    gap: 0.375rem;
+  }
+
+  .text-field span {
+    color: var(--sys-color-text);
+    font-family: var(--sys-font-mono);
+    font-size: 0.6875rem;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+  }
+
+  .text-field small {
+    margin-left: 0.35rem;
+    color: var(--sys-color-text-muted);
+    font: inherit;
+    font-weight: 500;
+  }
+
+  .text-field input {
+    min-height: 2.75rem;
+    border: 1px solid var(--sys-color-border);
+    border-radius: var(--sys-radius-control);
+    background-color: var(--sys-color-surface);
+    padding: 0.625rem 0.875rem;
+    color: var(--sys-color-text);
+    font: inherit;
+  }
+
   .search-field {
     display: flex;
     align-items: center;
@@ -425,6 +508,25 @@
     font-size: 0.6875rem;
     font-weight: 700;
     letter-spacing: 0.02em;
+  }
+
+  .save-defaults-btn {
+    display: inline-flex;
+    min-height: 2.75rem;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    border: 1px solid var(--sys-color-brand);
+    border-radius: var(--sys-radius-control);
+    background-color: var(--sys-color-brand);
+    color: var(--sys-color-text-on-brand);
+    font-weight: 800;
+    cursor: pointer;
+  }
+
+  .save-defaults-btn:disabled {
+    opacity: 0.65;
+    cursor: progress;
   }
 
   .account-row {

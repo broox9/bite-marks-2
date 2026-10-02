@@ -7,6 +7,8 @@
   import { PUBLIC_CONVEX_URL } from "$env/static/public";
   import { createSvelteAuthClient } from "@mmailaender/convex-better-auth-svelte/svelte";
   import { authClient } from "$lib/auth-client";
+  import { getSearchPreferences } from '$lib/adapters/primary/remote-handlers/search-preferences.remote';
+  import { locationStore } from '$lib/adapters/primary/stores/location.store.svelte';
   import {
     applyThemePreference,
     readThemePreference,
@@ -24,6 +26,16 @@
     authClient,
     convexUrl: PUBLIC_CONVEX_URL,
     getServerState: () => data.authState,
+  });
+
+  const searchPreferencesQuery = data.user ? getSearchPreferences({}) : null;
+  let hydratedPreference = $state<unknown>(null);
+
+  $effect(() => {
+    const preference = searchPreferencesQuery?.current;
+    if (!preference || preference === hydratedPreference) return;
+    hydratedPreference = preference;
+    locationStore.apply(preference);
   });
 
   onMount(() => {
