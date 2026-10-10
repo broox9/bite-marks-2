@@ -1,6 +1,6 @@
 # Bite Marks — R1 Design Spec
 
-Source screenshots: `docs/redesign-05-18-2026/`
+Source screenshots: `docs/design/redesign-05-18-2026/`
 
 ---
 

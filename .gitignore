@@ -4,10 +4,12 @@ node_modules
 .output
 .vercel
 .netlify
-.wrangler
-/.svelte-kit
+.wrangler/
+.svelte-kit/
 /build
 /dist
+.impeccable
+.vscode
 
 # OS
 .DS_Store
@@ -29,7 +31,10 @@ vite.config.ts.timestamp-*
 
 
 # Claude
+.claude/
 .claude/worktrees/*
+
+.agents/skills
 
 # Google OAuth client secrets (never commit)
 client_secret_*.json

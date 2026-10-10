@@ -23,6 +23,15 @@ for the framework, Vite for the build tool, and Tailwind CSS installed (prefer C
 *   **`src/convex`**: Convex schema, queries/mutations, Better Auth, HTTP router.
 *   **`src/routes`**: SvelteKit UI routes.
 
+## Skills
+
+Project skills live in `.agents/skills/` (`.claude/skills` symlinks to it). Use these copies, not global installs.
+
+| Skill | Use for | Output |
+|-------|---------|--------|
+| `.agents/skills/archify` | Diagrams (architecture, workflow, sequence, dataflow, lifecycle) | `docs/diagrams/<type>-<slug>-<YYYYMMDD-HHMMSS>/` |
+| `.agents/skills/impeccable` | Design (critique, polish, design system) | `docs/design/` (`PRODUCT.md`, `DESIGN.md`, `design.json`) |
+
 ## Auth docs
 
 - See [`docs/AUTH-README.md`](docs/AUTH-README.md) for Convex + Better Auth.

@@ -40,4 +40,14 @@ export default defineSchema({
     userId: v.string(),
     tagName: v.string(),
   }).index("by_user", ["userId"]),
+
+  // Capped per user (see MAX_SAVED_LOCATIONS); at most one row per user has isDefault.
+  savedLocations: defineTable({
+    userId: v.string(),
+    name: v.string(),
+    lat: v.number(),
+    lng: v.number(),
+    radiusMiles: v.number(),
+    isDefault: v.boolean(),
+  }).index("by_user", ["userId"]),
 });

@@ -1,0 +1,186 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "Bite Marks — Clean Architecture Backend",
+    "output": "docs/diagrams/architecture-clean-backend-20261004-231311/clean-backend.html",
+    "quality_profile": "showcase",
+    "locale": "en",
+    "repository": {
+      "url": "git@github.com:broox9/bite-marks-2.git",
+      "link_mode": "local-only",
+      "revision": "f62343e7810e9a7d8c9edb4801e998ad7283d49f"
+    },
+    "legend": {
+      "entries": {
+        "frontend": { "label": "Inbound caller" },
+        "backend": { "label": "Adapter / use case" },
+        "cloud": { "label": "Domain model" },
+        "messagebus": { "label": "Port (interface)" },
+        "database": { "label": "Persistence" },
+        "security": { "label": "Auth" },
+        "external": { "label": "Legacy service" }
+      }
+    }
+  },
+  "components": [
+    {
+      "id": "ui", "type": "frontend", "label": "Svelte pages", "sublabel": "remote function calls",
+      "pos": [520, 40], "size": [150, 64],
+      "sources": [
+        { "path": "src/routes/list/+page.svelte", "line": 12, "end_line": 31, "label": "getSpots, deleteUserSpot" },
+        { "path": "src/routes/tags/+page.svelte", "line": 1, "end_line": 17, "label": "listTags, createTag" }
+      ]
+    },
+    {
+      "id": "authNode", "type": "security", "label": "Auth endpoints", "sublabel": "hooks + /api/auth proxy",
+      "pos": [30, 190], "size": [150, 64],
+      "sources": [
+        { "path": "src/hooks.server.ts", "line": 32, "end_line": 58, "label": "token → locals.user" },
+        { "path": "src/routes/api/auth/[...all]/+server.ts", "line": 1, "end_line": 3, "label": "Better Auth proxy" }
+      ]
+    },
+    {
+      "id": "spotsHandlers", "type": "backend", "label": "spots.remote.ts", "sublabel": "+ /all-spots load",
+      "tag": "zod + 401 guard",
+      "pos": [520, 190], "size": [150, 64],
+      "sources": [
+        { "path": "src/lib/adapters/primary/remote-handlers/spots.remote.ts", "line": 30, "end_line": 89 },
+        { "path": "src/routes/all-spots/+page.server.ts", "line": 1, "end_line": 10 }
+      ]
+    },
+    {
+      "id": "tagsRemote", "type": "backend", "label": "tags.remote.ts", "sublabel": "zod + 401 guard",
+      "tag": "bypasses core",
+      "pos": [1010, 190], "size": [150, 64],
+      "sources": [{ "path": "src/lib/adapters/primary/remote-handlers/tags.remote.ts", "line": 12, "end_line": 46 }]
+    },
+    {
+      "id": "diContainer", "type": "backend", "label": "di-container", "sublabel": "composition root",
+      "tag": "USE_CONVEX switch",
+      "pos": [520, 340], "size": [150, 64],
+      "sources": [{ "path": "src/lib/glue/di-container.ts", "line": 7, "end_line": 17 }]
+    },
+    {
+      "id": "useCase", "type": "backend", "label": "PlaceAndSpotUseCase", "sublabel": "thin orchestration",
+      "pos": [520, 490], "size": [150, 64],
+      "sources": [{ "path": "src/lib/use_cases/placeAndSpot.ts", "line": 5, "end_line": 40 }]
+    },
+    {
+      "id": "domain", "type": "cloud", "label": "Domain schemas", "sublabel": "Place, Spot, Tag (zod)",
+      "pos": [765, 490], "size": [150, 64],
+      "sources": [
+        { "path": "src/lib/core/domain/Place/Place.ts", "line": 3, "end_line": 23 },
+        { "path": "src/lib/core/domain/Spot/Spot.ts", "line": 4, "end_line": 21 },
+        { "path": "src/lib/core/domain/Tag/Tag.ts", "line": 1, "end_line": 15 }
+      ]
+    },
+    {
+      "id": "port", "type": "messagebus", "label": "PersistenceRepository", "sublabel": "port interface",
+      "pos": [520, 640], "size": [150, 64],
+      "sources": [{ "path": "src/lib/ports/persistence.repository.ts", "line": 2, "end_line": 14 }]
+    },
+    {
+      "id": "appwriteAdapter", "type": "backend", "label": "AppwriteAdapter", "sublabel": "legacy fallback",
+      "tag": "USE_CONVEX off",
+      "pos": [275, 640], "size": [150, 64],
+      "sources": [
+        { "path": "src/lib/adapters/secondary/appwrite/index.ts", "line": 10, "end_line": 30 },
+        { "path": "src/lib/adapters/secondary/appwrite/index.ts", "line": 213, "end_line": 215, "label": "admin singleton" }
+      ]
+    },
+    {
+      "id": "appwrite", "type": "external", "label": "Appwrite TablesDB", "sublabel": "bite_marks database",
+      "pos": [275, 790], "size": [150, 64],
+      "sources": [{ "path": "src/lib/adapters/secondary/appwrite/server-client.server.ts", "line": 14, "end_line": 44 }]
+    },
+    {
+      "id": "convexAdapter", "type": "backend", "label": "ConvexAdapter", "sublabel": "maps docs to domain",
+      "tag": "USE_CONVEX=1",
+      "pos": [765, 790], "size": [150, 64],
+      "sources": [
+        { "path": "src/lib/adapters/secondary/convex/index.ts", "line": 10, "end_line": 54, "label": "toDomainSpot, toConvexPlace" },
+        { "path": "src/lib/adapters/secondary/convex/index.ts", "line": 56, "end_line": 156 }
+      ]
+    },
+    {
+      "id": "betterAuth", "type": "security", "label": "Better Auth", "sublabel": "Convex component",
+      "pos": [520, 940], "size": [150, 64],
+      "sources": [
+        { "path": "src/convex/auth.ts", "line": 12, "end_line": 44 },
+        { "path": "src/convex/http.ts", "line": 1, "end_line": 8 },
+        { "path": "src/convex/auth.config.ts", "line": 1, "end_line": 6 }
+      ]
+    },
+    {
+      "id": "convexFns", "type": "backend", "label": "Convex functions", "sublabel": "spots, places, tags",
+      "tag": "requireUserId + assertUser",
+      "pos": [765, 940], "size": [150, 64],
+      "sources": [
+        { "path": "src/convex/spots.ts", "line": 50, "end_line": 211 },
+        { "path": "src/convex/authHelpers.ts", "line": 3, "end_line": 11 },
+        { "path": "src/convex/tags.ts", "line": 12, "end_line": 39 }
+      ]
+    },
+    {
+      "id": "tables", "type": "database", "label": "Convex tables", "sublabel": "places, spots, tags",
+      "pos": [765, 1090], "size": [150, 64],
+      "sources": [{ "path": "src/convex/schema.ts", "line": 4, "end_line": 42 }]
+    }
+  ],
+  "boundaries": [
+    { "kind": "region", "label": "Primary adapters (SvelteKit server)", "wraps": ["authNode", "spotsHandlers", "tagsRemote"] },
+    { "kind": "region", "label": "Core: use case, domain, port", "wraps": ["useCase", "domain", "port"] },
+    { "kind": "region", "label": "Convex deployment", "wraps": ["betterAuth", "convexFns", "tables"] }
+  ],
+  "connections": [
+    { "id": "ui-spots", "from": "ui", "to": "spotsHandlers", "label": "RPC", "variant": "emphasis" },
+    { "id": "ui-tags", "from": "ui", "to": "tagsRemote", "label": "RPC", "fromSide": "right", "toSide": "top" },
+    { "id": "spots-di", "from": "spotsHandlers", "to": "diContainer", "label": "get use case", "variant": "emphasis" },
+    { "id": "di-usecase", "from": "diContainer", "to": "useCase", "label": "inject adapter", "variant": "emphasis" },
+    { "id": "usecase-domain", "from": "useCase", "to": "domain", "label": "types", "variant": "dashed" },
+    { "id": "usecase-port", "from": "useCase", "to": "port", "label": "depends on", "variant": "emphasis" },
+    { "id": "appwrite-implements", "from": "appwriteAdapter", "to": "port", "label": "implements", "variant": "dashed" },
+    { "id": "convex-implements", "from": "convexAdapter", "to": "port", "label": "implements", "variant": "dashed", "fromSide": "top", "toSide": "right" },
+    { "id": "appwrite-db", "from": "appwriteAdapter", "to": "appwrite", "label": "TablesDB" },
+    { "id": "convex-client", "from": "convexAdapter", "to": "convexFns", "label": "HTTP client", "variant": "emphasis" },
+    { "id": "tags-bypass", "from": "tagsRemote", "to": "convexFns", "label": "direct client", "fromSide": "bottom", "toSide": "right" },
+    { "id": "auth-identity", "from": "betterAuth", "to": "convexFns", "label": "identity", "variant": "security" },
+    { "id": "auth-session", "from": "authNode", "to": "betterAuth", "label": "getCurrentUser", "variant": "security", "fromSide": "bottom", "toSide": "left" },
+    { "id": "fns-tables", "from": "convexFns", "to": "tables", "label": "ctx.db" }
+  ],
+  "cards": [
+    {
+      "dot": "emerald", "title": "Dependency rule",
+      "items": [
+        "PlaceAndSpotUseCase depends only on the PersistenceRepository port and domain types",
+        "di-container is the only module that picks a concrete adapter (USE_CONVEX=1 → ConvexAdapter)",
+        "Adapters are built per request so the Convex HTTP client runs with the caller's auth token"
+      ]
+    },
+    {
+      "dot": "amber", "title": "Where the boundaries leak",
+      "items": [
+        "tags.remote.ts calls Convex directly, skipping the use case and port",
+        "ConvexAdapter (and the settings page) import transformResultToPlace from the Appwrite DTO folder",
+        "Port methods are typed any; getSpotByPlaceId actually receives a spot row id",
+        "PlaceRepository, SpotRepository, and the local_dev InMemoryAdapter are defined but never wired"
+      ]
+    },
+    {
+      "dot": "rose", "title": "Authorization",
+      "items": [
+        "Remote handlers throw 401 when hooks.server left locals.user empty",
+        "Convex spot and tag functions call requireUserId (Better Auth identity) and assertUser on the userId argument",
+        "Spot reads, updates, and deletes also check spot.userId before touching the row"
+      ]
+    },
+    {
+      "dot": "slate", "title": "Not drawn: uncommitted work",
+      "items": [
+        "savedLocations: Location domain, SavedLocationRepository port, Convex adapter, remote handlers, table + functions",
+        "Wired through getSavedLocationRepository() in di-container, Convex-only with no use case"
+      ]
+    }
+  ]
+}

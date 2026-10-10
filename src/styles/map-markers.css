@@ -2,7 +2,7 @@
  * Shared mapbox marker styling (R1 pin: label pill + pointer triangle).
  * Global so it works regardless of which route mounts the map — component
  * <style> blocks are per-route bundles and wouldn't reach markers created
- * on another page. See DESIGN.md §6.5.
+ * on another page. See docs/design/DESIGN.md §6.5.
  */
 
 .r1-pin {
