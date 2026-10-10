@@ -15,6 +15,7 @@ import type * as http from "../http.js";
 import type * as migrations from "../migrations.js";
 import type * as migrationsNode from "../migrationsNode.js";
 import type * as places from "../places.js";
+import type * as savedLocations from "../savedLocations.js";
 import type * as spots from "../spots.js";
 import type * as tags from "../tags.js";
 
@@ -32,6 +33,7 @@ declare const fullApi: ApiFromModules<{
   migrations: typeof migrations;
   migrationsNode: typeof migrationsNode;
   places: typeof places;
+  savedLocations: typeof savedLocations;
   spots: typeof spots;
   tags: typeof tags;
 }>;

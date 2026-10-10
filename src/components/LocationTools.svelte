@@ -36,9 +36,12 @@
     if (!selected) return
     console.log('[bs] SELECTION', JSON.stringify(selected))
     const { address, lat, lng, name, neighborhood } = selected
-    locationStore.name = neighborhood ? neighborhood === name ? address : `${name}, ${neighborhood}` : address
-    locationStore.center = { lat, lng }
-    locationStore.radiusMiles = locationRadius;
+    locationStore.setActive({
+      name: neighborhood ? neighborhood === name ? address : `${name}, ${neighborhood}` : address,
+      center: { lat, lng },
+      radiusMiles: locationRadius,
+      savedLocationId: null,
+    })
     console.log('[bs] locationStore', locationStore)
   }
 

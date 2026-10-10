@@ -86,7 +86,7 @@
   --ref-radius-pill: 999px;
 
   /* R1 spec radii — thumbnails/CTAs (xl), hero/personal-details cards (2xl),
-   * bottom-sheet top corners (3xl). See DESIGN.md §4. */
+   * bottom-sheet top corners (3xl). See docs/design/DESIGN.md §4. */
   --ref-radius-xl:   0.75rem;
   --ref-radius-2xl:  0.875rem;
   --ref-radius-3xl:  1.375rem;

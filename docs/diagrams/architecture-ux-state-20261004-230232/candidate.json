@@ -1,0 +1,635 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "Bite Marks — UX & State Management",
+    "output": "docs/diagrams/architecture-ux-state-20261004-230232/ux-state.html",
+    "quality_profile": "showcase",
+    "locale": "en",
+    "repository": {
+      "url": "git@github.com:broox9/bite-marks-2.git",
+      "link_mode": "local-only",
+      "revision": "f62343e7810e9a7d8c9edb4801e998ad7283d49f"
+    },
+    "legend": {
+      "entries": {
+        "frontend": {
+          "label": "Route / component"
+        },
+        "backend": {
+          "label": "Server logic"
+        },
+        "database": {
+          "label": "State & storage"
+        },
+        "security": {
+          "label": "Auth gate"
+        },
+        "external": {
+          "label": "Actor / third-party"
+        }
+      }
+    }
+  },
+  "components": [
+    {
+      "id": "user",
+      "type": "external",
+      "label": "User",
+      "sublabel": "browser / mobile",
+      "pos": [
+        30,
+        200
+      ],
+      "size": [
+        150,
+        64
+      ],
+      "sources": [
+        {
+          "path": "src/components/MainNavLinks.svelte",
+          "line": 10,
+          "end_line": 16,
+          "label": "nav: Spots, Search, Settings"
+        }
+      ]
+    },
+    {
+      "id": "authGate",
+      "type": "security",
+      "label": "Auth gate",
+      "sublabel": "server hooks + layout load",
+      "tag": "303 → /login",
+      "pos": [
+        30,
+        360
+      ],
+      "size": [
+        150,
+        64
+      ],
+      "sources": [
+        {
+          "path": "src/hooks.server.ts",
+          "line": 32,
+          "end_line": 58,
+          "label": "token → locals.user"
+        },
+        {
+          "path": "src/routes/+layout.server.ts",
+          "line": 5,
+          "end_line": 22,
+          "label": "redirect guard"
+        }
+      ]
+    },
+    {
+      "id": "settings",
+      "type": "frontend",
+      "label": "/settings",
+      "sublabel": "location, radius, theme",
+      "pos": [
+        515,
+        40
+      ],
+      "size": [
+        150,
+        64
+      ],
+      "sources": [
+        {
+          "path": "src/routes/settings/+page.svelte",
+          "line": 30,
+          "end_line": 77,
+          "label": "theme + location writers"
+        },
+        {
+          "path": "src/routes/settings/+page.svelte",
+          "line": 124,
+          "end_line": 134,
+          "label": "bind radiusMiles"
+        }
+      ]
+    },
+    {
+      "id": "themePref",
+      "type": "database",
+      "label": "Theme preference",
+      "sublabel": "localStorage + data-theme",
+      "pos": [
+        270,
+        200
+      ],
+      "size": [
+        150,
+        64
+      ],
+      "sources": [
+        {
+          "path": "src/lib/theme.ts",
+          "line": 18,
+          "end_line": 41
+        }
+      ]
+    },
+    {
+      "id": "locationStore",
+      "type": "database",
+      "label": "locationStore",
+      "sublabel": "module $state runes",
+      "tag": "in-memory",
+      "pos": [
+        515,
+        200
+      ],
+      "size": [
+        150,
+        64
+      ],
+      "sources": [
+        {
+          "path": "src/lib/adapters/primary/stores/location.store.svelte.ts",
+          "line": 1,
+          "end_line": 57
+        }
+      ]
+    },
+    {
+      "id": "google",
+      "type": "external",
+      "label": "Google Places JS",
+      "sublabel": "via google.svelte.ts",
+      "pos": [
+        760,
+        200
+      ],
+      "size": [
+        150,
+        64
+      ],
+      "sources": [
+        {
+          "path": "src/lib/adapters/secondary/google/google.svelte.ts",
+          "line": 153,
+          "end_line": 195,
+          "label": "placeAutoComplete"
+        },
+        {
+          "path": "src/lib/adapters/secondary/google/google.svelte.ts",
+          "line": 314,
+          "end_line": 321,
+          "label": "getPlacePhotoUrl"
+        }
+      ]
+    },
+    {
+      "id": "layout",
+      "type": "frontend",
+      "label": "+layout.svelte",
+      "sublabel": "auth client, theme sync",
+      "pos": [
+        270,
+        360
+      ],
+      "size": [
+        150,
+        64
+      ],
+      "sources": [
+        {
+          "path": "src/routes/+layout.svelte",
+          "line": 21,
+          "end_line": 47
+        }
+      ]
+    },
+    {
+      "id": "listPage",
+      "type": "frontend",
+      "label": "/list",
+      "sublabel": "map, filters, drawer",
+      "pos": [
+        515,
+        360
+      ],
+      "size": [
+        150,
+        64
+      ],
+      "sources": [
+        {
+          "path": "src/routes/list/+page.svelte",
+          "line": 28,
+          "end_line": 45,
+          "label": "$state + $derived"
+        },
+        {
+          "path": "src/routes/list/+page.svelte",
+          "line": 109,
+          "end_line": 157,
+          "label": "markers $effect, save/delete"
+        }
+      ]
+    },
+    {
+      "id": "searchTool",
+      "type": "frontend",
+      "label": "PlaceSearchTool",
+      "sublabel": "query + results $state",
+      "pos": [
+        760,
+        360
+      ],
+      "size": [
+        150,
+        64
+      ],
+      "sources": [
+        {
+          "path": "src/components/PlaceSearchTool.svelte",
+          "line": 9,
+          "end_line": 41
+        },
+        {
+          "path": "src/lib/adapters/primary/place-search.driver.ts",
+          "line": 16,
+          "end_line": 25,
+          "label": "resultsListController"
+        }
+      ]
+    },
+    {
+      "id": "resultCard",
+      "type": "frontend",
+      "label": "ResultCard dialog",
+      "sublabel": "photo, Save spot",
+      "pos": [
+        1005,
+        360
+      ],
+      "size": [
+        150,
+        64
+      ],
+      "sources": [
+        {
+          "path": "src/components/ResultCard.svelte",
+          "line": 13,
+          "end_line": 36
+        }
+      ]
+    },
+    {
+      "id": "remoteQuery",
+      "type": "database",
+      "label": "Remote query state",
+      "sublabel": "current, loading, error",
+      "pos": [
+        515,
+        520
+      ],
+      "size": [
+        150,
+        64
+      ],
+      "sources": [
+        {
+          "path": "src/routes/list/+page.svelte",
+          "line": 31,
+          "end_line": 34,
+          "label": "getSpots({})"
+        },
+        {
+          "path": "src/routes/list/+page.svelte",
+          "line": 290,
+          "end_line": 302,
+          "label": "error / loading UI"
+        },
+        {
+          "path": "src/routes/spot/[id]/+page.svelte",
+          "line": 33,
+          "end_line": 33,
+          "label": "getSpotById"
+        }
+      ]
+    },
+    {
+      "id": "spotPage",
+      "type": "frontend",
+      "label": "/spot/[id]",
+      "sublabel": "form $state from query",
+      "pos": [
+        760,
+        520
+      ],
+      "size": [
+        150,
+        64
+      ],
+      "sources": [
+        {
+          "path": "src/routes/spot/[id]/+page.svelte",
+          "line": 37,
+          "end_line": 50,
+          "label": "form $state"
+        },
+        {
+          "path": "src/routes/spot/[id]/+page.svelte",
+          "line": 86,
+          "end_line": 96,
+          "label": "seed from query"
+        },
+        {
+          "path": "src/routes/spot/[id]/+page.svelte",
+          "line": 172,
+          "end_line": 199,
+          "label": "handleSave"
+        }
+      ]
+    },
+    {
+      "id": "remoteFns",
+      "type": "backend",
+      "label": "Remote functions",
+      "sublabel": "spots + tags query/command",
+      "tag": "401 if no locals.user",
+      "pos": [
+        760,
+        700
+      ],
+      "size": [
+        150,
+        64
+      ],
+      "sources": [
+        {
+          "path": "src/lib/adapters/primary/remote-handlers/spots.remote.ts",
+          "line": 30,
+          "end_line": 89
+        },
+        {
+          "path": "src/lib/adapters/primary/remote-handlers/tags.remote.ts",
+          "line": 12,
+          "end_line": 46
+        }
+      ]
+    },
+    {
+      "id": "useCase",
+      "type": "backend",
+      "label": "PlaceAndSpotUseCase",
+      "sublabel": "built per request",
+      "pos": [
+        760,
+        860
+      ],
+      "size": [
+        150,
+        64
+      ],
+      "sources": [
+        {
+          "path": "src/lib/glue/di-container.ts",
+          "line": 7,
+          "end_line": 17,
+          "label": "USE_CONVEX switch"
+        },
+        {
+          "path": "src/lib/use_cases/placeAndSpot.ts",
+          "line": 5,
+          "end_line": 40
+        }
+      ]
+    },
+    {
+      "id": "convex",
+      "type": "database",
+      "label": "Convex",
+      "sublabel": "places, spots, tags",
+      "pos": [
+        1005,
+        860
+      ],
+      "size": [
+        150,
+        64
+      ],
+      "sources": [
+        {
+          "path": "src/lib/adapters/secondary/convex/index.ts",
+          "line": 56,
+          "end_line": 156
+        },
+        {
+          "path": "src/convex/spots.ts",
+          "line": 50,
+          "end_line": 160
+        }
+      ]
+    }
+  ],
+  "boundaries": [
+    {
+      "kind": "region",
+      "label": "Browser — Svelte 5 runes",
+      "wraps": [
+        "settings",
+        "themePref",
+        "locationStore",
+        "google",
+        "layout",
+        "listPage",
+        "searchTool",
+        "resultCard",
+        "remoteQuery",
+        "spotPage"
+      ]
+    },
+    {
+      "kind": "region",
+      "label": "SvelteKit server (Worker)",
+      "wraps": [
+        "remoteFns",
+        "useCase"
+      ]
+    },
+    {
+      "kind": "region",
+      "label": "Convex cloud",
+      "wraps": [
+        "convex"
+      ]
+    }
+  ],
+  "connections": [
+    {
+      "id": "user-request",
+      "from": "user",
+      "to": "authGate",
+      "label": "page request",
+      "variant": "emphasis"
+    },
+    {
+      "id": "gate-to-layout",
+      "from": "authGate",
+      "to": "layout",
+      "label": "authState",
+      "variant": "security"
+    },
+    {
+      "id": "layout-theme",
+      "from": "layout",
+      "to": "themePref",
+      "label": "read + listen"
+    },
+    {
+      "id": "settings-theme",
+      "from": "settings",
+      "to": "themePref",
+      "label": "save theme",
+      "fromSide": "left",
+      "toSide": "top"
+    },
+    {
+      "id": "settings-location",
+      "from": "settings",
+      "to": "locationStore",
+      "label": "set center"
+    },
+    {
+      "id": "layout-list",
+      "from": "layout",
+      "to": "listPage",
+      "label": "children",
+      "variant": "emphasis"
+    },
+    {
+      "id": "list-location",
+      "from": "listPage",
+      "to": "locationStore",
+      "label": "map center"
+    },
+    {
+      "id": "list-search",
+      "from": "listPage",
+      "to": "searchTool",
+      "label": "showSearch",
+      "variant": "emphasis"
+    },
+    {
+      "id": "search-google",
+      "from": "searchTool",
+      "to": "google",
+      "label": "autocomplete"
+    },
+    {
+      "id": "google-location",
+      "from": "google",
+      "to": "locationStore",
+      "label": "reads bias",
+      "variant": "dashed"
+    },
+    {
+      "id": "search-card",
+      "from": "searchTool",
+      "to": "resultCard",
+      "label": "select",
+      "variant": "emphasis"
+    },
+    {
+      "id": "card-photo",
+      "from": "resultCard",
+      "to": "google",
+      "label": "photo URL",
+      "variant": "dashed",
+      "fromSide": "top",
+      "toSide": "right"
+    },
+    {
+      "id": "list-query",
+      "from": "listPage",
+      "to": "remoteQuery",
+      "label": "getSpots, invalidateAll"
+    },
+    {
+      "id": "spot-query",
+      "from": "spotPage",
+      "to": "remoteQuery",
+      "label": "getSpotById"
+    },
+    {
+      "id": "query-rpc",
+      "from": "remoteQuery",
+      "to": "remoteFns",
+      "label": "query RPC",
+      "fromSide": "bottom",
+      "toSide": "left"
+    },
+    {
+      "id": "spot-update",
+      "from": "spotPage",
+      "to": "remoteFns",
+      "label": "updateSpot"
+    },
+    {
+      "id": "card-save",
+      "from": "resultCard",
+      "to": "remoteFns",
+      "label": "saveSpot",
+      "variant": "emphasis",
+      "fromSide": "bottom",
+      "toSide": "right"
+    },
+    {
+      "id": "fns-usecase",
+      "from": "remoteFns",
+      "to": "useCase",
+      "label": "per request"
+    },
+    {
+      "id": "usecase-convex",
+      "from": "useCase",
+      "to": "convex",
+      "label": "HTTP client"
+    }
+  ],
+  "cards": [
+    {
+      "dot": "emerald",
+      "title": "Component-local state",
+      "items": [
+        "/list: showSearch, listExpanded, filterValue, selectedResultObj are $state",
+        "spotRows, savedPlaceIds, counts, filteredSpotRows are $derived from getSpots",
+        "Mapbox markers rebuild in an $effect on filteredSpotRows + activeMapSpotId",
+        "/spot/[id]: form fields seeded from getSpotById by $effect; saved via updateSpot"
+      ]
+    },
+    {
+      "dot": "violet",
+      "title": "Shared stores",
+      "items": [
+        "locationStore: module-level $state (center, name, radiusMiles) + $derived radiusMeters; resets on reload",
+        "Written by /settings and LocationTools on /; read by autocomplete bias, /list map pill, /spot distance",
+        "Theme: localStorage key bite-marks-theme → <html data-theme>; map pages swap Mapbox style via MutationObserver"
+      ]
+    },
+    {
+      "dot": "cyan",
+      "title": "Server state & refresh",
+      "items": [
+        "Remote query/command handlers read locals.user and throw 401 when absent",
+        "After saveSpot, updateSpot, or deleteUserSpot, pages call invalidateAll() to refetch queries",
+        "USE_CONVEX=1 selects ConvexAdapter; otherwise the legacy Appwrite adapter"
+      ]
+    },
+    {
+      "dot": "rose",
+      "title": "Auth",
+      "items": [
+        "hooks.server resolves locals.user from the Better Auth cookie via Convex getCurrentUser",
+        "+layout.server redirects signed-out users to /login, except /all-spots and /api/auth",
+        "+layout.svelte seeds createSvelteAuthClient with server authState; /login uses authClient.signIn"
+      ]
+    }
+  ]
+}

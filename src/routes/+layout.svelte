@@ -1,12 +1,14 @@
 <script lang="ts">
   import "../styles/app.css";
   import DotLogo from '$lib/assets/bite-marks-dot.svg'
-  import { onMount } from 'svelte';
+  import { onMount, untrack } from 'svelte';
 
   import type { LayoutProps } from "./$types";
   import { PUBLIC_CONVEX_URL } from "$env/static/public";
   import { createSvelteAuthClient } from "@mmailaender/convex-better-auth-svelte/svelte";
   import { authClient } from "$lib/auth-client";
+  import { locationStore } from "$lib/adapters/primary/stores/location.store.svelte";
+  import { listSavedLocations } from "$lib/adapters/primary/remote-handlers/savedLocations.remote";
   import {
     applyThemePreference,
     readThemePreference,
@@ -24,6 +26,19 @@
     authClient,
     convexUrl: PUBLIC_CONVEX_URL,
     getServerState: () => data.authState,
+  });
+
+  const userId = $derived(data.user?.id ?? null);
+
+  $effect(() => {
+    const id = userId;
+    untrack(() => {
+      if (id) {
+        void locationStore.hydrate(id, () => listSavedLocations({}));
+      } else {
+        locationStore.reset();
+      }
+    });
   });
 
   onMount(() => {

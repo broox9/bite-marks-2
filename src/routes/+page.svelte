@@ -1,8 +1,12 @@
 <script lang="ts">
 // import { resultsListController, selectResultController } from '$lib/application/controllers/results.controller';
 import type { ResultPlaceRecord } from "$lib/core/domain/Place/Place";
+import { onMount } from 'svelte';
+import { goto } from '$app/navigation';
 import { saveSpot } from '$lib/adapters/primary/remote-handlers/spots.remote';
+import { listSavedLocations } from '$lib/adapters/primary/remote-handlers/savedLocations.remote';
 import { locationStore } from '$lib/adapters/primary/stores/location.store.svelte';
+import { findDefaultLocation } from '$lib/core/domain/Location/Location';
 import ContainedZone from '../components/util/ContainedZone.svelte';
 import ResultCard from '../components/ResultCard.svelte';
 import ResultList from '../components/ResultList.svelte';
@@ -14,6 +18,23 @@ import PlaceSearchTool from '../components/PlaceSearchTool.svelte';
 // let resultList = $state<ResultPlaceRecord[] | []>([])
 let selectedResult = $state<ResultPlaceRecord | null>(null)
 // console.log('[bs] page::HOME', locationStore)
+
+const DEFAULT_LOCATION_PROMPTED_KEY = 'bite-marks-default-location-prompted'
+
+onMount(() => {
+    void promptForDefaultLocation()
+})
+
+async function promptForDefaultLocation() {
+    if (sessionStorage.getItem(DEFAULT_LOCATION_PROMPTED_KEY)) return
+    try {
+        const saved = await listSavedLocations({})
+        sessionStorage.setItem(DEFAULT_LOCATION_PROMPTED_KEY, '1')
+        if (!findDefaultLocation(saved)) await goto('/settings')
+    } catch (error) {
+        console.error('[bs] page::HOME::promptForDefaultLocation', error)
+    }
+}
 
 // const resultHandler = (results  : ResultPlaceRecord[]) => {
 //     resultList = results
