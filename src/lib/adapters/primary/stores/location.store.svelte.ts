@@ -49,6 +49,17 @@ function persist() {
   }
 }
 
+// A storage read that throws (blocked storage, privacy modes) is a cache miss,
+// so hydration still falls through to the cloud default.
+function readStorage(key: string): string | null {
+  try {
+    return localStorage.getItem(key)
+  } catch (error) {
+    console.warn('[bs] LOCATION::STORE::readStorage', error)
+    return null
+  }
+}
+
 /*
 Google Places
 "Text Search" takes a `locationBias.circle.center` (lat/lng) ~ "Pizza in New York"
@@ -103,7 +114,7 @@ export const locationStore = {
     }
     storageKey = key
 
-    const cached = parseActiveLocation(localStorage.getItem(key))
+    const cached = parseActiveLocation(readStorage(key))
     if (cached) {
       apply(cached)
       return

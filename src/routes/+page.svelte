@@ -3,6 +3,7 @@
 import type { ResultPlaceRecord } from "$lib/core/domain/Place/Place";
 import { onMount } from 'svelte';
 import { goto } from '$app/navigation';
+import { page } from '$app/state';
 import { saveSpot } from '$lib/adapters/primary/remote-handlers/spots.remote';
 import { listSavedLocations } from '$lib/adapters/primary/remote-handlers/savedLocations.remote';
 import { locationStore } from '$lib/adapters/primary/stores/location.store.svelte';
@@ -26,10 +27,13 @@ onMount(() => {
 })
 
 async function promptForDefaultLocation() {
-    if (sessionStorage.getItem(DEFAULT_LOCATION_PROMPTED_KEY)) return
+    const userId = page.data.user?.id
+    if (!userId) return
+    const promptedKey = `${DEFAULT_LOCATION_PROMPTED_KEY}:${userId}`
+    if (sessionStorage.getItem(promptedKey)) return
     try {
-        const saved = await listSavedLocations({})
-        sessionStorage.setItem(DEFAULT_LOCATION_PROMPTED_KEY, '1')
+        const saved = await listSavedLocations({ userId })
+        sessionStorage.setItem(promptedKey, '1')
         if (!findDefaultLocation(saved)) await goto('/settings')
     } catch (error) {
         console.error('[bs] page::HOME::promptForDefaultLocation', error)

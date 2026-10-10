@@ -14,7 +14,6 @@
     Trash2,
   } from '@lucide/svelte';
   import { page } from '$app/state';
-  import { goto } from '$app/navigation';
   import { onMount } from 'svelte';
   import { authClient } from '$lib/auth-client';
   import { locationStore } from '$lib/adapters/primary/stores/location.store.svelte';
@@ -57,8 +56,24 @@
   let locateError = $state<string | null>(null);
   let themePreference = $state<ThemePreference>('system');
 
-  const savedLocationsQuery = listSavedLocations({});
+  // Settings is behind auth (see +layout.server.ts), so a user is always present here.
+  const savedLocationsQuery = $derived(listSavedLocations({ userId: user!.id }));
   const savedLocationsLoaded = $derived(savedLocationsQuery.current !== undefined);
+  const savedLocationsError = $derived(
+    savedLocationsQuery.error !== undefined && savedLocationsQuery.current === undefined,
+  );
+  let isRetryingSavedLocations = $state(false);
+
+  async function retrySavedLocations() {
+    isRetryingSavedLocations = true;
+    try {
+      await savedLocationsQuery.refresh();
+    } catch (error) {
+      console.error('[bs] SETTINGS::retrySavedLocations', error);
+    } finally {
+      isRetryingSavedLocations = false;
+    }
+  }
   const savedLocations = $derived<SavedLocation[]>(savedLocationsQuery.current ?? []);
   const defaultLocation = $derived(findDefaultLocation(savedLocations));
   const activeSavedLocation = $derived(
@@ -234,7 +249,8 @@
 
   async function logout() {
     await authClient.signOut();
-    goto('/login');
+    // Full load so no client-side cache from this account survives sign-out.
+    window.location.assign('/login');
   }
 
   const initial = $derived((user?.name ?? user?.email ?? '?').charAt(0).toUpperCase());
@@ -389,7 +405,19 @@
       {/if}
     </div>
 
-    {#if !savedLocationsLoaded}
+    {#if savedLocationsError}
+      <div class="load-error" role="alert">
+        <p class="field-error">Couldn't load your saved locations.</p>
+        <button
+          type="button"
+          class="small-btn"
+          disabled={isRetryingSavedLocations}
+          onclick={retrySavedLocations}
+        >
+          {isRetryingSavedLocations ? 'Retrying…' : 'Try again'}
+        </button>
+      </div>
+    {:else if !savedLocationsLoaded}
       <p class="muted-note">Loading…</p>
     {:else if savedLocations.length === 0}
       <p class="muted-note">No saved locations yet. Pick a location above and save it.</p>
@@ -679,6 +707,13 @@
   .use-current-btn:disabled {
     opacity: 0.6;
     cursor: progress;
+  }
+
+  .load-error {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
   }
 
   .field-error {

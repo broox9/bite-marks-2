@@ -34,7 +34,7 @@
     const id = userId;
     untrack(() => {
       if (id) {
-        void locationStore.hydrate(id, () => listSavedLocations({}));
+        void locationStore.hydrate(id, () => listSavedLocations({ userId: id }));
       } else {
         locationStore.reset();
       }

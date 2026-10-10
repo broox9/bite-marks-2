@@ -5,7 +5,9 @@ import { z } from "zod";
 import { SavedLocationInputSchema } from "$lib/core/domain/Location/Location";
 import { getSavedLocationRepository } from "$lib/glue/di-container";
 
-const listSchema = z.object({});
+// `userId` only scopes the client-side query cache per account; the server
+// still authorizes from `locals.user` and rejects a mismatched id.
+const listSchema = z.object({ userId: z.string().min(1) });
 const locationIdSchema = z.string().min(1);
 const updateSchema = z.object({
   id: locationIdSchema,
@@ -18,8 +20,9 @@ function requireUser() {
   return user;
 }
 
-export const listSavedLocations = query(listSchema, async () => {
+export const listSavedLocations = query(listSchema, async ({ userId }) => {
   const user = requireUser();
+  if (userId !== user.id) throw error(403, "Forbidden");
   return await getSavedLocationRepository().list(user.id);
 });
 

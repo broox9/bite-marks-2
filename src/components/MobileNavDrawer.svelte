@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { goto } from '$app/navigation';
   import { page } from '$app/state';
   import {
     List,
@@ -94,7 +93,8 @@
   async function logout() {
     await authClient.signOut();
     open = false;
-    await goto('/login');
+    // Full load so no client-side cache from this account survives sign-out.
+    window.location.assign('/login');
   }
 
   $effect(() => {

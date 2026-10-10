@@ -1,0 +1,338 @@
+diff --git a/src/components/MobileNavDrawer.svelte b/src/components/MobileNavDrawer.svelte
+index 5b87d77..9359eed 100644
+--- a/src/components/MobileNavDrawer.svelte
++++ b/src/components/MobileNavDrawer.svelte
+@@ -1,5 +1,4 @@
+ <script lang="ts">
+-  import { goto } from '$app/navigation';
+   import { page } from '$app/state';
+   import {
+     List,
+@@ -94,7 +93,8 @@
+   async function logout() {
+     await authClient.signOut();
+     open = false;
+-    await goto('/login');
++    // Full load so no client-side cache from this account survives sign-out.
++    window.location.assign('/login');
+   }
+ 
+   $effect(() => {
+diff --git a/src/lib/adapters/primary/remote-handlers/savedLocations.remote.ts b/src/lib/adapters/primary/remote-handlers/savedLocations.remote.ts
+index 63653d0..0d09463 100644
+--- a/src/lib/adapters/primary/remote-handlers/savedLocations.remote.ts
++++ b/src/lib/adapters/primary/remote-handlers/savedLocations.remote.ts
+@@ -5,7 +5,9 @@ import { z } from "zod";
+ import { SavedLocationInputSchema } from "$lib/core/domain/Location/Location";
+ import { getSavedLocationRepository } from "$lib/glue/di-container";
+ 
+-const listSchema = z.object({});
++// `userId` only scopes the client-side query cache per account; the server
++// still authorizes from `locals.user` and rejects a mismatched id.
++const listSchema = z.object({ userId: z.string().min(1) });
+ const locationIdSchema = z.string().min(1);
+ const updateSchema = z.object({
+   id: locationIdSchema,
+@@ -18,8 +20,9 @@ function requireUser() {
+   return user;
+ }
+ 
+-export const listSavedLocations = query(listSchema, async () => {
++export const listSavedLocations = query(listSchema, async ({ userId }) => {
+   const user = requireUser();
++  if (userId !== user.id) throw error(403, "Forbidden");
+   return await getSavedLocationRepository().list(user.id);
+ });
+ 
+diff --git a/src/lib/adapters/primary/stores/location.store.svelte.test.ts b/src/lib/adapters/primary/stores/location.store.svelte.test.ts
+new file mode 100644
+index 0000000..4f29bf6
+--- /dev/null
++++ b/src/lib/adapters/primary/stores/location.store.svelte.test.ts
+@@ -0,0 +1,82 @@
++import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
++import type { SavedLocation } from "$lib/core/domain/Location/Location";
++import { locationStore } from "./location.store.svelte";
++
++const FALLBACK_NAME = "Midtown, New York";
++
++function savedDefault(id: string, name: string, lat: number, lng: number): SavedLocation {
++  return { id, name, lat, lng, radiusMiles: 5, isDefault: true };
++}
++
++function memoryStorage(): Storage {
++  const items = new Map<string, string>();
++  return {
++    get length() {
++      return items.size;
++    },
++    clear: () => items.clear(),
++    getItem: (key) => items.get(key) ?? null,
++    key: (index) => [...items.keys()][index] ?? null,
++    removeItem: (key) => void items.delete(key),
++    setItem: (key, value) => void items.set(key, String(value)),
++  };
++}
++
++describe("locationStore.hydrate", () => {
++  beforeEach(() => {
++    vi.stubGlobal("localStorage", memoryStorage());
++    vi.spyOn(console, "warn").mockImplementation(() => {});
++    locationStore.reset();
++  });
++
++  afterEach(() => {
++    vi.unstubAllGlobals();
++    vi.restoreAllMocks();
++  });
++
++  it("falls through to the saved default when reading storage throws", async () => {
++    vi.stubGlobal("localStorage", {
++      ...memoryStorage(),
++      getItem: () => {
++        throw new DOMException("blocked", "SecurityError");
++      },
++    });
++    const home = savedDefault("loc-a", "Brooklyn", 40.6782, -73.9442);
++
++    await expect(locationStore.hydrate("user-a", async () => [home])).resolves.toBeUndefined();
++
++    expect(locationStore.name).toBe("Brooklyn");
++    expect(locationStore.center).toEqual({ lat: 40.6782, lng: -73.9442 });
++    expect(locationStore.savedLocationId).toBe("loc-a");
++  });
++
++  it("does not carry one account's location into the next after reset", async () => {
++    const aHome = savedDefault("loc-a", "Brooklyn", 40.6782, -73.9442);
++    const bHome = savedDefault("loc-b", "Newark", 40.7357, -74.1724);
++
++    await locationStore.hydrate("user-a", async () => [aHome]);
++    expect(locationStore.savedLocationId).toBe("loc-a");
++
++    locationStore.reset();
++    expect(locationStore.name).toBe(FALLBACK_NAME);
++    expect(locationStore.savedLocationId).toBeNull();
++
++    const loadForB = vi.fn(async () => [bHome]);
++    await locationStore.hydrate("user-b", loadForB);
++
++    expect(loadForB).toHaveBeenCalledOnce();
++    expect(locationStore.name).toBe("Newark");
++    expect(locationStore.savedLocationId).toBe("loc-b");
++  });
++
++  it("keeps each account's cached pick on this device separate", async () => {
++    const aHome = savedDefault("loc-a", "Brooklyn", 40.6782, -73.9442);
++    await locationStore.hydrate("user-a", async () => [aHome]);
++    locationStore.reset();
++
++    // User B has no saved default: they must land on the fallback, not A's cache.
++    await locationStore.hydrate("user-b", async () => []);
++    expect(locationStore.name).toBe(FALLBACK_NAME);
++    expect(locationStore.savedLocationId).toBeNull();
++  });
++});
+diff --git a/src/lib/adapters/primary/stores/location.store.svelte.ts b/src/lib/adapters/primary/stores/location.store.svelte.ts
+index 991c29f..15aeafc 100644
+--- a/src/lib/adapters/primary/stores/location.store.svelte.ts
++++ b/src/lib/adapters/primary/stores/location.store.svelte.ts
+@@ -49,6 +49,17 @@ function persist() {
+   }
+ }
+ 
++// A storage read that throws (blocked storage, privacy modes) is a cache miss,
++// so hydration still falls through to the cloud default.
++function readStorage(key: string): string | null {
++  try {
++    return localStorage.getItem(key)
++  } catch (error) {
++    console.warn('[bs] LOCATION::STORE::readStorage', error)
++    return null
++  }
++}
++
+ /*
+ Google Places
+ "Text Search" takes a `locationBias.circle.center` (lat/lng) ~ "Pizza in New York"
+@@ -103,7 +114,7 @@ export const locationStore = {
+     }
+     storageKey = key
+ 
+-    const cached = parseActiveLocation(localStorage.getItem(key))
++    const cached = parseActiveLocation(readStorage(key))
+     if (cached) {
+       apply(cached)
+       return
+diff --git a/src/routes/+layout.svelte b/src/routes/+layout.svelte
+index b781c6b..3ee283e 100644
+--- a/src/routes/+layout.svelte
++++ b/src/routes/+layout.svelte
+@@ -34,7 +34,7 @@
+     const id = userId;
+     untrack(() => {
+       if (id) {
+-        void locationStore.hydrate(id, () => listSavedLocations({}));
++        void locationStore.hydrate(id, () => listSavedLocations({ userId: id }));
+       } else {
+         locationStore.reset();
+       }
+diff --git a/src/routes/+page.svelte b/src/routes/+page.svelte
+index 44a7ac1..e3b4983 100644
+--- a/src/routes/+page.svelte
++++ b/src/routes/+page.svelte
+@@ -3,6 +3,7 @@
+ import type { ResultPlaceRecord } from "$lib/core/domain/Place/Place";
+ import { onMount } from 'svelte';
+ import { goto } from '$app/navigation';
++import { page } from '$app/state';
+ import { saveSpot } from '$lib/adapters/primary/remote-handlers/spots.remote';
+ import { listSavedLocations } from '$lib/adapters/primary/remote-handlers/savedLocations.remote';
+ import { locationStore } from '$lib/adapters/primary/stores/location.store.svelte';
+@@ -26,10 +27,13 @@ onMount(() => {
+ })
+ 
+ async function promptForDefaultLocation() {
+-    if (sessionStorage.getItem(DEFAULT_LOCATION_PROMPTED_KEY)) return
++    const userId = page.data.user?.id
++    if (!userId) return
++    const promptedKey = `${DEFAULT_LOCATION_PROMPTED_KEY}:${userId}`
++    if (sessionStorage.getItem(promptedKey)) return
+     try {
+-        const saved = await listSavedLocations({})
+-        sessionStorage.setItem(DEFAULT_LOCATION_PROMPTED_KEY, '1')
++        const saved = await listSavedLocations({ userId })
++        sessionStorage.setItem(promptedKey, '1')
+         if (!findDefaultLocation(saved)) await goto('/settings')
+     } catch (error) {
+         console.error('[bs] page::HOME::promptForDefaultLocation', error)
+diff --git a/src/routes/list/+page.svelte b/src/routes/list/+page.svelte
+index 841e581..2160644 100644
+--- a/src/routes/list/+page.svelte
++++ b/src/routes/list/+page.svelte
+@@ -23,7 +23,7 @@
+   import mapboxgl from "mapbox-gl";
+   import "mapbox-gl/dist/mapbox-gl.css";
+   import { MAPBOX_PUBLIC_KEY } from "$lib/constants";
+-  import { onMount } from 'svelte';
++  import { onMount, untrack } from 'svelte';
+ 
+   let showSearch = $state(false);
+   let listExpanded = $state(false);
+@@ -94,6 +94,19 @@
+     };
+   });
+ 
++  // The store may hydrate the user's saved default after the map mounts on the
++  // fallback center; recenter when the active location changes. Panning the
++  // map doesn't write to the store, so this never fights the user.
++  $effect(() => {
++    const { lat, lng } = locationStore.center;
++    if (!mapReady || !map) return;
++    untrack(() => {
++      const current = map.getCenter();
++      if (current.lat === lat && current.lng === lng) return;
++      map.jumpTo({ center: [lng, lat] });
++    });
++  });
++
+   function updateSpotsInView() {
+     if (!map) return;
+     const bounds = map.getBounds();
+diff --git a/src/routes/settings/+page.svelte b/src/routes/settings/+page.svelte
+index 76cc76b..cec95b9 100644
+--- a/src/routes/settings/+page.svelte
++++ b/src/routes/settings/+page.svelte
+@@ -14,7 +14,6 @@
+     Trash2,
+   } from '@lucide/svelte';
+   import { page } from '$app/state';
+-  import { goto } from '$app/navigation';
+   import { onMount } from 'svelte';
+   import { authClient } from '$lib/auth-client';
+   import { locationStore } from '$lib/adapters/primary/stores/location.store.svelte';
+@@ -57,8 +56,24 @@
+   let locateError = $state<string | null>(null);
+   let themePreference = $state<ThemePreference>('system');
+ 
+-  const savedLocationsQuery = listSavedLocations({});
++  // Settings is behind auth (see +layout.server.ts), so a user is always present here.
++  const savedLocationsQuery = $derived(listSavedLocations({ userId: user!.id }));
+   const savedLocationsLoaded = $derived(savedLocationsQuery.current !== undefined);
++  const savedLocationsError = $derived(
++    savedLocationsQuery.error !== undefined && savedLocationsQuery.current === undefined,
++  );
++  let isRetryingSavedLocations = $state(false);
++
++  async function retrySavedLocations() {
++    isRetryingSavedLocations = true;
++    try {
++      await savedLocationsQuery.refresh();
++    } catch (error) {
++      console.error('[bs] SETTINGS::retrySavedLocations', error);
++    } finally {
++      isRetryingSavedLocations = false;
++    }
++  }
+   const savedLocations = $derived<SavedLocation[]>(savedLocationsQuery.current ?? []);
+   const defaultLocation = $derived(findDefaultLocation(savedLocations));
+   const activeSavedLocation = $derived(
+@@ -234,7 +249,8 @@
+ 
+   async function logout() {
+     await authClient.signOut();
+-    goto('/login');
++    // Full load so no client-side cache from this account survives sign-out.
++    window.location.assign('/login');
+   }
+ 
+   const initial = $derived((user?.name ?? user?.email ?? '?').charAt(0).toUpperCase());
+@@ -389,7 +405,19 @@
+       {/if}
+     </div>
+ 
+-    {#if !savedLocationsLoaded}
++    {#if savedLocationsError}
++      <div class="load-error" role="alert">
++        <p class="field-error">Couldn't load your saved locations.</p>
++        <button
++          type="button"
++          class="small-btn"
++          disabled={isRetryingSavedLocations}
++          onclick={retrySavedLocations}
++        >
++          {isRetryingSavedLocations ? 'Retrying…' : 'Try again'}
++        </button>
++      </div>
++    {:else if !savedLocationsLoaded}
+       <p class="muted-note">Loading…</p>
+     {:else if savedLocations.length === 0}
+       <p class="muted-note">No saved locations yet. Pick a location above and save it.</p>
+@@ -681,6 +709,13 @@
+     cursor: progress;
+   }
+ 
++  .load-error {
++    display: flex;
++    align-items: center;
++    justify-content: space-between;
++    gap: 0.75rem;
++  }
++
+   .field-error {
+     margin: 0;
+     color: var(--sys-color-error-text);
+diff --git a/vitest.config.ts b/vitest.config.ts
+index f04e229..adb27cd 100644
+--- a/vitest.config.ts
++++ b/vitest.config.ts
+@@ -1,7 +1,10 @@
+ import { defineConfig } from "vitest/config";
++import { svelte } from "@sveltejs/vite-plugin-svelte";
+ import path from "node:path";
+ 
+ export default defineConfig({
++  // Compiles runes in `.svelte.ts` modules (e.g. stores) for tests.
++  plugins: [svelte()],
+   resolve: {
+     alias: {
+       $lib: path.resolve("./src/lib"),

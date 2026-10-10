@@ -23,7 +23,7 @@
   import mapboxgl from "mapbox-gl";
   import "mapbox-gl/dist/mapbox-gl.css";
   import { MAPBOX_PUBLIC_KEY } from "$lib/constants";
-  import { onMount } from 'svelte';
+  import { onMount, untrack } from 'svelte';
 
   let showSearch = $state(false);
   let listExpanded = $state(false);
@@ -92,6 +92,19 @@
       map.remove();
       mapReady = false;
     };
+  });
+
+  // The store may hydrate the user's saved default after the map mounts on the
+  // fallback center; recenter when the active location changes. Panning the
+  // map doesn't write to the store, so this never fights the user.
+  $effect(() => {
+    const { lat, lng } = locationStore.center;
+    if (!mapReady || !map) return;
+    untrack(() => {
+      const current = map.getCenter();
+      if (current.lat === lat && current.lng === lng) return;
+      map.jumpTo({ center: [lng, lat] });
+    });
   });
 
   function updateSpotsInView() {
