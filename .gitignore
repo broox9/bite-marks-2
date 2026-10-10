@@ -31,7 +31,10 @@ vite.config.ts.timestamp-*
 
 
 # Claude
+.claude/
 .claude/worktrees/*
+
+.agents/skills
 
 # Google OAuth client secrets (never commit)
 client_secret_*.json
