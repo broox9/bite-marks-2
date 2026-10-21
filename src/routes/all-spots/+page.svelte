@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type { PageData } from './$types';
 	import CuisineIcon from '../../components/CuisineIcon.svelte';
+	import { ExternalLink, Share2 } from '@lucide/svelte';
 
 	type MasterPlace = PageData['masterPlaces'] extends Array<infer Place> ? Place : any;
 	type MasterPlacesResponse =
@@ -51,16 +52,23 @@
 					</div>
 				</div>
 
-				{#if place.websiteURI}
-					<a
-						href={place.websiteURI}
-						target="_blank"
-						rel="noopener noreferrer"
-						class="website-link"
-					>
-						Visit Website
+				<div class="card-actions">
+					<a class="share-link" href={`/p/${encodeURIComponent(place.place_id)}`}>
+						<Share2 size={15} />
+						Share
 					</a>
-				{/if}
+					{#if place.websiteURI}
+						<a
+							href={place.websiteURI}
+							target="_blank"
+							rel="noopener noreferrer"
+							class="website-link"
+						>
+							Website
+							<ExternalLink size={13} />
+						</a>
+					{/if}
+				</div>
 			</div>
 		{/each}
 	</div>
@@ -175,16 +183,50 @@
 		color: var(--price-text);
 	}
 
-	.website-link {
+	.card-actions {
+		display: flex;
+		align-items: center;
+		gap: 0.625rem;
 		margin-top: 1rem;
+	}
+
+	.card-actions a {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		gap: 0.35rem;
+		min-height: 2.25rem;
+		border-radius: var(--sys-radius-control);
+		padding: 0.4rem 0.75rem;
 		color: var(--link);
 		font-size: 0.875rem;
-		font-weight: 500;
+		font-weight: 700;
 		text-decoration: none;
+	}
+
+	.share-link {
+		border: 1px solid var(--comp-btn-primary-border);
+		background: var(--comp-btn-primary-bg);
+		color: var(--comp-btn-primary-text) !important;
+	}
+
+	.share-link:hover {
+		background: var(--comp-btn-primary-bg-hover);
+	}
+
+	.website-link {
+		border: 1px solid var(--sys-color-border);
+		background: var(--sys-color-surface);
 	}
 
 	.website-link:hover {
 		color: var(--link-hover);
+		background: var(--sys-color-surface-raised);
+	}
+
+	.card-actions a:focus-visible {
+		outline: none;
+		box-shadow: var(--comp-focus-ring);
 	}
 
 	@media (min-width: 48rem) {

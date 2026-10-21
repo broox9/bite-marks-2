@@ -63,6 +63,33 @@ describe("ConvexAdapter", () => {
     expect(result).toBeNull();
   });
 
+  it("maps a public catalog place into the domain shape", async () => {
+    client.query.mockResolvedValue({
+      placeId: "ChIJ123",
+      name: "Cafe",
+      address: "1 Main",
+      rating: 4.5,
+      websiteURI: "https://example.com",
+      priceLevel: "moderate",
+      lat: 1,
+      lng: 2,
+      photos: [],
+      neighborhood: "Downtown",
+      areas: ["City"],
+      placeTypes: ["cafe"],
+      primaryType: "cafe",
+    });
+
+    const result = await adapter.getMasterPlace("ChIJ123");
+
+    expect(result).toMatchObject({
+      id: "ChIJ123",
+      place_id: "ChIJ123",
+      price_level: "moderate",
+      place_types: ["cafe"],
+    });
+  });
+
   it("passes placeId for hasUserSpot dedupe", async () => {
     client.query.mockResolvedValue(true);
     const result = await adapter.hasUserSpot("ChIJ123", "user_1");

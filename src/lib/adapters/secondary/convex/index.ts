@@ -53,6 +53,25 @@ function toConvexPlace(place: ResultPlaceRecord | Record<string, any>) {
   };
 }
 
+function toDomainPlace(place: Record<string, any>) {
+  return {
+    id: place.placeId,
+    place_id: place.placeId,
+    name: place.name,
+    address: place.address,
+    rating: place.rating,
+    websiteURI: place.websiteURI,
+    price_level: place.priceLevel,
+    lat: place.lat,
+    lng: place.lng,
+    photos: place.photos,
+    neighborhood: place.neighborhood,
+    areas: place.areas,
+    place_types: place.placeTypes,
+    primaryType: place.primaryType,
+  };
+}
+
 export class ConvexAdapter implements PersistenceRepository {
   constructor(private client: ConvexHttpClient) {}
 
@@ -78,7 +97,8 @@ export class ConvexAdapter implements PersistenceRepository {
   }
 
   async getMasterPlace(id: string): Promise<any> {
-    return this.client.query(api.places.getByPlaceId, { placeId: id });
+    const place = await this.client.query(api.places.getByPlaceId, { placeId: id });
+    return place ? toDomainPlace(place) : null;
   }
 
   async getUserSpot(rowId: string, userId: string): Promise<any> {
@@ -100,22 +120,7 @@ export class ConvexAdapter implements PersistenceRepository {
 
   async getMasterPlaces(): Promise<any[]> {
     const places = await this.client.query(api.places.getAll, {});
-    return places.map((p) => ({
-      id: p.placeId,
-      place_id: p.placeId,
-      name: p.name,
-      address: p.address,
-      rating: p.rating,
-      websiteURI: p.websiteURI,
-      price_level: p.priceLevel,
-      lat: p.lat,
-      lng: p.lng,
-      photos: p.photos,
-      neighborhood: p.neighborhood,
-      areas: p.areas,
-      place_types: p.placeTypes,
-      primaryType: p.primaryType,
-    }));
+    return places.map(toDomainPlace);
   }
 
   async hasMasterPlace(id: string): Promise<boolean> {

@@ -108,6 +108,20 @@ describe('PlaceAndSpotUseCase', () => {
     });
   });
 
+  describe('getMasterPlace', () => {
+    it('delegates to repository getMasterPlace with the Google place id', async () => {
+      await useCase.getMasterPlace('ChIJ123');
+      expect(repo.getMasterPlace).toHaveBeenCalledWith('ChIJ123');
+    });
+  });
+
+  describe('hasUserSpot', () => {
+    it('checks the place id for the current user', async () => {
+      await useCase.hasUserSpot('ChIJ123', 'user-1');
+      expect(repo.hasUserSpot).toHaveBeenCalledWith('ChIJ123', 'user-1');
+    });
+  });
+
   describe('upsert', () => {
     it('calls savePlaceAndSpot with place and userId', async () => {
       const place = { id: 'p1', place_id: 'ChIJ', name: 'Place', address: '', websiteURI: '', price_level: 'free', lat: 0, lng: 0, photos: [], neighborhood: '', areas: [], place_types: [] } as any;
