@@ -8,7 +8,7 @@ export interface PersistenceRepository {
   getUserSpots: (userId: string) => Promise<any>;
   getMasterPlaces: () => Promise<any[]>;
   hasMasterPlace: (id: string) => Promise<boolean>;
-  hasUserSpot: (name: string, userId: string) => Promise<boolean>;
+  hasUserSpot: (placeId: string, userId: string) => Promise<boolean>;
   updateUserSpot: (rowId: string, data: any, userId: string) => Promise<any>;
   deleteUserSpot: (rowId: string, userId: string) => Promise<any>;
 }

@@ -28,6 +28,14 @@ export class PlaceAndSpotUseCase {
     return this.persistenceRepository.getMasterPlaces();
   }
 
+  async getMasterPlace(placeId: string) {
+    return this.persistenceRepository.getMasterPlace(placeId);
+  }
+
+  async hasUserSpot(placeId: string, userId: string) {
+    return this.persistenceRepository.hasUserSpot(placeId, userId);
+  }
+
   async upsert(place: MasterPlaceRecord, userId: string | number) {
     console.log("[bs] use-case::upsert", place, userId);
     return this.persistenceRepository.savePlaceAndSpot(place, userId);

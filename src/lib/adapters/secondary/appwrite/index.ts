@@ -42,7 +42,7 @@ export class AppwriteAdapter implements PersistenceRepository {
   }
 
   async savePlaceAndSpot(masterPlace: any, userId: string | number) {
-    const existingSpot = await this.hasUserSpot(masterPlace.name ?? '', userId as string);
+    const existingSpot = await this.hasUserSpot(masterPlace.place_id ?? masterPlace.id ?? '', userId as string);
     if (existingSpot) {
       console.log("[bs] adapter::savePlaceAndSpot::EXISTING SPOT", existingSpot);
       return { success: true, spotResult: existingSpot };
@@ -70,7 +70,13 @@ export class AppwriteAdapter implements PersistenceRepository {
 
   async getMasterPlace(id: string): Promise<any> {
     const { document } = await this.#db().getDocument(DATABASE_ID, COLLECTIONS.masterPlaces, id);
-    return document;
+    if (!document) return null;
+    const place = transformResultToPlace(document);
+    return {
+      id: place.place_id || document.$id || id,
+      ...place,
+      photos: Array.isArray(document.photos) ? document.photos : [],
+    };
   }
 
   async getUserSpot(rowId: string, userId: string): Promise<any> {
@@ -176,12 +182,12 @@ export class AppwriteAdapter implements PersistenceRepository {
     return (result?.total ?? result?.documents?.length ?? 0) > 0;
   }
 
-  async hasUserSpot(name: string, userId: string): Promise<boolean> {
+  async hasUserSpot(placeId: string, userId: string): Promise<boolean> {
     const result = await this.#db().listRows({
       databaseId: DATABASE_ID,
       tableId: COLLECTIONS.userPlaces,
       queries: [
-        Query.equal("name", name),
+        Query.equal("place_id", placeId),
         Query.equal("user_id", userId),
       ],
       total: true,

@@ -3,6 +3,7 @@
   import { goto } from "$app/navigation";
   import { page } from "$app/state";
   import { authClient } from "$lib/auth-client";
+  import { safeRedirectTo } from "$lib/utils/redirect";
 
   let email = $state("");
   let password = $state("");
@@ -11,6 +12,7 @@
   let mode = $state<"login" | "register">(
     page.url.searchParams.get("mode") === "register" ? "register" : "login",
   );
+  const redirectTo = $derived(safeRedirectTo(page.url.searchParams.get("redirectTo")));
 
   const oauthErrorMessage = $derived.by(() => {
     const code = page.url.searchParams.get("oauth");
@@ -45,7 +47,7 @@
           return;
         }
       }
-      await goto("/list");
+      await goto(redirectTo);
     } catch (error) {
       errorMessage =
         error instanceof Error ? error.message : "Authentication failed.";
@@ -60,7 +62,7 @@
     try {
       await authClient.signIn.social({
         provider: "google",
-        callbackURL: "/list",
+        callbackURL: redirectTo,
       });
     } catch (error) {
       errorMessage =
