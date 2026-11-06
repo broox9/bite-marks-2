@@ -1,14 +1,12 @@
 <script lang="ts">
   import {
     Bookmark,
-    LocateFixed,
     LogOut,
     MapPin,
     Monitor,
     Moon,
     Pencil,
     RotateCcw,
-    Search,
     Star,
     Sun,
     Trash2,
@@ -24,9 +22,6 @@
     setDefaultSavedLocation,
     updateSavedLocation,
   } from '$lib/adapters/primary/remote-handlers/savedLocations.remote';
-  import { searchForAreas } from '$lib/adapters/secondary/google/google.svelte';
-  import { transformResultToPlace } from '$lib/adapters/secondary/appwrite/dtos/placesToRecord';
-  import type { ResultPlaceRecord } from '$lib/core/domain/Place/Place';
   import {
     activeLocationFromSaved,
     findDefaultLocation,
@@ -44,16 +39,12 @@
     saveThemePreference,
     type ThemePreference,
   } from '$lib/theme';
-  import ResultList from '../../components/ResultList.svelte';
+  import LocationTools from '../../components/LocationTools.svelte';
 
   type ActionSection = 'active' | 'radius' | 'saved';
 
   const user = $derived(page.data.user as { id: string; email?: string | null; name?: string | null } | null);
 
-  let locationInput = $state('');
-  let locationResults = $state<ResultPlaceRecord[]>([]);
-  let isLocating = $state(false);
-  let locateError = $state<string | null>(null);
   let themePreference = $state<ThemePreference>('system');
 
   // Settings is behind auth (see +layout.server.ts), so a user is always present here.
@@ -101,58 +92,6 @@
   function chooseTheme(preference: ThemePreference) {
     themePreference = preference;
     saveThemePreference(preference);
-  }
-
-  async function searchHandler(e: Event) {
-    const value = (e.currentTarget as HTMLInputElement | null)?.value;
-    if (!value || value.length < 3) {
-      locationResults = [];
-      return;
-    }
-    await searchForAreas(value, (results) => {
-      locationResults = results.map(transformResultToPlace);
-    });
-  }
-
-  function selectAreaResult(selected: ResultPlaceRecord) {
-    if (!selected) return;
-    const { address, lat, lng, name, neighborhood } = selected;
-    locationStore.setActive({
-      name: neighborhood
-        ? neighborhood === name
-          ? address
-          : `${name}, ${neighborhood}`
-        : address,
-      center: { lat, lng },
-      savedLocationId: null,
-    });
-    saveNameDraft = null;
-    locationInput = '';
-    locationResults = [];
-  }
-
-  function useCurrentLocation() {
-    if (!navigator.geolocation) {
-      locateError = 'Geolocation is not available in this browser.';
-      return;
-    }
-    isLocating = true;
-    locateError = null;
-    navigator.geolocation.getCurrentPosition(
-      (pos) => {
-        locationStore.setActive({
-          name: 'Current location',
-          center: { lat: pos.coords.latitude, lng: pos.coords.longitude },
-          savedLocationId: null,
-        });
-        saveNameDraft = null;
-        isLocating = false;
-      },
-      () => {
-        locateError = 'Could not get your location.';
-        isLocating = false;
-      },
-    );
   }
 
   async function runLocationAction(
@@ -290,11 +229,7 @@
           · used for distances and "spots in view"
         </div>
       </div>
-      <button type="button" class="use-current-btn" onclick={useCurrentLocation} disabled={isLocating}>
-        <LocateFixed size={13} /> {isLocating ? 'Locating…' : 'Use current'}
-      </button>
     </div>
-    {#if locateError}<p class="field-error">{locateError}</p>{/if}
 
     {#if savedLocationsLoaded && !activeSavedLocation}
       <form
@@ -338,19 +273,12 @@
       <p class="field-error" role="alert">{actionError.message}</p>
     {/if}
 
-    <label class="search-field">
-      <Search size={15} class="search-field-icon" />
-      <input
-        type="search"
-        placeholder="Search for a location"
-        bind:value={locationInput}
-        oninput={searchHandler}
-        autocomplete="off"
-      />
-    </label>
-    {#if locationResults.length}
-      <ResultList items={locationResults} onSelect={selectAreaResult} query={locationInput} />
-    {/if}
+    <LocationTools
+      showHeading={false}
+      showRadius={false}
+      showCurrentLocation
+      onLocationChange={() => { saveNameDraft = null; }}
+    />
   </section>
 
   <section class="settings-card" aria-labelledby="radius-heading">
@@ -661,7 +589,7 @@
 
   .location-row {
     display: grid;
-    grid-template-columns: auto 1fr auto;
+    grid-template-columns: auto minmax(0, 1fr);
     align-items: center;
     gap: 0.625rem;
   }
@@ -689,26 +617,6 @@
     color: var(--sys-color-text-muted);
   }
 
-  .use-current-btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.375rem;
-    white-space: nowrap;
-    border: 1px solid var(--sys-color-brand);
-    border-radius: var(--sys-radius-control);
-    background-color: transparent;
-    color: var(--sys-color-brand);
-    padding: 0.375rem 0.625rem;
-    font-size: 0.75rem;
-    font-weight: 700;
-    cursor: pointer;
-  }
-
-  .use-current-btn:disabled {
-    opacity: 0.6;
-    cursor: progress;
-  }
-
   .load-error {
     display: flex;
     align-items: center;
@@ -720,42 +628,6 @@
     margin: 0;
     color: var(--sys-color-error-text);
     font-size: 0.8125rem;
-  }
-
-  .search-field {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    background-color: var(--comp-input-search-bg);
-    border-radius: var(--comp-input-search-radius);
-    padding: 0.625rem 0.875rem;
-    min-height: 2.75rem;
-    border: 1px solid transparent;
-    transition: border-color 0.15s ease, box-shadow 0.15s ease;
-  }
-
-  .search-field:focus-within {
-    border-color: var(--sys-color-accent);
-    box-shadow: var(--comp-focus-ring);
-  }
-
-  .search-field :global(.search-field-icon) {
-    color: var(--sys-color-text-muted);
-    flex-shrink: 0;
-  }
-
-  .search-field input {
-    flex: 1;
-    min-width: 0;
-    border: none;
-    background: transparent;
-    outline: none;
-    font: inherit;
-    color: var(--sys-color-text);
-  }
-
-  .search-field input::placeholder {
-    color: var(--sys-color-text-muted);
   }
 
   .radius-value-row {

@@ -6,6 +6,8 @@ export default defineConfig({
   // Compiles runes in `.svelte.ts` modules (e.g. stores) for tests.
   plugins: [svelte()],
   resolve: {
+    // Component tests need Svelte's client entry point for mount/unmount.
+    conditions: ["browser"],
     alias: {
       $lib: path.resolve("./src/lib"),
       $convex: path.resolve("./src/convex"),
