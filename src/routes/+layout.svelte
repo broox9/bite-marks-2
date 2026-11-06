@@ -4,7 +4,7 @@
   import { onMount, untrack } from 'svelte';
 
   import type { LayoutProps } from "./$types";
-  import { PUBLIC_CONVEX_URL } from "$env/static/public";
+  import { env } from "$env/dynamic/public";
   import { createSvelteAuthClient } from "@mmailaender/convex-better-auth-svelte/svelte";
   import { authClient } from "$lib/auth-client";
   import { locationStore } from "$lib/adapters/primary/stores/location.store.svelte";
@@ -24,7 +24,7 @@
 
   createSvelteAuthClient({
     authClient,
-    convexUrl: PUBLIC_CONVEX_URL,
+    convexUrl: env.PUBLIC_CONVEX_URL!,
     getServerState: () => data.authState,
   });
 

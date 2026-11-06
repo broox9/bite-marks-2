@@ -29,12 +29,9 @@ export default defineSchema({
     personalNotes: v.union(v.string(), v.null()),
     isVisited: v.boolean(),
     socialLinks: v.array(v.string()),
-    // Appwrite $id, populated by the migration and dropped once it completes.
-    legacyUserId: v.optional(v.string()),
   })
     .index("by_user", ["userId"])
-    .index("by_user_place", ["userId", "placeId"])
-    .index("by_legacy_user", ["legacyUserId"]),
+    .index("by_user_place", ["userId", "placeId"]),
 
   tags: defineTable({
     userId: v.string(),

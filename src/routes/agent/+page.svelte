@@ -1,6 +1,4 @@
 <script lang="ts">
-  // import { agentRemoteCall } from "./agent.remote";
-  let { data, children } = $props();
   let userPrompt = $state("");
   let agentResponse = $state("");
   let isButtonDisabled = $state(false);
@@ -48,7 +46,7 @@
     {/each}
   </section>
   <section class="agent-footer">
-    <form on:submit={handleSubmit}>
+    <form onsubmit={handleSubmit}>
       <input
         type="text"
         name="user-prompt"

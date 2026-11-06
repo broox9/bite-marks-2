@@ -39,8 +39,5 @@ vite.config.ts.timestamp-*
 # Google OAuth client secrets (never commit)
 client_secret_*.json
 
-# Appwrite → Convex migration exports (contain user emails)
-.tmp/migration/
-
 .cursor
 scripts/*

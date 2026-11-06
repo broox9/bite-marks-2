@@ -7,7 +7,7 @@
    // do these proper, don't use them directily
   import { searchForAreas } from "$lib/adapters/secondary/google/google.svelte";
   import { locationStore } from "$lib/adapters/primary/stores/location.store.svelte";
-  import { transformResultToPlace } from "$lib/adapters/secondary/appwrite/dtos/placesToRecord";
+  import { transformResultToPlace } from "$lib/adapters/secondary/google/placesToRecord";
   import type { ResultPlaceRecord } from "$lib/core/domain/Place/Place";
   import ResultList from "./ResultList.svelte";
 

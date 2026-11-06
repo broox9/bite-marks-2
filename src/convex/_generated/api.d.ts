@@ -12,8 +12,6 @@ import type * as auth from "../auth.js";
 import type * as authHelpers from "../authHelpers.js";
 import type * as health from "../health.js";
 import type * as http from "../http.js";
-import type * as migrations from "../migrations.js";
-import type * as migrationsNode from "../migrationsNode.js";
 import type * as places from "../places.js";
 import type * as savedLocations from "../savedLocations.js";
 import type * as spots from "../spots.js";
@@ -30,8 +28,6 @@ declare const fullApi: ApiFromModules<{
   authHelpers: typeof authHelpers;
   health: typeof health;
   http: typeof http;
-  migrations: typeof migrations;
-  migrationsNode: typeof migrationsNode;
   places: typeof places;
   savedLocations: typeof savedLocations;
   spots: typeof spots;
