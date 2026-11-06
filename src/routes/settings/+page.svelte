@@ -25,7 +25,7 @@
     updateSavedLocation,
   } from '$lib/adapters/primary/remote-handlers/savedLocations.remote';
   import { searchForAreas } from '$lib/adapters/secondary/google/google.svelte';
-  import { transformResultToPlace } from '$lib/adapters/secondary/appwrite/dtos/placesToRecord';
+  import { transformResultToPlace } from '$lib/adapters/secondary/google/placesToRecord';
   import type { ResultPlaceRecord } from '$lib/core/domain/Place/Place';
   import {
     activeLocationFromSaved,

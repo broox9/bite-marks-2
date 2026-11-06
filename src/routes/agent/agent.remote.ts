@@ -1,7 +1,6 @@
 // import { generateText } from "ai";
 // import { openai } from "@ai-sdk/openai";
 import { Agent, run } from "@openai/agents";
-import { OPENAI_API_KEY } from '$env/dynamic/private';
 import { query, command } from '$app/server'
 import z from 'zod'
 

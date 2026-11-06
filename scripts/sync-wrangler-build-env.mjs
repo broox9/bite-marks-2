@@ -25,7 +25,6 @@ const BUILD_KEYS = [
   "PUBLIC_CONVEX_SITE_URL",
   "PUBLIC_SITE_URL",
   "PUBLIC_APP_URL",
-  "USE_CONVEX",
 ];
 
 const config = parseJsonc(readFileSync(wranglerPath, "utf8"));
@@ -47,8 +46,7 @@ for (const key of BUILD_KEYS) {
     written.push(key);
   } else if (
     key === "PUBLIC_CONVEX_URL" ||
-    key === "PUBLIC_CONVEX_SITE_URL" ||
-    key === "USE_CONVEX"
+    key === "PUBLIC_CONVEX_SITE_URL"
   ) {
     missing.push(key);
   }

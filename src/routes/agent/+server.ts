@@ -1,7 +1,4 @@
 import { Agent, run } from "@openai/agents";
-import { json } from "@sveltejs/kit";
-import { OPENAI_API_KEY } from '$env/dynamic/private';
-import z from 'zod'
 import type { RequestHandler } from './$types';
 
 
@@ -30,7 +27,21 @@ export const POST: RequestHandler = async ({ request }) => {
   console.log('[bs] Agent::POST', body);
   const agentStream = await run(agent, body.prompt, { stream: true });
   const textStream = agentStream.toTextStream();
-  const readableStream = textStream.pipeThrough(new TextEncoderStream());
+  const iterator = textStream[Symbol.asyncIterator]();
+  const encoder = new TextEncoder();
+  const readableStream = new ReadableStream<Uint8Array>({
+    async pull(controller) {
+      const { done, value } = await iterator.next();
+      if (done) {
+        controller.close();
+        return;
+      }
+      controller.enqueue(encoder.encode(value));
+    },
+    async cancel() {
+      await iterator.return?.();
+    },
+  });
 
   return new Response(readableStream, {
     headers: {

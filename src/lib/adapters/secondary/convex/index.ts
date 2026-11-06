@@ -4,7 +4,7 @@ import { api } from "$convex/_generated/api";
 import type { PersistenceRepository } from "$lib/ports/persistence.repository";
 import type { ResultPlaceRecord } from "$lib/core/domain/Place/Place";
 import type { UserSpotRecord } from "$lib/core/domain/Spot/Spot";
-import { transformResultToPlace } from "$lib/adapters/secondary/appwrite/dtos/placesToRecord";
+import { transformResultToPlace } from "$lib/adapters/secondary/google/placesToRecord";
 import type { FlattenedSpot } from "$convex/spots";
 
 function toDomainSpot(flat: FlattenedSpot): UserSpotRecord & { rowId: string; $id: string } {
@@ -128,7 +128,6 @@ export class ConvexAdapter implements PersistenceRepository {
   }
 
   async hasUserSpot(nameOrPlaceId: string, userId: string): Promise<boolean> {
-    // Prefer place-id dedupe (fixes the old name-based Appwrite check).
     return this.client.query(api.spots.hasForUserPlace, {
       userId,
       placeId: nameOrPlaceId,

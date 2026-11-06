@@ -12,7 +12,6 @@ export class PlaceAndSpotUseCase {
   async getSpotByPlaceId(placeId: string, userId: string) {
     const result = await this.persistenceRepository.getUserSpot(placeId, userId);
     if (!result) return null;
-    // Convex adapter already attaches rowId; Appwrite rows expose $id.
     const rowId = result.rowId ?? result.$id ?? result.id;
     return { ...result, rowId };
   }

@@ -1,157 +1,81 @@
 # Bite Marks
 
-A restaurant bookmarking web application built with Svelte, SvelteKit, and Appwrite.
+A restaurant bookmarking web application built with SvelteKit, Convex, Better Auth, and
+Cloudflare Workers.
 
 ## Features
 
-- 🔐 Authentication (Email/Password + Google OAuth)
-- 📍 Restaurant discovery and bookmarking
-- 🗺️ Google Maps integration
-- 🏷️ Tag system for organizing restaurants
-- 📱 Responsive design
+- Email/password and Google authentication
+- Restaurant discovery and bookmarking
+- Google Maps integration
+- Tags for organizing restaurants
+- Responsive design
 
-## Quick Start
+## Prerequisites
 
-### Prerequisites
+- Node.js 22+
+- npm 11+
+- A Convex deployment
+- Google Cloud credentials for OAuth and Maps
 
-- Node.js 18+ and npm
-- Appwrite account ([cloud.appwrite.io](https://cloud.appwrite.io))
-- Google Cloud Console account (for Google OAuth and Maps)
+## Package manager
 
-### Setup
+This repository uses **npm**. `package-lock.json` is the authoritative lockfile, CI installs
+dependencies with `npm ci`, and all project commands use npm scripts.
 
-1. **Clone and install dependencies**
-   ```bash
-   git clone <repository-url>
-   cd bite-marks-2
-   npm install
-   ```
+## Setup
 
-2. **Configure environment variables**
-   ```bash
-   cp .env.example .env
-   # Edit .env with your Appwrite credentials
-   ```
-
-3. **Configure Google OAuth** (if using)
-   - Follow the complete setup guide: `scripts/google-oauth-setup-checklist.md`
-   - Or see quick reference: `GOOGLE_OAUTH_FIX_SUMMARY.md`
-
-4. **Start development server**
-   ```bash
-   npm run dev
-   ```
-
-## Documentation
-
-### Authentication
-- **`AUTH-README.md`** - Complete authentication system overview
-- **`docs/oauth-social-sign-in.md`** - OAuth implementation details
-- **`scripts/google-oauth-setup-checklist.md`** - Google OAuth configuration guide
-- **`scripts/test-google-oauth.md`** - Testing and troubleshooting
-
-### Project Structure
-- **`AGENTS.md`** - Project overview and architecture
-
-## Architecture
-
-This project follows a hexagonal (ports-and-adapters) architecture:
-
-```
-src/
-├── lib/
-│   ├── core/domain/      # Domain types and schemas
-│   ├── use_cases/        # Application use cases
-│   ├── ports/            # Port interfaces
-│   ├── adapters/
-│   │   ├── primary/      # Inbound adapters (UI, handlers)
-│   │   └── secondary/    # Outbound adapters (Appwrite, Google)
-│   └── glue/             # Dependency injection
-└── routes/               # SvelteKit routes and pages
+```bash
+npm ci
+cp .env.example .env.local
+npm run dev:convex
 ```
 
-## Key Technologies
-
-- **Frontend**: Svelte, SvelteKit
-- **Backend**: Appwrite
-- **Build Tool**: Vite
-- **Styling**: CSS custom properties (no Tailwind)
-- **Language**: TypeScript
-
-## Development
-
-### Running the app
+In a second terminal:
 
 ```bash
 npm run dev
 ```
 
-Or open in browser:
+Configure these application variables in `.env.local`:
 
 ```bash
-npm run dev -- --open
+PUBLIC_CONVEX_URL=https://your-deployment.convex.cloud
+PUBLIC_CONVEX_SITE_URL=https://your-deployment.convex.site
+PUBLIC_SITE_URL=http://localhost:5173
 ```
 
-### Type checking
+Set `BETTER_AUTH_SECRET`, `SITE_URL`, and optional Google OAuth credentials on the matching
+Convex deployment. See `docs/AUTH-README.md` and `docs/oauth-social-sign-in.md`.
+
+## Architecture
+
+The application follows a ports-and-adapters architecture:
+
+- `src/lib/core/domain`: domain types and schemas
+- `src/lib/use_cases`: application orchestration
+- `src/lib/ports`: persistence interfaces
+- `src/lib/adapters/primary`: SvelteKit handlers and stores
+- `src/lib/adapters/secondary`: Convex and Google integrations
+- `src/lib/glue`: composition root
+- `src/convex`: schema, functions, Better Auth, and HTTP routes
+
+Cloudflare Workers deployments use `@sveltejs/adapter-cloudflare`.
+
+## Quality checks
 
 ```bash
 npm run check
-```
-
-## Building
-
-To create a production version:
-
-```bash
+npm test
 npm run build
 ```
 
-Preview the production build:
+## Deployment
 
 ```bash
-npm run preview
+npm run preview:worker
+npm run deploy
 ```
 
-## Configuration
-
-### Environment Variables
-
-Required variables:
-
-```bash
-# Public (client-side)
-PUBLIC_APPWRITE_ENDPOINT=https://cloud.appwrite.io/v1
-
-# Private (server-side)
-APPWRITE_PROJECT_ID=your-project-id
-APPWRITE_API_KEY=your-api-key
-```
-
-Optional:
-
-```bash
-# For production behind reverse proxy
-PUBLIC_APP_URL=https://yourdomain.com
-```
-
-See `.env.example` for complete configuration template.
-
-## Google OAuth Setup
-
-Google Sign-In requires configuration in both Google Cloud Console and Appwrite Console.
-
-**Quick setup**: Follow `scripts/google-oauth-setup-checklist.md`
-
-**Troubleshooting**: See `scripts/test-google-oauth.md`
-
-## Contributing
-
-This is a personal side project for practicing agentic coding and AI-assisted development.
-
-## License
-
-Private project - no license specified.
-
----
-
-> **Note**: This project uses Prettier for formatting and ESLint for linting. No testing framework is currently configured.
+Deployment requires the Cloudflare and Convex environment configuration described in
+`.env.example` and `wrangler.jsonc`.

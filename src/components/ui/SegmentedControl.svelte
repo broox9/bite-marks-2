@@ -1,9 +1,9 @@
 <script lang="ts">
   type Option = { value: string; label: string };
-  let { options, selected = $bindable() } = $props<{
+  let { options, selected = $bindable() }: {
     options: Option[];
     selected: string;
-  }>();
+  } = $props();
 </script>
 
 <div class="segmented-control" role="radiogroup">
