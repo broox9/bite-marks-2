@@ -47,12 +47,31 @@
 
   let themePreference = $state<ThemePreference>('system');
 
+  function extractErrorDetails(error: unknown): string | null {
+    if (!error) return null;
+    if (typeof error === 'object') {
+      const maybeBody = (error as { body?: { message?: unknown } }).body;
+      if (typeof maybeBody?.message === 'string' && maybeBody.message.trim()) {
+        return maybeBody.message.trim();
+      }
+      const maybeMessage = (error as { message?: unknown }).message;
+      if (typeof maybeMessage === 'string' && maybeMessage.trim()) {
+        return maybeMessage.trim();
+      }
+    }
+    if (typeof error === 'string' && error.trim()) {
+      return error.trim();
+    }
+    return null;
+  }
+
   // Settings is behind auth (see +layout.server.ts), so a user is always present here.
   const savedLocationsQuery = $derived(listSavedLocations({ userId: user!.id }));
   const savedLocationsLoaded = $derived(savedLocationsQuery.current !== undefined);
   const savedLocationsError = $derived(
     savedLocationsQuery.error !== undefined && savedLocationsQuery.current === undefined,
   );
+  const savedLocationsErrorDetails = $derived(extractErrorDetails(savedLocationsQuery.error));
   let isRetryingSavedLocations = $state(false);
 
   async function retrySavedLocations() {
@@ -107,7 +126,13 @@
       await savedLocationsQuery.refresh();
     } catch (error) {
       console.error('[bs] SETTINGS::location action', action, error);
-      actionError = { section, message: 'Something went wrong. Please try again.' };
+      const details = extractErrorDetails(error);
+      actionError = {
+        section,
+        message: details
+          ? `Something went wrong: ${details}`
+          : 'Something went wrong. Please try again.',
+      };
     } finally {
       pendingAction = null;
     }
@@ -128,7 +153,11 @@
         radiusMiles,
       });
       if (!result.success) return result.error;
-      locationStore.setActive(activeLocationFromSaved(result.location));
+      if (result.location.isDefault) {
+        locationStore.setDefault(result.location);
+      } else {
+        locationStore.setActive(activeLocationFromSaved(result.location));
+      }
       saveNameDraft = null;
     });
   }
@@ -146,7 +175,8 @@
 
   function makeDefault(location: SavedLocation) {
     return runLocationAction(`default:${location.id}`, 'saved', async () => {
-      await setDefaultSavedLocation(location.id);
+      const updated = await setDefaultSavedLocation(location.id);
+      locationStore.setDefault(updated);
     });
   }
 
@@ -335,7 +365,12 @@
 
     {#if savedLocationsError}
       <div class="load-error" role="alert">
-        <p class="field-error">Couldn't load your saved locations.</p>
+        <div class="load-error-text">
+          <p class="field-error">Couldn't load your saved locations.</p>
+          {#if savedLocationsErrorDetails}
+            <p class="error-detail">{savedLocationsErrorDetails}</p>
+          {/if}
+        </div>
         <button
           type="button"
           class="small-btn"
@@ -624,10 +659,25 @@
     gap: 0.75rem;
   }
 
+  .load-error-text {
+    display: grid;
+    gap: 0.25rem;
+    min-width: 0;
+  }
+
   .field-error {
     margin: 0;
     color: var(--sys-color-error-text);
     font-size: 0.8125rem;
+  }
+
+  .error-detail {
+    margin: 0;
+    color: var(--sys-color-text-muted);
+    font-family: var(--sys-font-mono);
+    font-size: 0.75rem;
+    line-height: 1.4;
+    overflow-wrap: anywhere;
   }
 
   .radius-value-row {

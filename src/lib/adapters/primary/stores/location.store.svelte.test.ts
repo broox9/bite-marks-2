@@ -4,8 +4,12 @@ import { locationStore } from "./location.store.svelte";
 
 const FALLBACK_NAME = "Midtown, New York";
 
-function savedDefault(id: string, name: string, lat: number, lng: number): SavedLocation {
-  return { id, name, lat, lng, radiusMiles: 5, isDefault: true };
+function savedDefault(id: string, name: string, lat: number, lng: number, radiusMiles = 5): SavedLocation {
+  return { id, name, lat, lng, radiusMiles, isDefault: true };
+}
+
+function savedNonDefault(id: string, name: string, lat: number, lng: number, radiusMiles = 10): SavedLocation {
+  return { id, name, lat, lng, radiusMiles, isDefault: false };
 }
 
 function memoryStorage(): Storage {
@@ -78,5 +82,85 @@ describe("locationStore.hydrate", () => {
     await locationStore.hydrate("user-b", async () => []);
     expect(locationStore.name).toBe(FALLBACK_NAME);
     expect(locationStore.savedLocationId).toBeNull();
+  });
+
+  it("switches to a newly set default when an older cached pick is in localStorage", async () => {
+    // Device starts with no saved default and caches an unsaved location pick.
+    await locationStore.hydrate("user-a", async () => []);
+    locationStore.setActive({
+      name: "Midtown, New York",
+      center: { lat: 40.7484, lng: -73.9857 },
+      radiusMiles: 29,
+      savedLocationId: null,
+    });
+
+    // Later (or from another device), Philadelphia is saved as default.
+    const philly = savedDefault("loc-philly", "Philadelphia, PA", 39.9526, -75.1652, 15);
+    await locationStore.hydrate("user-a", async () => [philly]);
+
+    expect(locationStore.snapshot).toEqual({
+      name: "Philadelphia, PA",
+      center: { lat: 39.9526, lng: -75.1652 },
+      radiusMiles: 15,
+      savedLocationId: "loc-philly",
+    });
+  });
+
+  it("updates the active location after reload when a different saved location becomes default", async () => {
+    const brooklyn = savedDefault("loc-brooklyn", "Brooklyn", 40.6782, -73.9442, 8);
+    const philly = savedNonDefault("loc-philly", "Philadelphia, PA", 39.9526, -75.1652, 12);
+
+    await locationStore.hydrate("user-a", async () => [brooklyn, philly]);
+    expect(locationStore.savedLocationId).toBe("loc-brooklyn");
+
+    // Default changes to Philadelphia in Settings.
+    const nextBrooklyn: SavedLocation = { ...brooklyn, isDefault: false };
+    const nextPhilly: SavedLocation = { ...philly, isDefault: true };
+    locationStore.setDefault(nextPhilly);
+
+    expect(locationStore.savedLocationId).toBe("loc-philly");
+    expect(locationStore.name).toBe("Philadelphia, PA");
+    expect(locationStore.radiusMiles).toBe(12);
+
+    // Simulate reload on the same device: cached default must remain Philadelphia.
+    await locationStore.hydrate("user-a", async () => [nextBrooklyn, nextPhilly]);
+    expect(locationStore.savedLocationId).toBe("loc-philly");
+    expect(locationStore.name).toBe("Philadelphia, PA");
+  });
+
+  it("preserves a temporary unsaved pick across reloads when the saved default has not changed", async () => {
+    const brooklyn = savedDefault("loc-brooklyn", "Brooklyn", 40.6782, -73.9442, 8);
+    await locationStore.hydrate("user-a", async () => [brooklyn]);
+
+    // User switches temporarily to an unsaved search location.
+    locationStore.setActive({
+      name: "Queens, NY",
+      center: { lat: 40.7282, lng: -73.7949 },
+      radiusMiles: 10,
+      savedLocationId: null,
+    });
+
+    // Reloading with the same default keeps the user's temporary pick.
+    await locationStore.hydrate("user-a", async () => [brooklyn]);
+    expect(locationStore.name).toBe("Queens, NY");
+    expect(locationStore.savedLocationId).toBeNull();
+  });
+
+  it("falls back to the remaining default when the cached saved location was deleted", async () => {
+    const brooklyn = savedDefault("loc-brooklyn", "Brooklyn", 40.6782, -73.9442, 8);
+    const philly = savedNonDefault("loc-philly", "Philadelphia, PA", 39.9526, -75.1652, 12);
+
+    await locationStore.hydrate("user-a", async () => [brooklyn, philly]);
+    locationStore.setActive({
+      name: philly.name,
+      center: { lat: philly.lat, lng: philly.lng },
+      radiusMiles: philly.radiusMiles,
+      savedLocationId: philly.id,
+    });
+
+    // Philly is deleted on another session; reload reconciles to the default.
+    await locationStore.hydrate("user-a", async () => [brooklyn]);
+    expect(locationStore.savedLocationId).toBe("loc-brooklyn");
+    expect(locationStore.name).toBe("Brooklyn");
   });
 });

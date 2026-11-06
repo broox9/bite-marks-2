@@ -11,6 +11,7 @@ import {
 // (event handlers, effects, `hydrate`), never during server rendering.
 
 const ACTIVE_LOCATION_STORAGE_PREFIX = 'bite-marks-active-location:'
+const DEFAULT_LOCATION_ID_STORAGE_PREFIX = 'bite-marks-default-location-id:'
 
 const FALLBACK_LOCATION: ActiveLocation = {
   name: 'Midtown, New York',
@@ -26,6 +27,7 @@ let savedLocationId = $state<string | null>(FALLBACK_LOCATION.savedLocationId)
 let radiusMeters = $derived(radiusMiles * 1609.34)
 
 let storageKey: string | null = null
+let defaultLocationIdKey: string | null = null
 // Bumped on every change so an in-flight `hydrate` can't clobber a newer pick.
 let generation = 0
 
@@ -40,13 +42,18 @@ function snapshot(): ActiveLocation {
   return { name, center: { ...center }, radiusMiles, savedLocationId }
 }
 
-function persist() {
-  if (!storageKey) return
+function writeStorage(key: string | null, value: string | null) {
+  if (!key) return
   try {
-    localStorage.setItem(storageKey, JSON.stringify(snapshot()))
+    if (value === null) localStorage.removeItem(key)
+    else localStorage.setItem(key, value)
   } catch (error) {
     console.error('[bs] LOCATION::STORE::persist', error)
   }
+}
+
+function persist() {
+  writeStorage(storageKey, JSON.stringify(snapshot()))
 }
 
 // A storage read that throws (blocked storage, privacy modes) is a cache miss,
@@ -58,6 +65,10 @@ function readStorage(key: string): string | null {
     console.warn('[bs] LOCATION::STORE::readStorage', error)
     return null
   }
+}
+
+function isSameCoords(a: { lat: number; lng: number }, b: { lat: number; lng: number }): boolean {
+  return Math.abs(a.lat - b.lat) < 1e-6 && Math.abs(a.lng - b.lng) < 1e-6
 }
 
 /*
@@ -103,21 +114,33 @@ export const locationStore = {
   },
 
   /**
-   * Restores this user's last-used location on this device, falling back to
-   * their saved default when nothing is cached.
+   * Synchronizes the store with a newly selected default location and records
+   * the default id so subsequent hydrations do not revert to an older cache.
+   */
+  setDefault(location: SavedLocation) {
+    generation++
+    apply(activeLocationFromSaved(location))
+    writeStorage(defaultLocationIdKey, location.id)
+    persist()
+  },
+
+  /**
+   * Restores this user's last-used location on this device, reconciling it with
+   * their saved locations and newly selected default.
    */
   async hydrate(userId: string, loadSavedLocations: () => Promise<SavedLocation[]>) {
     const key = ACTIVE_LOCATION_STORAGE_PREFIX + userId
+    const defaultKey = DEFAULT_LOCATION_ID_STORAGE_PREFIX + userId
     if (storageKey !== key) {
       generation++
       apply(FALLBACK_LOCATION)
     }
     storageKey = key
+    defaultLocationIdKey = defaultKey
 
     const cached = parseActiveLocation(readStorage(key))
     if (cached) {
       apply(cached)
-      return
     }
 
     const requestGeneration = generation
@@ -131,7 +154,48 @@ export const locationStore = {
     if (requestGeneration !== generation || storageKey !== key) return
 
     const defaultLocation = findDefaultLocation(saved)
-    if (defaultLocation) {
+    const lastKnownDefaultId = readStorage(defaultKey)
+    writeStorage(defaultKey, defaultLocation?.id ?? null)
+
+    if (!cached) {
+      if (defaultLocation) {
+        apply(activeLocationFromSaved(defaultLocation))
+        persist()
+      }
+      return
+    }
+
+    // If the user's saved default changed since this device last synced (or was
+    // set for the first time while an older cached pick existed), switch to the
+    // new default unless the cached pick already points to it.
+    if (
+      defaultLocation &&
+      defaultLocation.id !== lastKnownDefaultId &&
+      cached.savedLocationId !== defaultLocation.id
+    ) {
+      apply(activeLocationFromSaved(defaultLocation))
+      persist()
+      return
+    }
+
+    if (cached.savedLocationId !== null) {
+      const matchedSaved = saved.find((loc) => loc.id === cached.savedLocationId)
+      if (!matchedSaved) {
+        if (defaultLocation) {
+          apply(activeLocationFromSaved(defaultLocation))
+        } else {
+          apply({ ...cached, savedLocationId: null })
+        }
+        persist()
+      } else if (matchedSaved.name !== cached.name || !isSameCoords(matchedSaved, cached.center)) {
+        apply({
+          ...cached,
+          name: matchedSaved.name,
+          center: { lat: matchedSaved.lat, lng: matchedSaved.lng },
+        })
+        persist()
+      }
+    } else if (defaultLocation && isSameCoords(defaultLocation, cached.center)) {
       apply(activeLocationFromSaved(defaultLocation))
       persist()
     }
@@ -141,6 +205,7 @@ export const locationStore = {
   reset() {
     generation++
     storageKey = null
+    defaultLocationIdKey = null
     apply(FALLBACK_LOCATION)
   },
 
