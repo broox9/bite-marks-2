@@ -26,17 +26,23 @@ const agent = new Agent({
 
 
 export const POST: RequestHandler = async ({ request }) => {
-  const body = await request.json();
-  console.log('[bs] Agent::POST', body);
-  const agentStream = await run(agent, body.prompt, { stream: true });
-  const textStream = agentStream.toTextStream();
-  const readableStream = textStream.pipeThrough(new TextEncoderStream());
+  return new Response("Nope", {
+    status: 403,
+    statusText: "Maybe not right now",
+    headers: { "Content-Type": "text/plain" }
+  })
 
-  return new Response(readableStream, {
-    headers: {
-      'Content-Type': 'text/event-stream',
-      'Cache-Control': 'no-cache',
-      'Connection': 'keep-alive'
-    }
-  });
+//   const body = await request.json();
+//   console.log('[bs] Agent::POST', body);
+//   const agentStream = await run(agent, body.prompt, { stream: true });
+//   const textStream = agentStream.toTextStream();
+//   const readableStream = textStream.pipeThrough(new TextEncoderStream());
+//
+//   return new Response(readableStream, {
+//     headers: {
+//       'Content-Type': 'text/event-stream',
+//       'Cache-Control': 'no-cache',
+//       'Connection': 'keep-alive'
+//     }
+//   });
 }
