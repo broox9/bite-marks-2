@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it } from "vite-plus/test";
 
 import { isLocalHostname, isLocalUrl, shouldDropLocalSentryEvent } from "./event-filter";
 
@@ -35,7 +35,7 @@ describe("shouldDropLocalSentryEvent", () => {
     expect(
       shouldDropLocalSentryEvent({
         request: { url: "http://localhost:5173/login" },
-      })
+      }),
     ).toBe(true);
   });
 
@@ -43,7 +43,7 @@ describe("shouldDropLocalSentryEvent", () => {
     expect(
       shouldDropLocalSentryEvent({
         request: { url: "https://bite-marks.example/login" },
-      })
+      }),
     ).toBe(false);
     expect(shouldDropLocalSentryEvent({})).toBe(false);
   });

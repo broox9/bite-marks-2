@@ -1,5 +1,5 @@
 import { convexTest } from "convex-test";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it } from "vite-plus/test";
 import { api } from "./_generated/api";
 import schema from "./schema";
 
@@ -23,7 +23,7 @@ describe("spots authorization", () => {
     const t = convexTest(schema, modules);
 
     await expect(
-      t.mutation(api.spots.savePlaceAndSpot, { userId: "user-a", place })
+      t.mutation(api.spots.savePlaceAndSpot, { userId: "user-a", place }),
     ).rejects.toThrow("Unauthorized");
   });
 
@@ -43,7 +43,7 @@ describe("spots authorization", () => {
       userB.query(api.spots.getById, {
         rowId: created.spotResult._id,
         userId: "user-a",
-      })
+      }),
     ).rejects.toThrow("Forbidden");
 
     await expect(
@@ -51,7 +51,7 @@ describe("spots authorization", () => {
         rowId: created.spotResult._id,
         userId: "user-a",
         isVisited: true,
-      })
+      }),
     ).rejects.toThrow("Forbidden");
   });
 
@@ -61,7 +61,7 @@ describe("spots authorization", () => {
     const userB = t.withIdentity({ subject: "user-b" });
 
     await expect(
-      t.mutation(api.tags.create, { userId: "user-a", tagName: "brunch" })
+      t.mutation(api.tags.create, { userId: "user-a", tagName: "brunch" }),
     ).rejects.toThrow("Unauthorized");
 
     await userA.mutation(api.tags.create, {
@@ -69,8 +69,8 @@ describe("spots authorization", () => {
       tagName: "brunch",
     });
 
-    await expect(
-      userB.query(api.tags.listForUser, { userId: "user-a" })
-    ).rejects.toThrow("Forbidden");
+    await expect(userB.query(api.tags.listForUser, { userId: "user-a" })).rejects.toThrow(
+      "Forbidden",
+    );
   });
 });

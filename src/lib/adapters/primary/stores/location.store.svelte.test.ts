@@ -1,4 +1,4 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vite-plus/test";
 import type { SavedLocation } from "$lib/core/domain/Location/Location";
 import { locationStore } from "./location.store.svelte";
 
