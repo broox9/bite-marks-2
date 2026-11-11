@@ -24,5 +24,18 @@
     "PUBLIC_CONVEX_URL":"https://agreeable-grouse-769.convex.cloud",
     "PUBLIC_CONVEX_SITE_URL":"https://agreeable-grouse-769.convex.site",
     "USE_CONVEX": "1"
+  },
+  "previews": {
+    "vars": {
+      "NODE_ENV": "development",
+      "PUBLIC_APP_URL": "https://bite.broox.us",
+      "PUBLIC_SITE_URL": "https://bite.broox.us",
+      "PUBLIC_CONVEX_URL":"https://agreeable-grouse-769.convex.cloud",
+      "PUBLIC_CONVEX_SITE_URL":"https://agreeable-grouse-769.convex.site",
+      "USE_CONVEX": "1"
+    },
+    "version_metadata": {
+      "binding": "CF_VERSION_METADATA"
+    }
   }
 }

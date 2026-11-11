@@ -17,6 +17,12 @@ export const createAuth = (ctx: GenericCtx<DataModel>) => {
 
   return betterAuth({
     baseURL: siteUrl,
+    trustedOrigins: [
+      siteUrl,
+      "https://*.broox9.pages.dev",   // Cloudflare Pages previews
+      "https://*.broox9.workers.dev",  // or Workers preview URLs
+      "http://localhost:5173",
+    ],
     database: authComponent.adapter(ctx),
     emailAndPassword: {
       enabled: true,
