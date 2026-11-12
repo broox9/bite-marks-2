@@ -14,6 +14,7 @@
 		"preview:manual": "pnpx wrangler preview",
 		"preview:worker": "npm run build && wrangler dev .svelte-kit/cloudflare/_worker.js",
 		"deploy": "npm run build && wrangler deploy",
+		"deploy:preview": "npm run build:preview && wrangler versions upload --var PUBLIC_CONVEX_URL:https://fastidious-setter-628.convex.cloud --var PUBLIC_CONVEX_SITE_URL:https://fastidious-setter-628.convex.site",
 		"secrets:convex": "node scripts/put-convex-worker-secrets.mjs",
 		"prepare": "svelte-kit sync || echo ''",
 		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",

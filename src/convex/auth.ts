@@ -9,20 +9,61 @@ import authConfig from "./auth.config";
 
 const siteUrl = process.env.SITE_URL!;
 
+export const DEV_CONVEX_DEPLOYMENT_NAME = "fastidious-setter-628";
+export const DEV_PREVIEW_ORIGIN_PATTERN =
+  "https://*-bite-marks-2.broox9.workers.dev";
+export const LOCAL_DEV_ORIGIN = "http://localhost:5173";
+
+type AuthEnv = Record<string, string | undefined>;
+
+export function isDevConvexDeployment(env: AuthEnv = process.env): boolean {
+  const candidates = [env.CONVEX_SITE_URL, env.CONVEX_CLOUD_URL];
+  return candidates.some((raw) => {
+    if (!raw) return false;
+    try {
+      const { hostname } = new URL(raw);
+      return (
+        hostname === `${DEV_CONVEX_DEPLOYMENT_NAME}.convex.site` ||
+        hostname === `${DEV_CONVEX_DEPLOYMENT_NAME}.convex.cloud`
+      );
+    } catch {
+      return false;
+    }
+  });
+}
+
+export function resolveTrustedOrigins(
+  env: AuthEnv = process.env,
+): string[] | undefined {
+  if (!isDevConvexDeployment(env)) {
+    return undefined;
+  }
+
+  const fromEnv = (env.BETTER_AUTH_TRUSTED_ORIGINS ?? "")
+    .split(",")
+    .map((origin) => origin.trim())
+    .filter(Boolean);
+
+  return Array.from(
+    new Set([
+      ...(env.SITE_URL ? [env.SITE_URL] : []),
+      LOCAL_DEV_ORIGIN,
+      DEV_PREVIEW_ORIGIN_PATTERN,
+      ...fromEnv,
+    ]),
+  );
+}
+
 export const authComponent = createClient<DataModel>(components.betterAuth);
 
 export const createAuth = (ctx: GenericCtx<DataModel>) => {
   const googleClientId = process.env.GOOGLE_CLIENT_ID;
   const googleClientSecret = process.env.GOOGLE_CLIENT_SECRET;
+  const trustedOrigins = resolveTrustedOrigins();
 
   return betterAuth({
     baseURL: siteUrl,
-    trustedOrigins: [
-      siteUrl,
-      "https://*.broox9.pages.dev",   // Cloudflare Pages previews
-      "https://*.broox9.workers.dev",  // or Workers preview URLs
-      "http://localhost:5173",
-    ],
+    ...(trustedOrigins ? { trustedOrigins } : {}),
     database: authComponent.adapter(ctx),
     emailAndPassword: {
       enabled: true,
