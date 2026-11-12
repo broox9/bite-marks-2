@@ -28,12 +28,36 @@ The SvelteKit Worker only proxies `/api/auth/*` and reads the JWT cookie.
 2. Convex env (dev):
    - `BETTER_AUTH_SECRET`
    - `SITE_URL=http://localhost:5173`
+   - `BETTER_AUTH_TRUSTED_ORIGINS=https://*-bite-marks-2.broox9.workers.dev,http://localhost:5173`
    - Optional Google: `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` (use a **dev-only** OAuth client; do not rotate the Appwrite prod client yet).
 3. `.env.local` (written by Convex + app):
    - `PUBLIC_CONVEX_URL`
    - `PUBLIC_CONVEX_SITE_URL`
    - `PUBLIC_SITE_URL=http://localhost:5173`
    - `USE_CONVEX=1` (local data path)
+
+## Preview deployments (Cloudflare Workers Builds → dev Convex)
+
+Cloudflare Workers preview builds (`https://<branch-slug>-bite-marks-2.broox9.workers.dev`) target the **dev** Convex deployment (`fastidious-setter-628`) rather than production (`agreeable-grouse-769`), so preview sign-in works without trusting preview origins on production.
+
+### Build-time vs runtime configuration
+
+- `PUBLIC_CONVEX_URL` and `PUBLIC_CONVEX_SITE_URL` are imported via `$env/static/public` (in `src/routes/+layout.svelte` and `@mmailaender/convex-better-auth-svelte`), which Vite inlines into the client and SSR bundles at **build time**.
+- `wrangler.jsonc` defines production URLs under `vars` (`agreeable-grouse-769`) and preview URLs under `previews.vars` (`fastidious-setter-628`).
+- `scripts/sync-wrangler-build-env.mjs` generates `.env.production` before `vite build`:
+  - Uses `previews.vars` automatically when Cloudflare Workers Builds (`WORKERS_CI_BRANCH`) or Cloudflare Pages (`CF_PAGES_BRANCH`) builds a branch other than `main` (or `PRODUCTION_BRANCH`), or when `--preview` / `BUILD_TARGET=preview` / `CONVEX_PREVIEW=1` is passed (`npm run build:preview`, `npm run deploy:preview`).
+  - Uses top-level `vars` for production builds (`main` or default local `npm run build`).
+
+### Trusted origins on dev Convex
+
+- `src/convex/auth.ts` (`resolveTrustedOrigins()`) checks `CONVEX_SITE_URL` / `CONVEX_CLOUD_URL` and adds `https://*-bite-marks-2.broox9.workers.dev` and `http://localhost:5173` **only** when running on `fastidious-setter-628`.
+- On production (`agreeable-grouse-769`), `resolveTrustedOrigins()` returns `undefined`, leaving production trusted origins unchanged (`SITE_URL` = `https://bite.broox.us`).
+- Set the dev deployment env var and push current Convex functions so dev has the latest schema and auth config:
+  ```bash
+  npx convex env set BETTER_AUTH_TRUSTED_ORIGINS 'https://*-bite-marks-2.broox9.workers.dev,http://localhost:5173' --deployment-name fastidious-setter-628
+  npx convex dev --once
+  ```
+- Note: Google OAuth does not allow wildcard redirect URIs, so use email/password sign-in on `<branch-slug>-bite-marks-2.broox9.workers.dev` previews (or add a specific branch preview callback URL to the dev-only Google OAuth client when testing OAuth).
 
 ## Google OAuth (dev)
 
