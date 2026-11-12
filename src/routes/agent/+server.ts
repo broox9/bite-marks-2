@@ -1,6 +1,6 @@
 import { Agent, run } from "@openai/agents";
 import { json } from "@sveltejs/kit";
-import { OPENAI_API_KEY } from '$env/dynamic/private';
+// import { OPENAI_API_KEY } from '$env/dynamic/private';
 import z from 'zod'
 import type { RequestHandler } from './$types';
 

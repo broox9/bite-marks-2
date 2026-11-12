@@ -1,5 +1,5 @@
 import { convexTest } from "convex-test";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it } from "vite-plus/test";
 import { api } from "./_generated/api";
 import schema from "./schema";
 import { MAX_SAVED_LOCATIONS } from "../lib/core/domain/Location/limits";
@@ -17,11 +17,7 @@ function setup() {
   };
 }
 
-async function createFor(
-  user: ReturnType<typeof setup>["userA"],
-  name: string,
-  userId = "user-a"
-) {
+async function createFor(user: ReturnType<typeof setup>["userA"], name: string, userId = "user-a") {
   const result = await user.mutation(api.savedLocations.create, { userId, ...location, name });
   if (!result.success) throw new Error(result.error);
   return result.location;
@@ -31,11 +27,11 @@ describe("savedLocations authorization", () => {
   it("rejects anonymous reads and writes", async () => {
     const { t } = setup();
 
+    await expect(t.query(api.savedLocations.listForUser, { userId: "user-a" })).rejects.toThrow(
+      "Unauthorized",
+    );
     await expect(
-      t.query(api.savedLocations.listForUser, { userId: "user-a" })
-    ).rejects.toThrow("Unauthorized");
-    await expect(
-      t.mutation(api.savedLocations.create, { userId: "user-a", ...location })
+      t.mutation(api.savedLocations.create, { userId: "user-a", ...location }),
     ).rejects.toThrow("Unauthorized");
   });
 
@@ -43,9 +39,9 @@ describe("savedLocations authorization", () => {
     const { userA, userB } = setup();
     const home = await createFor(userA, "Home");
 
-    await expect(
-      userB.query(api.savedLocations.listForUser, { userId: "user-a" })
-    ).rejects.toThrow("Forbidden");
+    await expect(userB.query(api.savedLocations.listForUser, { userId: "user-a" })).rejects.toThrow(
+      "Forbidden",
+    );
 
     // Passing their own userId with someone else's location id finds nothing.
     expect(
@@ -53,19 +49,19 @@ describe("savedLocations authorization", () => {
         userId: "user-b",
         locationId: home._id,
         name: "Hijacked",
-      })
+      }),
     ).toBeNull();
     expect(
       await userB.mutation(api.savedLocations.setDefault, {
         userId: "user-b",
         locationId: home._id,
-      })
+      }),
     ).toBeNull();
     expect(
       await userB.mutation(api.savedLocations.remove, {
         userId: "user-b",
         locationId: home._id,
-      })
+      }),
     ).toMatchObject({ success: false });
 
     const [unchanged] = await userA.query(api.savedLocations.listForUser, { userId: "user-a" });
@@ -148,10 +144,10 @@ describe("savedLocations rules", () => {
     const { userA } = setup();
 
     await expect(
-      userA.mutation(api.savedLocations.create, { userId: "user-a", ...location, name: "  " })
+      userA.mutation(api.savedLocations.create, { userId: "user-a", ...location, name: "  " }),
     ).rejects.toThrow("Location name is required");
     await expect(
-      userA.mutation(api.savedLocations.create, { userId: "user-a", ...location, radiusMiles: 50 })
+      userA.mutation(api.savedLocations.create, { userId: "user-a", ...location, radiusMiles: 50 }),
     ).rejects.toThrow("Radius must be between");
   });
 });

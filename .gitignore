@@ -8,8 +8,10 @@ node_modules
 .svelte-kit/
 /build
 /dist
-.impeccable
+
+# IDEs
 .vscode
+.zed
 
 # OS
 .DS_Store
@@ -44,3 +46,4 @@ client_secret_*.json
 
 .cursor
 scripts/*
+.vitest/

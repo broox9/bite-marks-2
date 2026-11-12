@@ -1,24 +1,24 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { PlaceAndSpotUseCase } from './placeAndSpot';
-import type { PersistenceRepository } from '$lib/ports/persistence.repository';
+import { describe, it, expect, vi, beforeEach } from "vite-plus/test";
+import { PlaceAndSpotUseCase } from "./placeAndSpot";
+import type { PersistenceRepository } from "$lib/ports/persistence.repository";
 
 const mockRow = {
-  $id: 'spot-1',
-  id: 'spot-1',
-  rowId: 'spot-1',
+  $id: "spot-1",
+  id: "spot-1",
+  rowId: "spot-1",
   personal_rating: null,
   personal_notes: null,
   is_visited: false,
-  user_id: 'user-1',
+  user_id: "user-1",
   social_links: [],
-  place_id: 'place-1',
-  name: 'Test',
-  address: '',
-  price_level: 'free',
+  place_id: "place-1",
+  name: "Test",
+  address: "",
+  price_level: "free",
   lat: 0,
   lng: 0,
   photos: [],
-  neighborhood: '',
+  neighborhood: "",
   areas: [],
   place_types: [],
 };
@@ -40,7 +40,7 @@ function makeMockRepo(overrides: Partial<PersistenceRepository> = {}): Persisten
   };
 }
 
-describe('PlaceAndSpotUseCase', () => {
+describe("PlaceAndSpotUseCase", () => {
   let repo: PersistenceRepository;
   let useCase: PlaceAndSpotUseCase;
 
@@ -49,91 +49,108 @@ describe('PlaceAndSpotUseCase', () => {
     useCase = new PlaceAndSpotUseCase(repo);
   });
 
-  describe('getSpots', () => {
-    it('calls getUserSpots with the given userId', async () => {
-      await useCase.getSpots('user-1');
-      expect(repo.getUserSpots).toHaveBeenCalledWith('user-1');
+  describe("getSpots", () => {
+    it("calls getUserSpots with the given userId", async () => {
+      await useCase.getSpots("user-1");
+      expect(repo.getUserSpots).toHaveBeenCalledWith("user-1");
     });
 
-    it('returns total and a mapped rows array', async () => {
-      const result = await useCase.getSpots('user-1');
+    it("returns total and a mapped rows array", async () => {
+      const result = await useCase.getSpots("user-1");
       expect(result.total).toBe(1);
       expect(result.rows).toHaveLength(1);
     });
   });
 
-  describe('getSpotByPlaceId', () => {
-    it('returns null when repository returns null', async () => {
+  describe("getSpotByPlaceId", () => {
+    it("returns null when repository returns null", async () => {
       repo = makeMockRepo({ getUserSpot: vi.fn().mockResolvedValue(null) });
       useCase = new PlaceAndSpotUseCase(repo);
-      const result = await useCase.getSpotByPlaceId('place-1', 'user-1');
+      const result = await useCase.getSpotByPlaceId("place-1", "user-1");
       expect(result).toBeNull();
     });
 
-    it('returns transformed spot with rowId attached', async () => {
-      const result = await useCase.getSpotByPlaceId('place-1', 'user-1');
+    it("returns transformed spot with rowId attached", async () => {
+      const result = await useCase.getSpotByPlaceId("place-1", "user-1");
       expect(result).not.toBeNull();
-      expect(result!.rowId).toBe('spot-1');
+      expect(result!.rowId).toBe("spot-1");
     });
 
-    it('calls getUserSpot with placeId and userId', async () => {
-      await useCase.getSpotByPlaceId('place-123', 'user-456');
-      expect(repo.getUserSpot).toHaveBeenCalledWith('place-123', 'user-456');
+    it("calls getUserSpot with placeId and userId", async () => {
+      await useCase.getSpotByPlaceId("place-123", "user-456");
+      expect(repo.getUserSpot).toHaveBeenCalledWith("place-123", "user-456");
     });
   });
 
-  describe('updateSpot', () => {
-    it('calls updateUserSpot with rowId, data, and userId', async () => {
-      await useCase.updateSpot('row-1', { personal_notes: 'Great!' }, 'user-1');
-      expect(repo.updateUserSpot).toHaveBeenCalledWith('row-1', { personal_notes: 'Great!' }, 'user-1');
+  describe("updateSpot", () => {
+    it("calls updateUserSpot with rowId, data, and userId", async () => {
+      await useCase.updateSpot("row-1", { personal_notes: "Great!" }, "user-1");
+      expect(repo.updateUserSpot).toHaveBeenCalledWith(
+        "row-1",
+        { personal_notes: "Great!" },
+        "user-1",
+      );
     });
 
-    it('returns null when repository returns null', async () => {
+    it("returns null when repository returns null", async () => {
       repo = makeMockRepo({ updateUserSpot: vi.fn().mockResolvedValue(null) });
       useCase = new PlaceAndSpotUseCase(repo);
-      const result = await useCase.updateSpot('row-1', {}, 'user-1');
+      const result = await useCase.updateSpot("row-1", {}, "user-1");
       expect(result).toBeNull();
     });
 
-    it('returns transformed spot with rowId', async () => {
-      const result = await useCase.updateSpot('row-1', {}, 'user-1');
-      expect(result!.rowId).toBe('spot-1');
+    it("returns transformed spot with rowId", async () => {
+      const result = await useCase.updateSpot("row-1", {}, "user-1");
+      expect(result!.rowId).toBe("spot-1");
     });
   });
 
-  describe('getAllMasterPlaces', () => {
-    it('delegates to repository getMasterPlaces', async () => {
+  describe("getAllMasterPlaces", () => {
+    it("delegates to repository getMasterPlaces", async () => {
       await useCase.getAllMasterPlaces();
       expect(repo.getMasterPlaces).toHaveBeenCalled();
     });
   });
 
-  describe('getMasterPlace', () => {
-    it('delegates to repository getMasterPlace with the Google place id', async () => {
-      await useCase.getMasterPlace('ChIJ123');
-      expect(repo.getMasterPlace).toHaveBeenCalledWith('ChIJ123');
+  describe("getMasterPlace", () => {
+    it("delegates to repository getMasterPlace with the Google place id", async () => {
+      await useCase.getMasterPlace("ChIJ123");
+      expect(repo.getMasterPlace).toHaveBeenCalledWith("ChIJ123");
     });
   });
 
-  describe('hasUserSpot', () => {
-    it('checks the place id for the current user', async () => {
-      await useCase.hasUserSpot('ChIJ123', 'user-1');
-      expect(repo.hasUserSpot).toHaveBeenCalledWith('ChIJ123', 'user-1');
+  describe("hasUserSpot", () => {
+    it("checks the place id for the current user", async () => {
+      await useCase.hasUserSpot("ChIJ123", "user-1");
+      expect(repo.hasUserSpot).toHaveBeenCalledWith("ChIJ123", "user-1");
     });
   });
 
-  describe('upsert', () => {
-    it('calls savePlaceAndSpot with place and userId', async () => {
-      const place = { id: 'p1', place_id: 'ChIJ', name: 'Place', address: '', websiteURI: '', price_level: 'free', lat: 0, lng: 0, photos: [], neighborhood: '', areas: [], place_types: [] } as any;
-      await useCase.upsert(place, 'user-1');
-      expect(repo.savePlaceAndSpot).toHaveBeenCalledWith(place, 'user-1');
+  describe("upsert", () => {
+    it("calls savePlaceAndSpot with place and userId", async () => {
+      const place = {
+        id: "p1",
+        place_id: "ChIJ",
+        name: "Place",
+        address: "",
+        websiteURI: "",
+        price_level: "free",
+        lat: 0,
+        lng: 0,
+        photos: [],
+        neighborhood: "",
+        areas: [],
+        place_types: [],
+      } as any;
+      await useCase.upsert(place, "user-1");
+      expect(repo.savePlaceAndSpot).toHaveBeenCalledWith(place, "user-1");
     });
   });
 
-  describe('deleteSpot', () => {
-    it('calls deleteUserSpot with the rowId and userId', async () => {
-      await useCase.deleteSpot('row-99', 'user-1');
-      expect(repo.deleteUserSpot).toHaveBeenCalledWith('row-99', 'user-1');
+  describe("deleteSpot", () => {
+    it("calls deleteUserSpot with the rowId and userId", async () => {
+      await useCase.deleteSpot("row-99", "user-1");
+      expect(repo.deleteUserSpot).toHaveBeenCalledWith("row-99", "user-1");
     });
   });
 });

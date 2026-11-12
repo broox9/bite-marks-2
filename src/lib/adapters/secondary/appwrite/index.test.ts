@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from "vitest";
+import { describe, expect, it, vi } from "vite-plus/test";
 
 import { AppwriteAdapter } from "./index";
 
@@ -75,7 +75,7 @@ describe("AppwriteAdapter", () => {
     expect(db.listRows).toHaveBeenCalledWith(
       expect.objectContaining({
         queries: expect.arrayContaining(['equal("user_id", "user-42")']),
-      })
+      }),
     );
   });
 
