@@ -47,8 +47,9 @@
 
   let themePreference = $state<ThemePreference>('system');
 
-  // `page.data.user` is null when a JWT cookie exists but getCurrentUser did not
-  // return a user. Reading `user.id` there throws during render.
+  // ADR-0002: `page.data.user` is null when a JWT cookie exists but
+  // `getCurrentUser` did not return a user. Guard before reading `user.id` so
+  // render never throws if a page renders without a resolved session user.
   const savedLocationsQuery = $derived(user ? listSavedLocations({ userId: user.id }) : null);
   const savedLocationsLoaded = $derived(savedLocationsQuery?.current !== undefined);
   const savedLocationsError = $derived(

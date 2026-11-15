@@ -7,20 +7,20 @@ The SvelteKit Worker only proxies `/api/auth/*` and reads the JWT cookie.
 
 - **Email/password and Google** use Better Auth client methods (`authClient.signIn.*`).
 - **SSR**: `hooks.server.ts` reads the JWT with `getToken(event.cookies)` and wraps the request in `withServerConvexToken`.
-- **Route guard**: `+layout.server.ts` uses `getAuthState()` (allowlist: `/login`, `/all-spots`, `/api/auth/*`).
+- **Route guard**: `+layout.server.ts` gates protected routes on `locals.user != null` via `decideSessionRedirect` (allowlist: `/login`, `/all-spots`, `/p/*`, `/api/auth/*`; see `ADR-0002`).
 - **Data identity**: Convex functions take `ctx.auth.getUserIdentity().subject` as the user id.
 
 ## Source of truth
 
-| Role | Path |
-|------|------|
-| Login UI | `src/routes/login/+page.svelte` |
-| Auth client | `src/lib/auth-client.ts` |
-| Auth proxy | `src/routes/api/auth/[...all]/+server.ts` |
-| Hooks | `src/hooks.server.ts` |
-| Layout guard | `src/routes/+layout.server.ts` |
-| Better Auth on Convex | `src/convex/auth.ts`, `src/convex/http.ts`, `src/convex/auth.config.ts` |
-| Convex component registration | `src/convex/convex.config.ts` |
+| Role                          | Path                                                                    |
+| ----------------------------- | ----------------------------------------------------------------------- |
+| Login UI                      | `src/routes/login/+page.svelte`                                         |
+| Auth client                   | `src/lib/auth-client.ts`                                                |
+| Auth proxy                    | `src/routes/api/auth/[...all]/+server.ts`                               |
+| Hooks                         | `src/hooks.server.ts`                                                   |
+| Layout guard                  | `src/routes/+layout.server.ts`                                          |
+| Better Auth on Convex         | `src/convex/auth.ts`, `src/convex/http.ts`, `src/convex/auth.config.ts` |
+| Convex component registration | `src/convex/convex.config.ts`                                           |
 
 ## Local setup
 

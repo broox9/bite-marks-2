@@ -3,9 +3,12 @@ import { safeRedirectTo } from "./redirect";
 /**
  * Where to send this request, or null to render the page.
  *
- * A Convex JWT cookie makes `getAuthState().isAuthenticated` true even when
- * `getCurrentUser` returns null. Protected pages must follow the loaded user,
- * not the cookie, or they render with `user === null`.
+ * Per ADR-0002 (`docs/decisions/adr/0002-gate-sessions-on-resolved-user.md`),
+ * a Convex JWT cookie makes `getAuthState().isAuthenticated` true even when
+ * `getCurrentUser` returns null or throws. Protected pages and `/login` must
+ * follow the resolved user (`locals.user != null`), not the cookie flag, so
+ * protected routes never render with `user === null` and `/login` does not
+ * bounce a stale cookie back into the app.
  */
 export function decideSessionRedirect(input: {
   pathname: string;
