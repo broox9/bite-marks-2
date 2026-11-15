@@ -1,6 +1,6 @@
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { resolve } from "node:path";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it } from "vite-plus/test";
 import { betterAuth } from "better-auth/minimal";
 import { memoryAdapter } from "better-auth/adapters/memory";
 import {
@@ -83,23 +83,13 @@ describe("Convex auth trustedOrigins (dev vs prod isolation)", () => {
     const devCtx = await devAuth.$context;
 
     expect(
-      devCtx.isTrustedOrigin(
-        "https://chore-update-toolchain-bite-marks-2.broox9.workers.dev",
-      ),
+      devCtx.isTrustedOrigin("https://chore-update-toolchain-bite-marks-2.broox9.workers.dev"),
     ).toBe(true);
-    expect(
-      devCtx.isTrustedOrigin(
-        "https://a1b2c3d4-bite-marks-2.broox9.workers.dev",
-      ),
-    ).toBe(true);
+    expect(devCtx.isTrustedOrigin("https://a1b2c3d4-bite-marks-2.broox9.workers.dev")).toBe(true);
     expect(devCtx.isTrustedOrigin("http://localhost:5173")).toBe(true);
+    expect(devCtx.isTrustedOrigin("https://other-worker.broox9.workers.dev")).toBe(false);
     expect(
-      devCtx.isTrustedOrigin("https://other-worker.broox9.workers.dev"),
-    ).toBe(false);
-    expect(
-      devCtx.isTrustedOrigin(
-        "http://chore-update-toolchain-bite-marks-2.broox9.workers.dev",
-      ),
+      devCtx.isTrustedOrigin("http://chore-update-toolchain-bite-marks-2.broox9.workers.dev"),
     ).toBe(false);
 
     const prodTrustedOrigins = resolveTrustedOrigins({
@@ -116,24 +106,18 @@ describe("Convex auth trustedOrigins (dev vs prod isolation)", () => {
 
     expect(prodCtx.isTrustedOrigin("https://bite.broox.us")).toBe(true);
     expect(
-      prodCtx.isTrustedOrigin(
-        "https://chore-update-toolchain-bite-marks-2.broox9.workers.dev",
-      ),
+      prodCtx.isTrustedOrigin("https://chore-update-toolchain-bite-marks-2.broox9.workers.dev"),
     ).toBe(false);
     expect(prodCtx.isTrustedOrigin("http://localhost:5173")).toBe(false);
   });
 });
 
 describe("sync-wrangler-build-env preview vs production target resolution", () => {
-  const wranglerConfig = parseJsonc(
-    readFileSync(resolve(process.cwd(), "wrangler.jsonc"), "utf8"),
-  );
+  const wranglerConfig = parseJsonc(readFileSync(resolve(process.cwd(), "wrangler.jsonc"), "utf8"));
 
   it("detects preview builds from CLI flags and CI branch variables", () => {
     expect(isPreviewBuild({ argv: [], env: {} })).toBe(false);
-    expect(
-      isPreviewBuild({ argv: [], env: { WORKERS_CI_BRANCH: "main" } }),
-    ).toBe(false);
+    expect(isPreviewBuild({ argv: [], env: { WORKERS_CI_BRANCH: "main" } })).toBe(false);
     expect(
       isPreviewBuild({
         argv: [],
@@ -158,18 +142,12 @@ describe("sync-wrangler-build-env preview vs production target resolution", () =
   it("resolves prod Convex URLs for production builds and dev Convex URLs for preview builds", () => {
     const prod = resolveBuildVars(wranglerConfig, { preview: false });
     expect(prod.missing).toEqual([]);
-    expect(prod.selected.PUBLIC_CONVEX_URL).toBe(
-      "https://agreeable-grouse-769.convex.cloud",
-    );
-    expect(prod.selected.PUBLIC_CONVEX_SITE_URL).toBe(
-      "https://agreeable-grouse-769.convex.site",
-    );
+    expect(prod.selected.PUBLIC_CONVEX_URL).toBe("https://agreeable-grouse-769.convex.cloud");
+    expect(prod.selected.PUBLIC_CONVEX_SITE_URL).toBe("https://agreeable-grouse-769.convex.site");
 
     const preview = resolveBuildVars(wranglerConfig, { preview: true });
     expect(preview.missing).toEqual([]);
-    expect(preview.selected.PUBLIC_CONVEX_URL).toBe(
-      "https://fastidious-setter-628.convex.cloud",
-    );
+    expect(preview.selected.PUBLIC_CONVEX_URL).toBe("https://fastidious-setter-628.convex.cloud");
     expect(preview.selected.PUBLIC_CONVEX_SITE_URL).toBe(
       "https://fastidious-setter-628.convex.site",
     );
@@ -178,11 +156,38 @@ describe("sync-wrangler-build-env preview vs production target resolution", () =
       preview.selected,
       "wrangler.jsonc previews.vars (preview)",
     );
-    expect(formatted).toContain(
-      "PUBLIC_CONVEX_URL=https://fastidious-setter-628.convex.cloud",
-    );
-    expect(formatted).toContain(
-      "PUBLIC_CONVEX_SITE_URL=https://fastidious-setter-628.convex.site",
-    );
+    expect(formatted).toContain("PUBLIC_CONVEX_URL=https://fastidious-setter-628.convex.cloud");
+    expect(formatted).toContain("PUBLIC_CONVEX_SITE_URL=https://fastidious-setter-628.convex.site");
+  });
+
+  it("keeps package.json scripts and migration scripts reproducible on a clean checkout", () => {
+    const pkg = JSON.parse(readFileSync(resolve(process.cwd(), "package.json"), "utf8")) as {
+      scripts?: Record<string, string>;
+    };
+    const scripts = pkg.scripts ?? {};
+
+    expect(scripts["secrets:convex"]).toBeUndefined();
+    expect(scripts["build"]).toContain("scripts/sync-wrangler-build-env.mjs");
+    expect(scripts["build:preview"]).toContain("scripts/sync-wrangler-build-env.mjs --preview");
+
+    for (const [name, cmd] of Object.entries(scripts)) {
+      for (const match of cmd.matchAll(/(?:node|tsx|vpx)\s+(scripts\/[^\s&|;]+)/g)) {
+        const scriptPath = resolve(process.cwd(), match[1]);
+        expect(
+          existsSync(scriptPath),
+          `package.json script "${name}" references missing file ${match[1]}`,
+        ).toBe(true);
+      }
+      for (const match of cmd.matchAll(/npm run ([a-zA-Z0-9:_-]+)/g)) {
+        const referencedScript = match[1];
+        expect(
+          scripts[referencedScript],
+          `package.json script "${name}" references missing npm script "${referencedScript}"`,
+        ).toBeDefined();
+      }
+    }
+
+    expect(existsSync(resolve(process.cwd(), "scripts/export-appwrite.ts"))).toBe(true);
+    expect(existsSync(resolve(process.cwd(), "src/scripts/export-appwrite.ts"))).toBe(false);
   });
 });

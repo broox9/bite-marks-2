@@ -47,6 +47,8 @@ Cloudflare Workers preview builds (`https://<branch-slug>-bite-marks-2.broox9.wo
 - `scripts/sync-wrangler-build-env.mjs` generates `.env.production` before `vite build`:
   - Uses `previews.vars` automatically when Cloudflare Workers Builds (`WORKERS_CI_BRANCH`) or Cloudflare Pages (`CF_PAGES_BRANCH`) builds a branch other than `main` (or `PRODUCTION_BRANCH`), or when `--preview` / `BUILD_TARGET=preview` / `CONVEX_PREVIEW=1` is passed (`npm run build:preview`, `npm run deploy:preview`).
   - Uses top-level `vars` for production builds (`main` or default local `npm run build`).
+  - Use gitignored `.env.production.local` only for local build-time overrides.
+- Private Worker runtime secrets (such as `APPWRITE_API_KEY` during the rollback window or `SENTRY_DSN`) are set via `npx wrangler secret put <NAME>` (and gitignored `.dev.vars` for local `wrangler dev`). Convex auth secrets (`BETTER_AUTH_SECRET`, `SITE_URL`, `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, and dev-only `BETTER_AUTH_TRUSTED_ORIGINS`) live on the Convex deployment via `npx convex env set <NAME> <VALUE> [--prod]`.
 
 ### Trusted origins on dev Convex
 
