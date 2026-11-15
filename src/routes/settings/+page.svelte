@@ -65,16 +65,21 @@
     return null;
   }
 
-  // Settings is behind auth (see +layout.server.ts), so a user is always present here.
-  const savedLocationsQuery = $derived(listSavedLocations({ userId: user!.id }));
-  const savedLocationsLoaded = $derived(savedLocationsQuery.current !== undefined);
+  // ADR-0002: `page.data.user` is null when a JWT cookie exists but
+  // `getCurrentUser` did not return a user. Guard before reading `user.id` so
+  // render never throws if a page renders without a resolved session user.
+  const savedLocationsQuery = $derived(user ? listSavedLocations({ userId: user.id }) : null);
+  const savedLocationsLoaded = $derived(savedLocationsQuery?.current !== undefined);
   const savedLocationsError = $derived(
-    savedLocationsQuery.error !== undefined && savedLocationsQuery.current === undefined,
+    savedLocationsQuery != null &&
+      savedLocationsQuery.error !== undefined &&
+      savedLocationsQuery.current === undefined,
   );
-  const savedLocationsErrorDetails = $derived(extractErrorDetails(savedLocationsQuery.error));
+  const savedLocationsErrorDetails = $derived(extractErrorDetails(savedLocationsQuery?.error));
   let isRetryingSavedLocations = $state(false);
 
   async function retrySavedLocations() {
+    if (!savedLocationsQuery) return;
     isRetryingSavedLocations = true;
     try {
       await savedLocationsQuery.refresh();
@@ -84,7 +89,7 @@
       isRetryingSavedLocations = false;
     }
   }
-  const savedLocations = $derived<SavedLocation[]>(savedLocationsQuery.current ?? []);
+  const savedLocations = $derived<SavedLocation[]>(savedLocationsQuery?.current ?? []);
   const defaultLocation = $derived(findDefaultLocation(savedLocations));
   const activeSavedLocation = $derived(
     savedLocations.find((location) => location.id === locationStore.savedLocationId) ?? null,
@@ -123,7 +128,7 @@
     try {
       const message = await perform();
       if (message) actionError = { section, message };
-      await savedLocationsQuery.refresh();
+      await savedLocationsQuery?.refresh();
     } catch (error) {
       console.error('[bs] SETTINGS::location action', action, error);
       const details = extractErrorDetails(error);
@@ -363,7 +368,9 @@
       {/if}
     </div>
 
-    {#if savedLocationsError}
+    {#if !user}
+      <p class="muted-note">Sign in to manage saved locations.</p>
+    {:else if savedLocationsError}
       <div class="load-error" role="alert">
         <div class="load-error-text">
           <p class="field-error">Couldn't load your saved locations.</p>
