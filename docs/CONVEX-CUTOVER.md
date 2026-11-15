@@ -38,15 +38,15 @@ The previous rehearsal reported 98 places and 94 spots. Treat those numbers as h
 
 ## Work sequence and ownership
 
-| Gate | Linear issue | Required before |
-| --- | --- | --- |
-| Convex access control, validators, tests, and typecheck | [BRO-35](https://linear.app/brookes-personal/issue/BRO-35/harden-convex-functions-and-restore-a-green-validation-gate) | Merge |
-| Migrated-user login, recovery, and disabled-account handling | [BRO-36](https://linear.app/brookes-personal/issue/BRO-36/complete-migrated-user-sign-in-and-account-state-handling) | Merge |
-| Idempotent import and complete verification | [BRO-37](https://linear.app/brookes-personal/issue/BRO-37/make-the-appwrite-to-convex-import-repeatable-and-verifiable) | Production import |
-| Rollback contract chosen and tested | [BRO-38](https://linear.app/brookes-personal/issue/BRO-38/choose-and-test-the-convex-cutover-rollback-contract) | Merge |
-| PR rebased/reduced and deployment reproducible | [BRO-39](https://linear.app/brookes-personal/issue/BRO-39/rebase-and-reduce-pr-38-make-deployment-reproducible) | Merge |
-| Production import and application cutover | [BRO-40](https://linear.app/brookes-personal/issue/BRO-40/execute-production-convex-import-and-application-cutover) | Go-live |
-| Appwrite retirement | [BRO-41](https://linear.app/brookes-personal/issue/BRO-41/retire-appwrite-after-the-rollback-window) | Final cleanup |
+| Gate                                                         | Linear issue                                                                                                            | Required before   |
+| ------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------- | ----------------- |
+| Convex access control, validators, tests, and typecheck      | [BRO-35](https://linear.app/brookes-personal/issue/BRO-35/harden-convex-functions-and-restore-a-green-validation-gate)  | Merge             |
+| Migrated-user login, recovery, and disabled-account handling | [BRO-36](https://linear.app/brookes-personal/issue/BRO-36/complete-migrated-user-sign-in-and-account-state-handling)    | Merge             |
+| Idempotent import and complete verification                  | [BRO-37](https://linear.app/brookes-personal/issue/BRO-37/make-the-appwrite-to-convex-import-repeatable-and-verifiable) | Production import |
+| Rollback contract chosen and tested                          | [BRO-38](https://linear.app/brookes-personal/issue/BRO-38/choose-and-test-the-convex-cutover-rollback-contract)         | Merge             |
+| PR rebased/reduced and deployment reproducible               | [BRO-39](https://linear.app/brookes-personal/issue/BRO-39/rebase-and-reduce-pr-38-make-deployment-reproducible)         | Merge             |
+| Production import and application cutover                    | [BRO-40](https://linear.app/brookes-personal/issue/BRO-40/execute-production-convex-import-and-application-cutover)     | Go-live           |
+| Appwrite retirement                                          | [BRO-41](https://linear.app/brookes-personal/issue/BRO-41/retire-appwrite-after-the-rollback-window)                    | Final cleanup     |
 
 ## Phase 0 — Make the change safe to merge
 
@@ -109,14 +109,14 @@ Record here before merge:
 
 ### 0.5 Reduce and reproduce the PR — BRO-39
 
-- [ ] Rebase PR #38 onto current `main`.
-- [ ] Remove patch-equivalent already-merged price work.
-- [ ] Move unrelated UI redesign and broad dependency upgrades to separate PRs where practical.
-- [ ] Keep one authoritative Appwrite export script under `scripts/`.
-- [ ] Track `scripts/put-convex-worker-secrets.mjs` or remove the package command and document its replacement.
-- [ ] Reconcile conflicting documentation about Wrangler variables and build-time public Convex URLs.
-- [ ] Verify a clean checkout can run check, test, build, and Worker preview.
-- [ ] Confirm no credentials, OAuth tokens, migration exports, or user emails are tracked by Git.
+- [x] Rebase PR #38 onto current `main`. (Superseded when PR #38 merged on 2026-08-10; remaining items completed as post-merge cleanup on `main`.)
+- [x] Remove patch-equivalent already-merged price work. (Superseded by PR #38 merge.)
+- [x] Move unrelated UI redesign and broad dependency upgrades to separate PRs where practical. (Superseded by PR #38 merge.)
+- [x] Keep one authoritative Appwrite export script under `scripts/` (`scripts/export-appwrite.ts`; removed duplicate `src/scripts/export-appwrite.ts`).
+- [x] Track `scripts/put-convex-worker-secrets.mjs` or remove the package command and document its replacement. (Removed `secrets:convex`; non-secret Convex URLs and `USE_CONVEX` live in `wrangler.jsonc`, private Worker secrets use `npx wrangler secret put <NAME>`, and Convex auth secrets use `npx convex env set`.)
+- [x] Reconcile conflicting documentation about Wrangler variables and build-time public Convex URLs.
+- [ ] Verify a clean checkout can run check, test, build, and Worker preview. (`npm test`, `npm run build`, `npm run build:preview`, and `npm run preview:worker` pass; `npm run check` remains tracked under BRO-35 / TypeScript 7 `svelte-check` compatibility.)
+- [x] Confirm no credentials, OAuth tokens, migration exports, or user emails are tracked by Git.
 
 ## Phase 1 — Development rehearsal
 
@@ -195,9 +195,9 @@ npx convex env set --prod GOOGLE_CLIENT_SECRET '<production client secret>'
 
 - [ ] Create a production Google OAuth client with redirect URI `https://bite.broox.us/api/auth/callback/google`.
 - [ ] Do not rotate or disable the Appwrite OAuth client yet.
-- [ ] Put build-time public Convex URLs in gitignored `.env.production.local`.
-- [ ] Put runtime secrets/variables in the approved Worker configuration path from BRO-39.
-- [ ] Confirm a clean production build contains the intended production Convex URL.
+- [ ] Verify `wrangler.jsonc` `vars` has the production Convex URLs (`https://agreeable-grouse-769.convex.cloud` and `https://agreeable-grouse-769.convex.site`), `PUBLIC_SITE_URL`, `PUBLIC_APP_URL`, and `USE_CONVEX="1"`, and `previews.vars` has the dev Convex URLs (`https://fastidious-setter-628.convex.cloud` and `https://fastidious-setter-628.convex.site`). `scripts/sync-wrangler-build-env.mjs` writes `.env.production` from `wrangler.jsonc` before `vp build` (use gitignored `.env.production.local` only for local build-time overrides).
+- [ ] Set private Worker runtime secrets via `npx wrangler secret put <NAME>` (for example `APPWRITE_API_KEY` during the rollback window, or in gitignored `.dev.vars` for local `wrangler dev`) and Convex auth secrets on the Convex deployment via `npx convex env set --prod <NAME> <VALUE>`.
+- [ ] Confirm a clean production build (`npm run build`) contains the intended production Convex URL (`https://agreeable-grouse-769.convex.cloud`).
 - [ ] Confirm production Convex starts empty or contains only explicitly approved data.
 
 ### 2.2 Prepare the maintenance window
