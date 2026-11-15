@@ -12,6 +12,7 @@ export default defineConfig({
       $lib: path.resolve("./src/lib"),
       $convex: path.resolve("./src/convex"),
       $components: path.resolve("./src/components"),
+      $app: path.resolve("./node_modules/@sveltejs/kit/src/runtime/app"),
     },
   },
   test: {
